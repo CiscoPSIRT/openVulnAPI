@@ -3,4 +3,4 @@ The Cisco Product Security Incident Response Team (PSIRT) openVuln API is a REST
 
 Security automation is a hot topic these days. Most organizations have many systems to patch and configure securely, with numerous versions of software and features enabled. Many security administrators are seeking ways to leverage standards and available tools to reduce the complexity and time necessary to respond to security advisories, assess their devices, and ensure compliance so they can allocate resources to focus on other areas of their network and security infrastructure.
 
-For more information about the Cisco PSIRT openVuln API visit: https://developer.cisco.com/site/PSIRT/
+API COMING SOON!
