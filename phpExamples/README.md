@@ -10,6 +10,7 @@ For composer installation instructions please see:
 
 and for operation:
 * [Basic usage](https://getcomposer.org/doc/01-basic-usage.md)
+
 in practice once you donwload this folder, thanks to the composer.json file, you will be able to invoke:
 ```
 php composer.phar install
