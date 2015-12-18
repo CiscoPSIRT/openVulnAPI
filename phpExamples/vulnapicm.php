@@ -30,8 +30,8 @@
     'clientId'                => '<put here your client id>',    // The client ID assigned to you by the provider
     'clientSecret'            => '<put here your secret>',   // The client password assigned to you by the provider
     'redirectUri'             => 'http://myserver.example.com.com/vulnapi/vulnapicm.php',
-    'urlAuthorize'            => 'https://cloudsso-test.cisco.com/as/authorization.oauth2',
-    'urlAccessToken'          => 'https://cloudsso-test.cisco.com/as/token.oauth2',
+    'urlAuthorize'            => 'https://cloudsso.cisco.com/as/authorization.oauth2',
+    'urlAccessToken'          => 'https://cloudsso.cisco.com/as/token.oauth2',
     'urlResourceOwnerDetails' => ''
   ]);
 
