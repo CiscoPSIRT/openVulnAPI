@@ -1,0 +1,280 @@
+swagger: '2.0'
+info:
+  version: 0.0.3
+  title: 'Cisco PSIRT openVuln API'
+  description: |
+    The Cisco Product Security Incident Response Team (PSIRT) openVuln API is a RESTful API that allows customers to obtain Cisco Security Vulnerability information in different machine-consumable formats. APIs are important for customers because they allow their technical staff and programmers to build tools that help them do their job more effectively (in this case, to keep up with security vulnerability information).
+    For more information about the Cisco PSIRT openVuln API visit https://developer.cisco.com/site/PSIRT
+    
+    This is a beta release of a swagger YAML for the Cisco PSIRT openVuln API 
+    
+    To access the API sign in with your Cisco CCO account at http://apiconsole.cisco.com and register an application 
+    to recieve a client_id and a client_secret
+    
+    You can then get your token using curl or any other method you prefer.
+    
+    'curl -s -k -H "Content-Type: application/x-www-form-urlencoded" -X POST -d "client_id=<your_client_id>" -d "client_secret=<your_client_secret>" -d "grant_type=client_credentials" https://cloudsso.cisco.com/as/token.oauth2'
+    
+    You will receive an access token as demonstrated in the following example:
+     '{"access_token":"I7omWtBDAieSiUX3shOxNJfuy4J6","token_type":"Bearer","expires_in":3599}'
+    
+    In Swagger, click on Change Authentication
+    
+    enter the text "Bearer I7omWtBDAieSiUX3shOxNJfuy4J6" (which is the token you received)
+    
+    then click on "Try this operation"
+   
+    
+  contact: 
+    name: Omar Santos
+    email: os@cisco.com
+schemes:
+ - https
+host: api.cisco.com
+
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+  
+produces:
+  - application/json
+
+paths:
+ 
+
+  /security/advisories/cvrf/cve/CVE-2012-2486:
+    get:
+      description: |
+        Used to obtain an advisory in CVRF format for a given Common Vulnerability Enumerator (CVE). The `cve_id` format is CVE-YYYY-NNNN. For more information about CVE visit http://cve.mitre.org/
+        
+      security:
+       - Bearer: []
+      responses:
+        '200':
+          description: Successful response
+          
+  /security/advisories/cvrf/all:
+    get:
+      description: >
+        Used to obtain all advisories in Common Vulnerability Reporting Format
+        (CVRF). For more information about CVRF go to
+        https://communities.cisco.com/docs/DOC-63156 . By default the output is
+        in JSON. To obtain the output in XML use the .xml extension. For example,
+        /advisories/cvrf/all.xml
+      security:
+       - Bearer: []
+      responses:
+        '200':
+          description: Successful response
+
+
+  /advisories/cvrf/cve/:
+    get:
+      description: >
+        Used to obtain an advisory in CVRF format for a given Common
+        Vulnerability Enumerator (CVE). The `cve_id` format is CVE-YYYY-NNNN. For
+        more information about CVE visit http://cve.mitre.org/
+      parameters:
+        - name: cve_id
+          in: query
+          description: 'CVE Identifier (i.e., CVE-YYYY-NNNN)'
+          required: true
+          type: string
+          format: CVE-YYYY-NNNN
+      security:
+       - Bearer: []
+      responses:
+        '200':
+          description: Successful response
+          
+  /security/advisories/cvrf/advisory/:
+    get:
+      description: >
+        Used to obtain an advisory in CVRF format for a given advisory ID
+        `advisory_id` (i.e., cisco-sa-20150819-pcp)
+      parameters:
+        - name: advisory_id
+          in: query
+          description: advisory ID
+          required: true
+          type: string
+          format: cisco-sa-XXX
+      security:
+       - Bearer: []
+      responses:
+        '200':
+          description: Successful response
+          
+  /security/advisories/cvrf/severity/:
+    get:
+      description: >
+        Used to obtain all security advisories for a given security impact rating
+        (critical, high, medium, or low) in CVRF format.
+      parameters:
+        - name: critical
+          in: query
+          description: Used to obtain all advisories that have a security impact rating of critical
+          required: true
+          type: string
+          format: critical
+        - name: high
+          in: query
+          description: Used to obtain all advisories that have a security impact rating of high
+          required: true
+          type: string
+          format: high
+        - name: medium
+          in: query
+          description: Used to obtain all advisories that have a security impact rating of medium.
+          required: true
+          type: string
+          format: medium
+        - name: low
+          in: query
+          description: Used to obtain all advisories that have a security impact rating of low.
+          required: true
+          type: string
+          format: low
+      security:
+       - Bearer: []
+      responses:
+        '200':
+          description: Successful response
+          
+  /security/advisories/cvrf/year/:
+    get:
+      description: >
+        Used to obtain all security advisories that have were orginally published
+        in a specific year `YYYY`.
+      parameters:
+        - name: 
+          in: query
+          description: The four digit year.
+          required: true
+          type: string
+          format: YYYY
+      security:
+       - Bearer: []
+      responses:
+        '200':
+          description: Successful response
+  /security/advisories/cvrf/latest/:
+    get:
+      description: >
+        Used to obtain all the latest security advisories in CVRF format given an
+        absolute number. For instance, the latest 10 or latest 5.
+      parameters:
+        - name: number
+          in: query
+          description: An absolute number to obtain the latest security advisories.
+          required: true
+          type: integer
+          format: number
+      security:
+       - Bearer: []
+      responses:
+        '200':
+          description: Successful response
+          
+  /security/advisories/oval/all:
+    get:
+      description: >
+        Used to obtain all Open Vulnerability and Assessment Language (OVAL)
+        definitions available for Cisco security vulnerabilities. For more
+        information about OVAL go to https://communities.cisco.com/docs/DOC-63158
+        . By default the output is in JSON. To obtain the output in XML use the
+        .xml extension. For example, /advisories/oval/all.xml
+      responses:
+        '200':
+          description: Successful response
+  /security/advisories/oval/cve/:
+    get:
+      description: >
+        Used to obtain OVAL definitions for a given CVE Identifier. The `cve_id`
+        format is CVE-YYYY-NNNN.
+      parameters:
+        - name: cve_id
+          in: query
+          description: 'CVE Identifier (i.e., CVE-YYYY-NNNN)'
+          required: true
+          type: string
+          format: CVE-YYYY-NNNN
+      security:
+       - Bearer: []
+      responses:
+        '200':
+          description: Successful response
+          
+  /security/advisories/oval/advisory/:
+    get:
+      description: >
+        Used to obtain OVAL definitions for a given advisory ID `advisory_id`
+        (i.e., cisco-sa-20150819-pcp)
+      parameters:
+        - name: advisory_id
+          in: query
+          description: advisory ID
+          required: true
+          type: string
+          format: cisco-sa-XXX
+      security:
+       - Bearer: []
+      responses:
+        '200':
+          description: Successful response
+          
+  /security/advisories/oval/severity/:
+    get:
+      description: >
+        Used to obtain all OVAL definitions for a given security impact rating
+        (critical, high, medium, or low).
+      parameters:
+        - name: critical
+          in: query
+          description: Used to obtain all OVAL definitions for advisories that have a security impact rating of critical
+          required: true
+          type: string
+          format: critical
+        - name: high
+          in: query
+          description: Used to obtain all OVAL definitions for advisories that have a security impact rating of high
+          required: true
+          type: string
+          format: high
+        - name: medium
+          in: query
+          description: Used to obtain all OVAL definitions for advisories that have a security impact rating of medium.
+          required: true
+          type: string
+          format: medium
+        - name: low
+          in: query
+          description: Used to obtain all OVAL definitions for advisories that have a security impact rating of low.
+          required: true
+          type: string
+          format: low
+      security:
+       - Bearer: []
+      responses:
+        '200':
+          description: Successful response
+          
+  /security/advisories/oval/latest/:
+    get:
+      description: >
+        Used to obtain all the latest OVAL definitions given an absolute number.
+        For instance, the latest 10 or latest 5.
+      parameters:
+        - name: number
+          in: query
+          description: The latest OVAL definitions (absolute number).
+          required: true
+          type: integer
+          format: number
+      security:
+       - Bearer: []
+      responses:
+        '200':
+          description: Successful response
