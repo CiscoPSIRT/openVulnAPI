@@ -2,7 +2,11 @@
 
 # Example python code to access the openVuln API
 # Based on contributions from Ryan Ruckley
- 
+# Requirements:
+#  - Python version 3
+#  - oauth2 - sudo pip3 install oauth2
+#  - oauth2 - sudo pip3 install request
+
 import oauth2 as oauth
 import json
 import urllib.request
