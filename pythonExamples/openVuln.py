@@ -1,6 +1,7 @@
 #!/usr/local/bin/python3
 
 # Example python code to access the openVuln API
+# Based on contributions from Ryan Ruckley
  
 import oauth2 as oauth
 import json
