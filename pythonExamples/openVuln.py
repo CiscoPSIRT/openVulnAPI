@@ -5,7 +5,7 @@
 # Requirements:
 #  - Python version 3
 #  - oauth2 - sudo pip3 install oauth2
-#  - oauth2 - sudo pip3 install request
+#  - request - sudo pip3 install request
 
 import oauth2 as oauth
 import json
