@@ -1,8 +1,9 @@
+#!/usr/local/bin/python3
 # Description: Script to pull data from Cisco PSIRT openVuln API
 # 
 #
 # Author: Derek Santos derekhalo@gmail.com
-# Version: 0.1.20160420
+# Version: 0.1.20160422
 #
 # Requirements:
 #  - Python version 3
@@ -71,7 +72,37 @@ elif sys.argv[1] == "-oval":
 
 
 elif sys.argv[1] == "--help" or sys.argv[1] == "--h" or sys.argv[1] == "-h" or sys.argv[1] == "-help":
-    print("THIS IS HELP")
+    print("Usage: openVuln.py  \
+               -cvrf -all :  Used to obtain all advisories in CVRF format\
+\
+-cvrf -cve <cve-id> : Used to obtain an advisory in CVRF format for a given CVE (cve-id = CVE-YYYY-NNNN)\
+\
+-cvrf -advisory <advisory-id> : Used to obtain an advisory in CVRF format for a given advisory ID (i.e., cisco-sa-20150819-pcp)\
+\
+-cvrf -severity critical : Used to obtain all advisories that have a security impact rating of critical in CVRF format\
+\
+-cvrf -severity high : Used to obtain all advisories that have a security impact rating of high in CVRF format\
+\
+-cvrf -severity medium : Used to obtain all advisories that have a security impact rating of medium in CVRF format\
+\
+-cvrf -severity low : Used to obtain all advisories that have a security impact rating of low in CVRF format\
+\
+-cvrf/ -year <YYYY> : Used to obtain an advisory in CVRF format for a given year (first published) YYYY = year for digits (i.e., 2015)\
+\
+-cvrf latest <number> : Used to obtain all the latest advisories given an absolute number. <number> = the number of advisories (i.e., latest 10, latest 5, etc.)\
+\
+\
+-oval -all : Used to obtain all available OVAL definitions\
+\
+-oval -cve <cve-id> :Used to obtain the OVAL definition for a given CVE (CVE = CVE-YYYY-NNNN)\
+\
+-oval -advisory <advisory-id> : Used to obtain an OVAL definition for a given advisory ID (i.e., cisco-sa-20150819-pcp)\
+\
+-oval -severity critical :Used to obtain all advisories that have a security impact rating of critical in CVRF format\
+\
+-oval -severity high: Used to obtain all advisories that have a security impact rating of high in CVRF format\
+\
+-oval -latest <number> :Used to obtain all the latest OVAL definitions given an absolute number.")
 
 
 
