@@ -15,9 +15,9 @@ import json, urllib.request, sys
  
 print('Connecting to Cisco...')
  
-consumer = oauth.Consumer(key="a9cbj36qsf4v7txnv9ymaqn6",secret="taTsuwtsrAxtkDU6WkyCNYyQ")
+consumer = oauth.Consumer(key="<id>",secret="<secret>")
  
-request_token_url = "https://cloudsso.cisco.com/as/token.oauth2?grant_type=client_credentials&client_id=a9cbj36qsf4v7txnv9ymaqn6&client_secret=taTsuwtsrAxtkDU6WkyCNYyQ"
+request_token_url = "https://cloudsso.cisco.com/as/token.oauth2?grant_type=client_credentials&client_id=<your id>&client_secret=<your secret>"
  
 client = oauth.Client(consumer)
  
