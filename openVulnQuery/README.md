@@ -29,11 +29,11 @@ Obtain client ID and Secret:
   - OAuth2 Token automatically generated on each call to the API.
 
 ####Run OpenVulnQuery in the Terminal
-- If installed with pip run the program by typing 
+- If installed with pip run the program by typing
 ```
   >>OpenVulnQuery --Advisory Type --API Filters --Parsing Fields --Output Format -Count
 ```
-- Or cd into the directory with the main.py file and run using 
+- Or cd into the directory with the main.py file and run using
 ```
   >>python main.py --Advisory Type --API Filters --Parsing Fields --Output Format -Count
 ```
@@ -188,3 +188,32 @@ Finding the Number of CVRF Advisories with a "Critical" sir in 2013
 ```
 
 If more than one API filter is entered, the last filter will be used for the API call
+
+####Run OpenVulnQuery as a Library
+After you install openVulnQuery package, you can use the query_client module to make API-call which returns 
+ advisory objects. For each query to the API, you can pick advisory format and whether you want to parse the cvrf as we only support parsing cvrf xml files right now. 
+```
+>> from openVulnQuery import query_client
+>> query_client = query_client.QueryClient(client_id = "", client_secret = "")
+>> advisories = query_client.get_by_year(year = 2010, adv_format = "cvrf" parsed_cvrf = True)
+```
+Here are the information stored in advisory object.
+#####Advisory
+      * SIR
+      * First Published
+      * Last Updated
+      * CVES
+      * CVRF / OVAL URL
+      
+       Cvrf
+          * Document Title
+          * Summary
+          * Publication URL
+          * Full Product Name
+          * List of Vulnerabilities
+  
+              Vulnerability
+                * Title
+                * CVE
+                * BUG Ids
+                * Base Score
