@@ -28,11 +28,11 @@ Obtain client ID and Secret:
   - OAuth2 Token automatically generated on each call to the API.
 
 ####Run OpenVulnQuery in the Terminal
-- If installed with pip run the program by typing 
+- If installed with pip run the program by typing
 ```
   >>OpenVulnQuery --Advisory Type --API Filters --Parsing Fields --Output Format -Count
 ```
-- Or cd into the directory with the main.py file and run using 
+- Or cd into the directory with the main.py file and run using
 ```
   >>python main.py --Advisory Type --API Filters --Parsing Fields --Output Format -Count
 ```
