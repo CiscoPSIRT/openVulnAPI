@@ -25,6 +25,7 @@ Obtain client ID and Secret:
   - Under Select APIs choose Cisco PSIRT openVuln API
   - Agree to the terms and service and click Register
   - Edit CLIENT_ID and CLIENT_SECRET in the config file with the ones provided from the steps above.
+  - To edit the config.py file if installing with pip, run the command pip show openVulnQuery and cd into the location of the package. Then cd into the openVulnQuery folder and open the config.py file in your favorite editor, modify and save.
   - OAuth2 Token automatically generated on each call to the API.
 
 ####Run OpenVulnQuery in the Terminal
@@ -187,3 +188,32 @@ Finding the Number of CVRF Advisories with a "Critical" sir in 2013
 ```
 
 If more than one API filter is entered, the last filter will be used for the API call
+
+####Run OpenVulnQuery as a Library
+After you install openVulnQuery package, you can use the query_client module to make API-call which returns 
+ advisory objects. For each query to the API, you can pick advisory format and whether you want to parse the cvrf as we only support parsing cvrf xml files right now. 
+```
+>> from openVulnQuery import query_client
+>> query_client = query_client.QueryClient(client_id = "", client_secret = "")
+>> advisories = query_client.get_by_year(year = 2010, adv_format = "cvrf" parsed_cvrf = True)
+```
+Here are the information stored in advisory object.
+#####Advisory
+      * SIR
+      * First Published
+      * Last Updated
+      * CVES
+      * CVRF / OVAL URL
+      
+       Cvrf
+          * Document Title
+          * Summary
+          * Publication URL
+          * Full Product Name
+          * List of Vulnerabilities
+  
+              Vulnerability
+                * Title
+                * CVE
+                * BUG Ids
+                * Base Score
