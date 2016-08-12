@@ -3,7 +3,7 @@ from setuptools import setup
 setup(name='OpenVulnQuery',
       version='0.1',
       description='A python-based module(s) to query the Cisco PSIRT openVuln API.',
-      url='https://github4-chn.cisco.com/SRODevelopment/openVulnQuery',
+      url='https://github.com/CiscoPSIRT/openVulnAPI/tree/master/openVulnQuery',
       author='Bradley Korabik, Parash Ghimire',
       author_email='bkorabik@cisco.com, pghimire@cisco.com',
       license='The MIT License (MIT)',
@@ -15,7 +15,6 @@ setup(name='OpenVulnQuery',
       install_requires=[
           'argparse==1.4.0',
           'lxml==3.6.0',
-          'mock==2.0.0',
           'PrettyTable==0.7.2',
           'requests==2.10.0'
       ],

@@ -25,6 +25,7 @@ Obtain client ID and Secret:
   - Under Select APIs choose Cisco PSIRT openVuln API
   - Agree to the terms and service and click Register
   - Edit CLIENT_ID and CLIENT_SECRET in the config file with the ones provided from the steps above.
+  - To edit the config.py file if installing with pip, run the command pip show openVulnQuery and cd into the location of the package. Then cd into the openVulnQuery folder and open the config.py file in your favorite editor, modify and save.
   - OAuth2 Token automatically generated on each call to the API.
 
 ####Run OpenVulnQuery in the Terminal
