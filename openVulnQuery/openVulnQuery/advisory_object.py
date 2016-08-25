@@ -50,13 +50,14 @@ class Cvrf(object):
         vuln_args = []
         vulnerability = Cvrf.get_elem(tree, "vuln_ns:Vulnerability")
         for i, r in enumerate(vulnerability, start=1):
-            bug_ids = Cvrf.get_text(tree, "vuln_ns:Vulnerability[%s]/vuln_ns:ID" % i)
-            if  bug_ids == "NA": #Multiple BugIds are stored in Note for new advisory
-                bug_ids = Cvrf.get_text(tree, "vuln_ns:Vulnerability[%s]/vuln_ns:Notes/vuln_ns:Note[@Title='Cisco Bug IDs']" % i).split(",")
+            #Multiple BugIds are stored in Note under Vulnerabilities for latest cvrf 1.1 advisories
+            bug_ids = Cvrf.get_text(tree, "vuln_ns:Vulnerability[%s]/vuln_ns:Notes/vuln_ns:Note[@Title='Cisco Bug IDs']" % i)
+            if  bug_ids == "NA":
+                bug_ids = Cvrf.get_text(tree, "vuln_ns:Vulnerability[%s]/vuln_ns:ID" % i)
             #multiple vulnerabilities are seperated by ordinal number
             arg = {"title" : Cvrf.get_text(tree, "vuln_ns:Vulnerability[%s]/vuln_ns:Title" % i),
                    "cve" : Cvrf.get_text(tree, "vuln_ns:Vulnerability[%s]/vuln_ns:CVE" % i),
-                   "bug_ids" : bug_ids,
+                   "bug_ids" : bug_ids.split(","),
                    "base_score" : Cvrf.get_text(tree, "vuln_ns:Vulnerability[%s]/vuln_ns:CVSSScoreSets/vuln_ns:ScoreSet/vuln_ns:BaseScore" % i)}
             vuln_args.append(arg)
 
