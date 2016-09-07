@@ -194,8 +194,8 @@ After you install openVulnQuery package, you can use the query_client module to 
  advisory objects. For each query to the API, you can pick advisory format and whether you want to parse the cvrf as we only support parsing cvrf xml files right now. 
 ```
 >> from openVulnQuery import query_client
->> query_client = query_client.QueryClient(client_id = "", client_secret = "")
->> advisories = query_client.get_by_year(year = 2010, adv_format = "cvrf" parsed_cvrf = True)
+>> query_client = query_client.OpenVulnQueryClient(client_id='', client_secret='')
+>> advisories = query_client.get_by_year(year=2010, adv_format = 'cvrf', cvrf_parsed = True)
 ```
 Here are the information stored in advisory object.
 #####Advisory
