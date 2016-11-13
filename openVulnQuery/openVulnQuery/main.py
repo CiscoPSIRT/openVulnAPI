@@ -7,6 +7,7 @@ import query_client
 import sys
 from collections import defaultdict
 from prettytable import PrettyTable
+import advisory_object
 
 API_LABELS = ['sir', 'last_updated', 'first_published', 'advisory_id', 'cves', 'cvrf_url', 'oval_urls']
 CVRF_LABELS = ['document_title', 'summary', 'publication_url', 'full_product_name_list']
@@ -129,11 +130,11 @@ def count_field(advisory_field):
     count = 0
     if isinstance(advisory_field, (str, unicode)):
         if advisory_field != 'NA':
-            count=1
+            count = 1
     else:
         for item in advisory_field:
             if item != 'NA':
-                count+=1
+                count += 1
     return count
 
 def output(advisory_list, output_format, file_handle):
@@ -192,13 +193,14 @@ def map_vulnerabilites_to_advisory(advisories):
     """Creates a copy of an advisory depending on the number of vulnerabilities to link each vulnerability with its advisory one per line in table or csv format"""
 
     updated_advisories = []
-    for advisory_dict in advisories:
-        if 'vulns' in advisory_dict:
-            for vuln in advisory_dict['vulns']:
-                for key, val in vuln.items():
-                    advisory_dict.pop('vulns', None)
-                    advisory_dict[key] = val
-                    updated_advisories.append(advisory_dict.copy())
+    for advisory in advisories:
+        if 'vulns' in advisory:
+            vulns = advisory['vulns']
+            advisory.pop('vulns')
+            for vuln in vulns:
+                advisory_copy = advisory.copy()
+                advisory_copy.update(vuln)
+                updated_advisories.append(advisory_copy)
         else:
             updated_advisories.append(advisory_dict)
     return updated_advisories
@@ -263,6 +265,7 @@ def main():
 
             with get_output_filehandle(file_path) as f:
                 output(parsed_advisories, output_format, f)
+
 
 if __name__ == '__main__':
     main()
