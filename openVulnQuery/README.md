@@ -6,6 +6,9 @@ The Cisco Product Security Incident Response Team (PSIRT) openVuln API is a REST
 ####Pip Installation
 - pip install openVulnQuery
 
+  If you are experiencing any difficulty installing openVulnQuery.
+  Here is the link to [common installation issues solutions]   (https://github.com/iamparas/openVulnAPI/blob/master/openVulnQuery/InstallationIssueSolutions.md).
+
 ####Requirements
 - Tested on Python Version 2.7
 - argparse 1.4.0
