@@ -9,11 +9,18 @@ class Advisory(object):
     def __init__(self, advisory_dict, parse_cvrf, adv_format):
         self.parse_cvrf = parse_cvrf
         self.adv_format = adv_format
-        self.sir = advisory_dict["sir"]
         self.advisory_id = advisory_dict["advisoryId"]
+        self.sir = advisory_dict["sir"]
         self.first_published = advisory_dict["firstPublished"]
         self.last_updated = advisory_dict["lastUpdated"]
         self.cves = advisory_dict["cves"]
+        self.bug_ids = advisory_dict["bugIDs"]
+        self.cvss_base_score = advisory_dict["cvssBaseScore"]
+        self.advisory_title = advisory_dict["advisoryTitle"]
+        self.publication_url = advisory_dict["advisoryTitle"]
+        self.cwe = advisory_dict["cwe"]
+        self.product_names = advisory_dict["productNames"]
+        self.summary = advisory_dict["summary"]
         self._cvrf = None
         if self.adv_format == "cvrf":
             self.cvrf_url = advisory_dict["cvrfUrl"]
