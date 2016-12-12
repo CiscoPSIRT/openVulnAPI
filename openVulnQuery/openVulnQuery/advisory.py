@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 from lxml import etree
 import urllib2
 import cStringIO
@@ -28,12 +28,12 @@ def get_elem(tree, path):
     """Helper method to extract node element in  xml by xpath"""
 
     cvrf_ns = "http://www.icasi.org/CVRF/schema/cvrf/1.1"
-    prod_ns =  "http://www.icasi.org/CVRF/schema/prod/1.1"
+    prod_ns = "http://www.icasi.org/CVRF/schema/prod/1.1"
     vuln_ns = "http://www.icasi.org/CVRF/schema/vuln/1.1"
     result = tree.xpath("/cvrf_ns:cvrfdoc/%s" % path,
-                        namespaces = {"cvrf_ns" : cvrf_ns,
-                                      "prod_ns" : prod_ns,
-                                      "vuln_ns" : vuln_ns})
+                        namespaces={"cvrf_ns": cvrf_ns,
+                                    "prod_ns": prod_ns,
+                                    "vuln_ns": vuln_ns})
     return result
 
 
@@ -46,6 +46,7 @@ def get_text(tree, path):
     if len(elems) == 1:
         return elems.pop().text
     return [e.text for e in elems]
+
 
 class Advisory(object):
     """Abstract Advisory object"""
@@ -68,11 +69,12 @@ class Advisory(object):
         self.product_names = product_names
         self.summary = summary
 
-    def filter(*args):
+    def filter(self, *args):
         """Returns arg and value as a dictionary"""
-        return {arg : getattr(self, arg)
+        return {arg: getattr(self, arg)
                       for arg in args
                          if hasattr(self, arg)}
+
 
 class CVRF(Advisory):
     """CVRF object inherits from Advisory"""
@@ -84,6 +86,7 @@ class CVRF(Advisory):
 
     @property
     def additional_fields(self):
+        """Dictionary of additional fields extracted from XML Document"""
         if not self._additional_fields:
             self._additional_fields = CVRF.fromXML(self.cvrf_url)
         return self._additional_fields
@@ -92,30 +95,30 @@ class CVRF(Advisory):
         try:
             return self.additional_fields[attr]
         except:
-            raise AttributeError("Attribute doesnot exist")
+            raise AttributeError('Attribute doesnot exist')
 
     @staticmethod
     def fromXML(xml_url):
         """Parses XML to prepare arguments for CVRF Advisory"""
 
         xml = from_url(xml_url)
-        bad_xml = xml.decode("utf-8", errors="ignore")
-        good_xml = bad_xml.encode("utf-8")
+        bad_xml = xml.decode('utf-8', errors='ignore')
+        good_xml = bad_xml.encode('utf-8')
         tree = etree.parse(cStringIO.StringIO(good_xml))
 
-        vulnerability = get_elem(tree, "vuln_ns:Vulnerability")
+        vulnerability = get_elem(tree, 'vuln_ns:Vulnerability')
         vuln_title = []
         for i, r in enumerate(vulnerability, start=1):
-            vuln_title.append(get_text(tree, "vuln_ns:Vulnerability[%s]/vuln_ns:Title" % i))
+            vuln_title.append(get_text(tree, 'vuln_ns:Vulnerability[%s]/vuln_ns:Title' % i))
         kwargs = {
-                "vuln_title" : vuln_title
+                'vuln_title': vuln_title
             }
         return kwargs
-
 
 
 class OVAL(Advisory):
     """OVAL object as an Advisory"""
 
     def __init__(self, *args, **kwargs):
+        self.oval_url = kwargs.pop('oval_url', None)
         super(OVAL, self).__init__(*args, **kwargs)
