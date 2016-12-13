@@ -1,9 +1,9 @@
 import json
 import unittest
 import mock
-import query_client
-import config
-import advisory_object
+from openVulnQuery import query_client
+from openVulnQuery import advisory
+from openVulnQuery import config
 
 API_URL = "https://api.cisco.com/security/advisories"
 test_advisory_id = "Cisco-SA-20111107-CVE-2011-0941"
@@ -23,7 +23,42 @@ response_generic = """{
       "cves": [
         "%s"
       ],
-      "cvrfUrl": "http://tools.cisco.com/security/center/contentxml/CiscoSecurityAdvisory/Cisco-SA-20111107-CVE-2011-0941/cvrf/Cisco-SA-20111107-CVE-2011-0941_cvrf.xml"
+      "cvrfUrl": "http://tools.cisco.com/security/center/contentxml/CiscoSecurityAdvisory/Cisco-SA-20111107-CVE-2011-0941/cvrf/Cisco-SA-20111107-CVE-2011-0941_cvrf.xml",
+    "bugIDs": [
+        "CSCtj09179"
+      ],
+      "cvssBaseScore": "7.8",
+      "advisoryTitle": "Cisco IOS Software and Cisco Unified Communications Manager Session Initiation Protocol Packet Processing Memory Leak Vulnerability",
+      "publicationUrl": "http://tools.cisco.com/security/center/content/CiscoSecurityAdvisory/Cisco-SA-20111107-CVE-2011-0941",
+      "cwe": [
+        "CWE-399"
+      ],
+      "productNames": [
+        "Cisco Unified Communications Manager (CallManager)",
+        "Cisco IOS Software Releases 12.4 T",
+        "Cisco IOS Software Release 12.4(2)T",
+        "Cisco IOS Software Release 12.4(4)T",
+        "Cisco IOS Software Release 12.4(6)T",
+        "Cisco IOS Software Release 12.4(9)T",
+        "Cisco IOS Software Release 12.4(11)T",
+        "Cisco IOS Software Release 12.4(15)T",
+        "Cisco IOS Software Release 12.4(20)T",
+        "Cisco IOS Software Release 12.4(22)T",
+        "Cisco Unified Communications Manager Version 7.1",
+        "Cisco IOS Software Release 12.4(24)T",
+        "Cisco IOS 15.1M&T",
+        "Cisco IOS Software Release 15.1(1)T",
+        "Cisco Unified Communications Manager Version 8.0",
+        "Cisco IOS Software Release 15.1(2)T",
+        "Cisco Unified Communications Manager Version 8.5",
+        "Cisco IOS 15.1S",
+        "Cisco IOS Software Release 15.1(3)T",
+        "Cisco IOS Software Release 15.1(4)M",
+        "Cisco IOS Software Release 15.1(1)S",
+        "Cisco IOS Software Release 15.1(2)S",
+        "Cisco IOS Software Release 15.1(3)S"
+      ],
+      "summary": "<P>Cisco IOS Software and Cisco Unified Communications Manager contain a vulnerability that could allow an unauthenticated, remote attacker to cause a denial of service (DoS) condition.</P>\n<P>The vulnerability is due to improper processing of malformed packets by the affected software.&nbsp; An unauthenticated, remote attacker could exploit this vulnerability by sending malicious network requests to the targeted system.&nbsp; If successful, the attacker could cause the device to become unresponsive, resulting in a DoS condition.</P>\n<P>Cisco confirmed this vulnerability and released software updates.</P>\n<br />\n<br />\n<P>To exploit the vulnerability, an attacker must send malicious SIP packets to affected systems.&nbsp; Most environments restrict external connections using SIP, likely requiring an attacker to have access to internal networks prior to an attack.&nbsp; In addition, in environments that separate voice and data networks, attackers may have no access to networks that service voice traffic and allow the transmission of SIP packets, further increasing the difficulty of an exploit.</P>\n<P>Cisco indicates through the CVSS score that functional exploit code exists; however, the code is not known to be publicly available.</P>"
     }
     ]
     }""" % test_cve
@@ -36,8 +71,44 @@ response_advisory_id = """{
     "cves": [
     "CVE-2011-0941"
     ],
-    "cvrfUrl": "http://tools.cisco.com/security/center/contentxml/CiscoSecurityAdvisory/Cisco-SA-20111107-CVE-2011-0941/cvrf/Cisco-SA-20111107-CVE-2011-0941_cvrf.xml"
+    "cvrfUrl": "http://tools.cisco.com/security/center/contentxml/CiscoSecurityAdvisory/Cisco-SA-20111107-CVE-2011-0941/cvrf/Cisco-SA-20111107-CVE-2011-0941_cvrf.xml",
+    "bugIDs": [
+        "CSCtj09179"
+      ],
+      "cvssBaseScore": "7.8",
+      "advisoryTitle": "Cisco IOS Software and Cisco Unified Communications Manager Session Initiation Protocol Packet Processing Memory Leak Vulnerability",
+      "publicationUrl": "http://tools.cisco.com/security/center/content/CiscoSecurityAdvisory/Cisco-SA-20111107-CVE-2011-0941",
+      "cwe": [
+        "CWE-399"
+      ],
+      "productNames": [
+        "Cisco Unified Communications Manager (CallManager)",
+        "Cisco IOS Software Releases 12.4 T",
+        "Cisco IOS Software Release 12.4(2)T",
+        "Cisco IOS Software Release 12.4(4)T",
+        "Cisco IOS Software Release 12.4(6)T",
+        "Cisco IOS Software Release 12.4(9)T",
+        "Cisco IOS Software Release 12.4(11)T",
+        "Cisco IOS Software Release 12.4(15)T",
+        "Cisco IOS Software Release 12.4(20)T",
+        "Cisco IOS Software Release 12.4(22)T",
+        "Cisco Unified Communications Manager Version 7.1",
+        "Cisco IOS Software Release 12.4(24)T",
+        "Cisco IOS 15.1M&T",
+        "Cisco IOS Software Release 15.1(1)T",
+        "Cisco Unified Communications Manager Version 8.0",
+        "Cisco IOS Software Release 15.1(2)T",
+        "Cisco Unified Communications Manager Version 8.5",
+        "Cisco IOS 15.1S",
+        "Cisco IOS Software Release 15.1(3)T",
+        "Cisco IOS Software Release 15.1(4)M",
+        "Cisco IOS Software Release 15.1(1)S",
+        "Cisco IOS Software Release 15.1(2)S",
+        "Cisco IOS Software Release 15.1(3)S"
+      ],
+      "summary": "<P>Cisco IOS Software and Cisco Unified Communications Manager contain a vulnerability that could allow an unauthenticated, remote attacker to cause a denial of service (DoS) condition.</P>\n<P>The vulnerability is due to improper processing of malformed packets by the affected software.&nbsp; An unauthenticated, remote attacker could exploit this vulnerability by sending malicious network requests to the targeted system.&nbsp; If successful, the attacker could cause the device to become unresponsive, resulting in a DoS condition.</P>\n<P>Cisco confirmed this vulnerability and released software updates.</P>\n<br />\n<br />\n<P>To exploit the vulnerability, an attacker must send malicious SIP packets to affected systems.&nbsp; Most environments restrict external connections using SIP, likely requiring an attacker to have access to internal networks prior to an attack.&nbsp; In addition, in environments that separate voice and data networks, attackers may have no access to networks that service voice traffic and allow the transmission of SIP packets, further increasing the difficulty of an exploit.</P>\n<P>Cisco indicates through the CVSS score that functional exploit code exists; however, the code is not known to be publicly available.</P>"
     }""" % test_advisory_id
+
 
 def mocked_get_requests(*args, **kwargs):
     """Mocks requests get method from QueryClient"""
@@ -45,6 +116,7 @@ def mocked_get_requests(*args, **kwargs):
     url = "{base_url}/{path}".format(base_url = API_URL,
                                      path = args[0])
     return mocked_requests_lib_get(url = url).json()
+
 
 def mocked_requests_lib_get(*args, **kwargs):
     """Mocks library requests.get method"""
@@ -77,7 +149,7 @@ class OpenVulnQueryClientTestCvrf(unittest.TestCase):
     """Unit Test for all function in OpenVulnQueryClient"""
     def setUp(self):
         self.open_vuln_client = query_client.OpenVulnQueryClient(config.CLIENT_ID,
-                                                                    config.CLIENT_SECRET)
+                                                                 config.CLIENT_SECRET)
         self.adv_format = "cvrf"
 
 
@@ -106,7 +178,7 @@ class OpenVulnQueryClientTestCvrf(unittest.TestCase):
     def test_get_by_severity(self, mock_get_requests):
         """Checks if get_by_severity function calls request args with correct arguments"""
         exp_args = "cvrf/severity/%s" % test_severity
-        response = self.open_vuln_client.get_by_severity(self.adv_format, severity = test_severity)
+        response = self.open_vuln_client.get_by_severity(self.adv_format, severity=test_severity)
         mock_get_requests.assert_called_with(exp_args)
 
     @mock.patch("query_client.OpenVulnQueryClient.get_request", side_effect=mocked_get_requests)
@@ -131,8 +203,8 @@ class OpenVulnQueryClientTestCvrf(unittest.TestCase):
 
     def test_advisory_list(self):
         advisories = json.loads(response_generic)["advisories"]
-        advs = self.open_vuln_client.advisory_list(advisories, True, self.adv_format)
-        self.assertIsInstance(advs[0], advisory_object.Advisory, "This object is not instance of Advisory")
+        advs = self.open_vuln_client.advisory_list(advisories, self.adv_format)
+        self.assertIsInstance(advs[0], advisory.CVRF, "This object is not instance of Advisory")
 
 
 if __name__ == "__main__":
