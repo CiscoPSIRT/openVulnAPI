@@ -3,7 +3,7 @@ A python-based module(s) to query the Cisco PSIRT openVuln API.
 
 The Cisco Product Security Incident Response Team (PSIRT) openVuln API is a RESTful API that allows customers to obtain Cisco Security Vulnerability information in different machine-consumable formats. APIs are important for customers because they allow their technical staff and programmers to build tools that help them do their job more effectively (in this case, to keep up with security vulnerability information). More information about the API can be found at: https://developer.cisco.com/site/PSIRT/
 
-####Pip Installation
+####PIP Installation
 - pip install openVulnQuery
 
 ####Requirements
@@ -99,26 +99,23 @@ If no fields are passed in the default API fields will be returned
 
 Any field that has no information will return with with the field name and NA
 
-##### API Fields
-  - sir
-  - last_updated
-  - first_published
+##### Parsable Fields
   - advisory_id
+  - sir
+  - first_published
+  - last_updated
   - cves
-  - cvrf_url
-  - oval_urls
-
-##### XML Fields
-  Note: XML Fields are only for CVRF Advisories, --oval is not parseable
-
-  - document_title
-  - summary
+  - bug_ids
+  - cvss_base_score
+  - advisory_title
   - publication_url
-  - full_product_name_list
+  - cwe
+  - product_names
+  - summary
   - vuln_title
-  - vuln_base_score
-  - vuln_bug_ids
-  - vuln_cve
+  - oval_urls
+  - cvrf_url
+
 ```
 -f or --fields
 
@@ -127,20 +124,20 @@ Any field that has no information will return with with the field name and NA
               python main.py --cvrf or --oval --any API filter -f  or --fields list of fields separated by space
               >> python main.py --cvrf --all -f sir cves cvrf_url
               >> python main.py --cvrf --severity critical -f last_updated cves
-              >> python main.py --oval --all -f sir cves oval_urls
+              >> python main.py --oval --all -f sir cves oval_url
               >> python main.py --oval --severity critical -f last_updated cves
 
         CVRF XML Fields
               Examples:
               python main.py --cvrf --any API filter -f or --fields list of fields separated by space
-              >> python main.py --cvrf --all -f vuln_bug_ids vuln_title full_product_name_list
-              >> python main.py --cvrf --severity critical -f vuln_bug_ids summary
+              >> python main.py --cvrf --all -f bug_ids vuln_title product_names
+              >> python main.py --cvrf --severity critical -f bug_ids summary
 
         Combination
               Examples:
               python main.py --cvrf --any API filter -f or --fields list of fields separated by space
-              >> python main.py --cvrf --all -f sir vuln_bug_ids cves vuln_title
-              >> python main.py --cvrf --year 2011 -f cves cvrf_url vuln_bug_ids summary full_product_name_list
+              >> python main.py --cvrf --all -f sir bug_ids cves vuln_title
+              >> python main.py --cvrf --year 2011 -f cves cvrf_url bug_ids summary product_names
 ```
 ####Output Format (Optional)
 ```
@@ -166,16 +163,15 @@ Returns the count of fields entered with -f or --fields. If no fields are entere
 
         Examples:
         >> python main.py --cvrf --year 2016 -c
-        >> python main.py --cvrf --severity low -f sir cves vuln_bug_ids -c
+        >> python main.py --cvrf --severity low -f sir cves bug_ids -c
 ```
 
 ####Developers
 - Update the config.py file with client id and secret
 - Directly interact with query_client.py to query the Open Vuln API
-- query_client.py automatically interacts with advisory_object.py
-- advisory_object.py creates an object of advisory(s) that can be utilized to parse advisory data
-- advisory_object.py also parses CVRF XML file to get additional fields that are not included in the Open Vuln API
-- advisory_object.py utilizes an Advisory object for Open Vuln API fields and a CVRF and Vulnerability object for XML fields
+- query_client.py returns Advisory Object 
+- advisory.py module has Advisory object a abstract class which is inherited by CVRF and OVAL data type
+- This abstraction hides the implementation details and the data source used to populate the data type. The data members of CVRF and OVAL advisories are populated from API results as well parsing the XML file obtained from the API results. 
 
 ####Disclosures:
 No support for filtering based on --API fields, you can't use --year 2016 and --severity high
@@ -191,29 +187,29 @@ If more than one API filter is entered, the last filter will be used for the API
 
 ####Run OpenVulnQuery as a Library
 After you install openVulnQuery package, you can use the query_client module to make API-call which returns 
- advisory objects. For each query to the API, you can pick advisory format and whether you want to parse the cvrf as we only support parsing cvrf xml files right now. 
+ advisory objects. For each query to the API, you can pick the advisory format. 
 ```
 >> from openVulnQuery import query_client
 >> query_client = query_client.QueryClient(client_id = "", client_secret = "")
->> advisories = query_client.get_by_year(year = 2010, adv_format = "cvrf" parsed_cvrf = True)
+>> advisories = query_client.get_by_year(year = 2010, adv_format = "cvrf")
 ```
 Here are the information stored in advisory object.
 #####Advisory
-      * SIR
-      * First Published
-      * Last Updated
-      * CVES
-      * CVRF / OVAL URL
+      * advisory_id
+      * sir
+      * first_published
+      * last_updated
+      * cves
+      * bug_ids
+      * cvss_base_score
+      * advisory_title
+      * publication_url
+      * cwe
+      * product_names
+      * summary
       
-       Cvrf
-          * Document Title
-          * Summary
-          * Publication URL
-          * Full Product Name
-          * List of Vulnerabilities
-  
-              Vulnerability
-                * Title
-                * CVE
-                * BUG Ids
-                * Base Score
+   #####CVRF (inherits Advisory Abstract Class)
+            * cvrf_url
+            * vuln_title
+   #####OVAL (inherits Advisory Advisory Class)
+            * oval_url

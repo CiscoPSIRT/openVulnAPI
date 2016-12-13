@@ -17,11 +17,11 @@ def count_fields(advisories, fields):
     for advisory in advisories:
         for field in fields:
             if hasattr(advisory, field):
-                counts[field] += count_field(getattr(advisory, field))
+                counts[field] += get_count(getattr(advisory, field))
     return counts
 
 
-def count_field(advisory_field):
+def get_count(advisory_field):
     """Returns a count of the number of valid items in a particular advisory field"""
 
     count = 0
