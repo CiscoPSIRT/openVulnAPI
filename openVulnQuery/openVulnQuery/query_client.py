@@ -137,11 +137,3 @@ class OpenVulnQueryClient(object):
 
             advisory_list.append(adv)
         return advisory_list
-
-if __name__ == "__main__":
-    qc = OpenVulnQueryClient(client_id = config.CLIENT_ID, client_secret = config.CLIENT_SECRET)
-
-    for i in range(100):
-        advisories = qc.get_by_all(all_adv="all", adv_format = "cvrf")
-        print i
-    #print utils.filter_advisories(advisories, ["advisory_id", "bug_ids", "cves", "cwe"])
