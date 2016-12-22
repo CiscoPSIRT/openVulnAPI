@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='OpenVulnQuery',
-      version='0.1',
+      version='1.0',
       description='A python-based module(s) to query the Cisco PSIRT openVuln API.',
       url='https://github.com/CiscoPSIRT/openVulnAPI/tree/master/openVulnQuery',
       author='Bradley Korabik, Parash Ghimire',

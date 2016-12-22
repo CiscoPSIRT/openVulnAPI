@@ -211,8 +211,9 @@ Here are the information stored in advisory object.
       * product_names
       * summary
       
-   #####CVRF (inherits Advisory Abstract Class)
+#####CVRF (inherits Advisory Abstract Class)
             * cvrf_url
             * vuln_title
-   #####OVAL (inherits Advisory Advisory Class)
+
+#####OVAL (inherits Advisory Advisory Class)
             * oval_url
