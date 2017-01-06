@@ -53,44 +53,56 @@ Notes:
 --all
         Return all advisories in cvrf or oval format
         Examples:
-        >> python main.py --cvrf --all
-        >> python main.py --oval --all
+        >> openVulnQuery --cvrf --all
+        >> openVulnQuery --oval --all
 
 --advisory
         Search by specific advisory id
         Examples:
-        >> python main.py --cvrf --advisory cisco-sa-20110201-webex
-        >> python main.py --oval --advisory cisco-sa-20100324-ldp
+        >> openVulnQuery --cvrf --advisory cisco-sa-20110201-webex
+        >> openVulnQuery --oval --advisory cisco-sa-20100324-ldp
 
 --cve
         Search by specific cve id
         Examples:
-        >> python main.py --cvrf --cve CVE-2010-3043
-        >> python main.py --oval --cve CVE-2010-0576
+        >> openVulnQuery --cvrf --cve CVE-2010-3043
+        >> openVulnQuery --oval --cve CVE-2010-0576
 
 --latest
         Search by the number of latest advisories in cvrf or oval format
         Examples:
-        >> python main.py --cvrf --latest 10
-        >> python main.py --oval --latest 10
+        >> openVulnQuery --cvrf --latest 10
+        >> openVulnQuery --oval --latest 10
 
 --severity
         Search by severity (low, medium, high, critical)
         Note: Oval does not have a low severity
         Examples:
-        >> python main.py --cvrf --severity critical
-        >> python main.py --cvrf --severity high
-        >> python main.py --cvrf --severity medium
-        >> python main.py --cvrf --severity low
-        >> python main.py --oval --severity critical
-        >> python main.py --oval --severity high
-        >> python main.py --oval --severity medium
+        >> openVulnQuery --cvrf --severity critical
+        >> openVulnQuery --cvrf --severity high
+        >> openVulnQuery --cvrf --severity medium
+        >> openVulnQuery --cvrf --severity low
+        >> openVulnQuery --oval --severity critical
+        >> openVulnQuery --oval --severity high
+        >> openVulnQuery --oval --severity medium
 
 --year
         Search by the year (1995 to present)
         Examples:
-        >> python main.py --cvrf --year 2016
-        >> python main.py --oval --year 2016
+        >> openVulnQuery --cvrf --year 2016
+        >> openVulnQuery --oval --year 2016
+
+--product
+         Search by the product name
+         Examples:
+         >> openVulnQuery --cvrf --product Cisco
+         >> openVulnQuery --oval --product Cisco
+
+--ios_xe 
+        Search by IOS XE version
+        Examples:
+        >> openVulnQuery --cvrf --ios_xe 13.16.1S
+        >> openVulnQuery --oval --ios_xe 13.16.1S
 ```
 ####Parsing Fields (Optional)
 Notes:
@@ -121,40 +133,49 @@ Any field that has no information will return with with the field name and NA
 
         API Fields
               Examples:
-              python main.py --cvrf or --oval --any API filter -f  or --fields list of fields separated by space
-              >> python main.py --cvrf --all -f sir cves cvrf_url
-              >> python main.py --cvrf --severity critical -f last_updated cves
-              >> python main.py --oval --all -f sir cves oval_url
-              >> python main.py --oval --severity critical -f last_updated cves
+              openVulnQuery --cvrf or --oval --any API filter -f  or --fields list of fields separated by space
+              >> openVulnQuery --cvrf --all -f sir cves cvrf_url
+              >> openVulnQuery --cvrf --severity critical -f last_updated cves
+              >> openVulnQuery --oval --all -f sir cves oval_url
+              >> openVulnQuery --oval --severity critical -f last_updated cves
 
         CVRF XML Fields
               Examples:
-              python main.py --cvrf --any API filter -f or --fields list of fields separated by space
-              >> python main.py --cvrf --all -f bug_ids vuln_title product_names
-              >> python main.py --cvrf --severity critical -f bug_ids summary
+              openVulnQuery --cvrf --any API filter -f or --fields list of fields separated by space
+              >> openVulnQuery --cvrf --all -f bug_ids vuln_title product_names
+              >> openVulnQuery --cvrf --severity critical -f bug_ids summary
 
         Combination
               Examples:
-              python main.py --cvrf --any API filter -f or --fields list of fields separated by space
-              >> python main.py --cvrf --all -f sir bug_ids cves vuln_title
-              >> python main.py --cvrf --year 2011 -f cves cvrf_url bug_ids summary product_names
+              openVulnQuery --cvrf --any API filter -f or --fields list of fields separated by space
+              >> openVulnQuery --cvrf --all -f sir bug_ids cves vuln_title
+              >> openVulnQuery --cvrf --year 2011 -f cves cvrf_url bug_ids summary product_names
 ```
+
+#####Additional Filters
+User can be more specific on filtering advisories when searching all advisories or by severity. They can filter based on last updated and first published dates providing start and end date as a search range. Dates should be entered in YYYY-MM-DD format. 
+```
+>> openVulnQuery --cvrf --severity high --last_updated 2016-01-02:2016-04-02 --json filename.json
+>> openVulnQuery --cvrf --all --last_updated 2016-01-02:2016-07-02
+>> openVulnQuery --cvrf --severity critical --first_published 2015:01:02:2015-01-01
+```
+
 ####Output Format (Optional)
 ```
 Default
         Table style printed to screen
         Example:
-        >> python main.py --cvrf --year 2016
+        >> openVulnQuery --cvrf --year 2016
 
 --json file path
         Returns json in a file in the specified path
         Example:
-        >> python main.py --cvrf --year 2016 --json  /Users/bkorabik/Documents/2016_cvrf.json
+        >> openVulnQuery --cvrf --year 2016 --json  /Users/bkorabik/Documents/2016_cvrf.json
 
 --csv file path
         Creates a CSV file in the specified path
         Example:
-        >> python main.py --cvrf --year 2016 --csv  /Users/bkorabik/Documents/2016_cvrf.csv
+        >> openVulnQuery --cvrf --year 2016 --csv  /Users/bkorabik/Documents/2016_cvrf.csv
 ```
 ####Count (Optional)
 Returns the count of fields entered with -f or --fields. If no fields are entered the base API fields are counted and displayed
@@ -162,8 +183,8 @@ Returns the count of fields entered with -f or --fields. If no fields are entere
 -c
 
         Examples:
-        >> python main.py --cvrf --year 2016 -c
-        >> python main.py --cvrf --severity low -f sir cves bug_ids -c
+        >> openVulnQuery --cvrf --year 2016 -c
+        >> openVulnQuery --cvrf --severity low -f sir cves bug_ids -c
 ```
 
 ####Developers
@@ -179,8 +200,8 @@ No support for filtering based on --API fields, you can't use --year 2016 and --
 Filtering with Grep:
 ```
 Finding the Number of CVRF Advisories with a "Critical" sir in 2013
-        >> python main.py --cvrf --year 2013 -f sir | grep -c "Critical"
-        >> python main.py --cvrf --severity critical -f first_published | grep -c "2013"
+        >> openVulnQuery --cvrf --year 2013 -f sir | grep -c "Critical"
+        >> openVulnQuery --cvrf --severity critical -f first_published | grep -c "2013"
 ```
 
 If more than one API filter is entered, the last filter will be used for the API call
