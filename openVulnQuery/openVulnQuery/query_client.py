@@ -176,8 +176,3 @@ class OpenVulnQueryClient(object):
             advisory_list.append(adv)
         return advisory_list
 
-if __name__ == "__main__":
-    q = OpenVulnQueryClient(client_id=config.TEST_ClIENT_ID, client_secret=config.TEST_CLIENT_SECRET)
-    advisories = q.get_by_severity(adv_format="oval", severity="high")
-    for advisory in advisories:
-        print "%s  > %s" % (advisory.advisory_title, advisory.last_updated)
