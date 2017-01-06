@@ -96,7 +96,11 @@ def process_command_line():
                         choices=API_LABELS,
                         help='Separate fields by spaces to return advisory information')
 
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.api_resource[0] not in allows_filter:
+        if args.first_published or args.last_updated:
+            parser.error('Only %s based filter can have additional first_published or last_updated filter' % allows_filter)
+    return args
 
 
 def valid_date(date_text):
@@ -106,7 +110,7 @@ def valid_date(date_text):
         datetime.datetime.strptime(end_date, '%Y-%m-%d')
         return start_date, end_date
     except ValueError:
-        raise argparse.ArgumentTypeError('%s not a valid date. Enter date in YYYY-MM-DD format')
+        raise argparse.ArgumentTypeError('%s is not a valid date format. Enter date in YYYY-MM-DD:YYYY-MM-DD format' % date_text)
 
 
 def main():
