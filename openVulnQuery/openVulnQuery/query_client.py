@@ -175,4 +175,3 @@ class OpenVulnQueryClient(object):
 
             advisory_list.append(adv)
         return advisory_list
-
