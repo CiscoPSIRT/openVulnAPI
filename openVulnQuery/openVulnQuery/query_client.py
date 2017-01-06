@@ -53,7 +53,6 @@ class OpenVulnQueryClient(object):
     def get_by_cve(self, adv_format, cve):
         """Return the advisory using requested cve id"""
 
-
         advisories = self.get_request(
             "{adv_format}/cve/{cve}".format(adv_format=adv_format,
                                             cve=cve))
@@ -99,6 +98,13 @@ class OpenVulnQueryClient(object):
         advisories = self.get_request(
             "{adv_format}/product/{product_name}".format(adv_format=adv_format,
                                                          product_name=product_name))
+        return self.advisory_list(advisories['advisories'], adv_format)
+
+    def get_by_ios_xe(self, adv_format, ios_version):
+        """Return advisories by Cisco IOS advisories version"""
+
+        advisories = self.get_request(
+            "iosxe", params={'version': ios_version})
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_request(self, path, params=None):
@@ -151,19 +157,19 @@ class OpenVulnQueryClient(object):
                                     product_names=advisory_dict["productNames"],
                                     summary=advisory_dict["summary"])
             elif adv_format == "oval":
-                adv=advisory.OVAL(advisory_id=advisory_dict["advisoryId"],
-                                  sir=advisory_dict["sir"],
-                                  first_published=advisory_dict["firstPublished"],
-                                  last_updated=advisory_dict["lastUpdated"],
-                                  cves=advisory_dict["cves"],
-                                  oval_url=advisory_dict["oval"],
-                                  bug_ids=advisory_dict["bugIDs"],
-                                  cvss_base_score=advisory_dict["cvssBaseScore"],
-                                  advisory_title=advisory_dict["advisoryTitle"],
-                                  publication_url=advisory_dict["publicationUrl"],
-                                  cwe=advisory_dict["cwe"],
-                                  product_names=advisory_dict["productNames"],
-                                  summary=advisory_dict["summary"])
+                adv = advisory.OVAL(advisory_id=advisory_dict["advisoryId"],
+                                    sir=advisory_dict["sir"],
+                                    first_published=advisory_dict["firstPublished"],
+                                    last_updated=advisory_dict["lastUpdated"],
+                                    cves=advisory_dict["cves"],
+                                    oval_url=advisory_dict["oval"],
+                                    bug_ids=advisory_dict["bugIDs"],
+                                    cvss_base_score=advisory_dict["cvssBaseScore"],
+                                    advisory_title=advisory_dict["advisoryTitle"],
+                                    publication_url=advisory_dict["publicationUrl"],
+                                    cwe=advisory_dict["cwe"],
+                                    product_names=advisory_dict["productNames"],
+                                    summary=advisory_dict["summary"])
 
             self.logger.debug("%s Advisory %s Created", type(adv).__name__, adv.advisory_id)
 
