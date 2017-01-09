@@ -1,4 +1,5 @@
 import argparse
+import datetime
 
 import config
 import query_client
@@ -8,6 +9,7 @@ import utils
 API_LABELS = ['advisory_id', 'sir', 'first_published', 'last_updated', 'cves', 'cvss_base_score',
               'advisory_title', 'publication_url', 'cwe', 'product_names', 'summary',
               'oval_url', 'cvrf_url', 'bug_ids']
+allows_filter = ['all', 'severity']
 
 
 def process_command_line():
@@ -19,6 +21,7 @@ def process_command_line():
     advisory_format = parser.add_mutually_exclusive_group(required=True)
     api_resource = parser.add_mutually_exclusive_group(required=True)
     output_format = parser.add_mutually_exclusive_group()
+    additional_filter = parser.add_mutually_exclusive_group()
 
     advisory_format.add_argument('--cvrf',
                                  action='store_const',
@@ -32,39 +35,57 @@ def process_command_line():
                                  help='Selects from oval advisories')
 
     api_resource.add_argument('--all',
-                         action='store_const',
-                         const=('all', 'all'),
-                         dest='api_resource',
-                         help='Retrieve all cvrf/oval advisiories')
+                              action='store_const',
+                              const=('all', 'all'),
+                              dest='api_resource',
+                              help='Retrieve all cvrf/oval advisiories')
     api_resource.add_argument('--advisory',
-                         dest='api_resource',
-                         type=(lambda x: ('advisory', x)),
-                         help='Retrieve advisories by advisory id')
+                              dest='api_resource',
+                              type=(lambda x: ('advisory', x)),
+                              help='Retrieve advisories by advisory id')
     api_resource.add_argument('--cve',
-                         dest='api_resource',
-                         type=(lambda x: ('cve', x)),
-                         help='Retrieve advisories by cve id')
+                              dest='api_resource',
+                              type=(lambda x: ('cve', x)),
+                              help='Retrieve advisories by cve id')
     api_resource.add_argument('--latest',
-                         dest='api_resource',
-                         type=(lambda x: ('latest', x)),
-                         help='Retrieve latest (number) of advisories')
+                              dest='api_resource',
+                              type=(lambda x: ('latest', x)),
+                              help='Retrieve latest (number) of advisories')
     api_resource.add_argument('--severity',
-                         dest='api_resource',
-                         type=(lambda x: ('severity', x)),
-                         help='Retrieve advisories by severity (low, medium, high, critical)')
+                              dest='api_resource',
+                              type=(lambda x: ('severity', x)),
+                              help='Retrieve advisories by severity (low, medium, high, critical)')
     api_resource.add_argument('--year',
-                         dest='api_resource',
-                         type=(lambda x: ('year', x)),
-                         help='Retrieve advisories by year')
+                              dest='api_resource',
+                              type=(lambda x: ('year', x)),
+                              help='Retrieve advisories by year')
+
+    api_resource.add_argument('--product',
+                              dest='api_resource',
+                              type=(lambda x: ('product', x)),
+                              help='Retrieve advisories by product names')
+    api_resource.add_argument('--ios_xe',
+                              dest='api_resource',
+                              type=(lambda x: ('ios_xe', x)),
+                              help='Retrieve advisories affecting user inputted iso_xe version.'
+                                   'Only one version at a time is allowed.')
 
     output_format.add_argument('--csv',
                                dest='output_format',
                                type=(lambda x: ('csv', x)),
-                               help='Output to CSV with filepath')
+                               help='Output to CSV with file path')
     output_format.add_argument('--json',
                                dest='output_format',
                                type=(lambda x: ('json', x)),
-                               help='Output to JSON with filepath')
+                               help='Output to JSON with file path')
+    additional_filter.add_argument('--first_published',
+                                   dest='first_published',
+                                   type=valid_date,
+                                   help='Filter advisories based on first_published date YYYY-MM-DD:YYYY-MM-DD')
+    additional_filter.add_argument('--last_updated',
+                                   dest='last_updated',
+                                   type=valid_date,
+                                   help='Filter advisories based on last_updated date YYYY-MM-DD:YYYY-MM-DD')
 
     parser.add_argument('--count', '-c',
                         action='store_true',
@@ -72,10 +93,24 @@ def process_command_line():
     parser.add_argument('--fields', '-f',
                         dest='fields',
                         nargs='+',
-                        choices = API_LABELS,
-                        help='Seperate fields by spaces to return advisory information')
+                        choices=API_LABELS,
+                        help='Separate fields by spaces to return advisory information')
 
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.api_resource[0] not in allows_filter:
+        if args.first_published or args.last_updated:
+            parser.error('Only %s based filter can have additional first_published or last_updated filter' % allows_filter)
+    return args
+
+
+def valid_date(date_text):
+    try:
+        start_date, end_date = date_text.split(':')
+        datetime.datetime.strptime(start_date, '%Y-%m-%d')
+        datetime.datetime.strptime(end_date, '%Y-%m-%d')
+        return start_date, end_date
+    except ValueError:
+        raise argparse.ArgumentTypeError('%s is not a valid date format. Enter date in YYYY-MM-DD:YYYY-MM-DD format' % date_text)
 
 
 def main():
@@ -83,7 +118,7 @@ def main():
     args = process_command_line()
     api_resource_key, api_resource_value = args.api_resource
 
-    client = query_client.OpenVulnQueryClient(config.CLIENT_ID, config.CLIENT_SECRET)
+    client = query_client.OpenVulnQueryClient(config.ClIENT_ID, config.CLIENT_SECRET)
     query_client_func = getattr(client, 'get_by_{0}'.format(api_resource_key))
 
     if not args.fields:
@@ -92,7 +127,18 @@ def main():
         else:
             API_LABELS.remove('cvrf_url')
         args.fields = API_LABELS
-    advisories = query_client_func(args.advisory_format, api_resource_value)
+    if api_resource_key in allows_filter:
+        filter = query_client.Filter()
+        if args.first_published:
+            start_date, end_date = args.first_published
+            filter = query_client.FirstPublishedFilter(start_date, end_date)
+        elif args.last_updated:
+            start_date, end_date = args.last_updated
+            filter = query_client.LastPublishedFilter(start_date, end_date)
+        advisories = query_client_func(args.advisory_format, api_resource_value, filter)
+    else:
+        advisories = query_client_func(args.advisory_format, api_resource_value)
+
     returned_output = None
     if(args.count):
         returned_output = [utils.count_fields(advisories, args.fields)]
