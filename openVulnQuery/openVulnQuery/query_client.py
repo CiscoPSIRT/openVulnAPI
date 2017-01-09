@@ -5,6 +5,26 @@ import config
 import logging
 
 
+class Filter(object):
+    def __init__(self):
+        self.path = ''
+        self.params = None
+
+
+class LastPublishedFilter(object):
+    def __init__(self, start_date, end_date):
+        self.path = 'lastpublished'
+        self.params = {'startDate': start_date,
+                       'endDate': end_date}
+
+
+class FirstPublishedFilter(object):
+    def __init__(self, start_date, end_date):
+        self.path = 'firstpublished'
+        self.params = {'startDate': start_date,
+                       'endDate': end_date}
+
+
 class OpenVulnQueryClient(object):
     """Client sends get request for advisory information from OpenVuln API.
 
@@ -22,12 +42,12 @@ class OpenVulnQueryClient(object):
                         "Accept": "application/json",
                         "User-Agent": "TestApp"}
 
-    def get_by_all(self, adv_format, all_adv):
+    def get_by_all(self, adv_format, all_adv, filter):
         """Return all the advisiories using requested advisory format"""
 
         advisories = self.get_request(
-            "{adv_format}/{all}".format(adv_format=adv_format,
-                                        all=all_adv))
+            "{adv_format}/{all}/{filter}".format(adv_format=adv_format, all=all_adv, filter=filter.path),
+            filter.params)
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_cve(self, adv_format, cve):
@@ -46,13 +66,14 @@ class OpenVulnQueryClient(object):
                                                       advisory=advisory))]}
         return self.advisory_list(advisories['advisories'], adv_format)
 
-
-    def get_by_severity(self, adv_format, severity):
+    def get_by_severity(self, adv_format, severity, filter=Filter()):
         """Return the advisories using requested severity"""
 
         advisories = self.get_request(
-            "{adv_format}/severity/{severity}".format(adv_format=adv_format,
-                                                      severity=severity))
+            "{adv_format}/severity/{severity}/{filter}".format(adv_format=adv_format,
+                                                               severity=severity,
+                                                               filter=filter.path),
+            params=filter.params)
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_year(self, adv_format, year):
@@ -71,11 +92,27 @@ class OpenVulnQueryClient(object):
                                                   latest=latest))
         return self.advisory_list(advisories['advisories'], adv_format)
 
-    def get_request(self, path):
+    def get_by_product(self, adv_format, product_name):
+        """Return advisories by product name"""
+
+        advisories = self.get_request(
+            "{adv_format}/product".format(adv_format=adv_format),
+            params={'product': product_name})
+        return self.advisory_list(advisories['advisories'], adv_format)
+
+    def get_by_ios_xe(self, adv_format, ios_version):
+        """Return advisories by Cisco IOS advisories version"""
+
+        advisories = self.get_request(
+            "iosxe", params={'version': ios_version})
+        return self.advisory_list(advisories['advisories'], adv_format)
+
+    def get_request(self, path, params=None):
         """Send get request to OpenVuln API utilizing headers.
 
         Args:
             path: OpenVuln API path.
+            params: url parameters
 
         Returns:
             JSON of requested arguments for advisory information.
@@ -87,7 +124,8 @@ class OpenVulnQueryClient(object):
         self.logger.info("Sending Get Request %s", path)
         r = requests.get(
             url="{base_url}/{path}".format(base_url=config.API_URL, path=path),
-            headers=self.headers)
+            headers=self.headers,
+            params=params)
         r.raise_for_status()
         return r.json()
 
@@ -104,7 +142,7 @@ class OpenVulnQueryClient(object):
         """
         advisory_list = []
         for advisory_dict in advisories:
-            if(adv_format == "cvrf"):
+            if adv_format == "cvrf":
                 adv = advisory.CVRF(advisory_id=advisory_dict["advisoryId"],
                                     sir=advisory_dict["sir"],
                                     first_published =advisory_dict["firstPublished"],
@@ -118,20 +156,21 @@ class OpenVulnQueryClient(object):
                                     cwe=advisory_dict["cwe"],
                                     product_names=advisory_dict["productNames"],
                                     summary=advisory_dict["summary"])
-            elif(adv_format == "oval"):
-                adv=advisory.OVAL(advisory_id=advisory_dict["advisoryId"],
-                                  sir=advisory_dict["sir"],
-                                  first_published =advisory_dict["firstPublished"],
-                                  last_updated=advisory_dict["lastUpdated"],
-                                  cves=advisory_dict["cves"],
-                                  oval_url=advisory_dict["oval"],
-                                  bug_ids=advisory_dict["bugIDs"],
-                                  cvss_base_score=advisory_dict["cvssBaseScore"],
-                                  advisory_title=advisory_dict["advisoryTitle"],
-                                  publication_url=advisory_dict["publicationUrl"],
-                                  cwe=advisory_dict["cwe"],
-                                  product_names=advisory_dict["productNames"],
-                                  summary=advisory_dict["summary"])
+            elif adv_format == "oval":
+                oval_url = advisory_dict['oval'] if 'oval' in advisory_dict else advisory_dict['ovalUrl']
+                adv = advisory.OVAL(advisory_id=advisory_dict["advisoryId"],
+                                    sir=advisory_dict["sir"],
+                                    first_published=advisory_dict["firstPublished"],
+                                    last_updated=advisory_dict["lastUpdated"],
+                                    cves=advisory_dict["cves"],
+                                    oval_url=oval_url,
+                                    bug_ids=advisory_dict["bugIDs"],
+                                    cvss_base_score=advisory_dict["cvssBaseScore"],
+                                    advisory_title=advisory_dict["advisoryTitle"],
+                                    publication_url=advisory_dict["publicationUrl"],
+                                    cwe=advisory_dict["cwe"],
+                                    product_names=advisory_dict["productNames"],
+                                    summary=advisory_dict["summary"])
 
             self.logger.debug("%s Advisory %s Created", type(adv).__name__, adv.advisory_id)
 
