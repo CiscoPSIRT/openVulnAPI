@@ -212,7 +212,6 @@ Finding the Number of CVRF Advisories with a "Critical" sir in 2013
 If more than one API filter is entered, the last filter will be used for the API call
 
 ####Run OpenVulnQuery as a Library
-<<<<<<< HEAD
 After you install openVulnQuery package, you can use the query_client module to make API-call which returns 
  advisory objects. For each query to the API, you can pick the advisory format. 
 ```
