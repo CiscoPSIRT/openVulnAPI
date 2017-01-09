@@ -77,6 +77,8 @@ Notes:
         >> python main.py --cvrf --latest 10
         >> python main.py --oval --latest 10
 
+        Note: the latest option is limited to 100 maximum queries
+
 --severity
         Search by severity (low, medium, high, critical)
         Note: Oval does not have a low severity
@@ -189,6 +191,7 @@ Finding the Number of CVRF Advisories with a "Critical" sir in 2013
 If more than one API filter is entered, the last filter will be used for the API call
 
 ####Run OpenVulnQuery as a Library
+<<<<<<< HEAD
 After you install openVulnQuery package, you can use the query_client module to make API-call which returns 
  advisory objects. For each query to the API, you can pick the advisory format. 
 ```
@@ -214,6 +217,33 @@ Here are the information stored in advisory object.
 #####CVRF (inherits Advisory Abstract Class)
             * cvrf_url
             * vuln_title
-
-#####OVAL (inherits Advisory Advisory Class)
+#####OVAL (inherits Advisory Abstract Class)
             * oval_url
+After you install openVulnQuery package, you can use the query_client module to make API-call which returns
+ advisory objects. For each query to the API, you can pick advisory format and whether you want to parse the cvrf as we only support parsing cvrf xml files right now.
+```
+>> from openVulnQuery import query_client
+>> query_client = query_client.OpenVulnQueryClient(client_id='', client_secret='')
+>> advisories = query_client.get_by_year(year=2010, adv_format = 'cvrf', cvrf_parsed = True)
+```
+Here are the information stored in advisory object.
+#####Advisory
+      * SIR
+      * First Published
+      * Last Updated
+      * CVES
+      * CVRF / OVAL URL
+
+       Cvrf
+          * Document Title
+          * Summary
+          * Publication URL
+          * Full Product Name
+          * List of Vulnerabilities
+
+              Vulnerability
+                * Title
+                * CVE
+                * BUG Ids
+                * Base Score
+
