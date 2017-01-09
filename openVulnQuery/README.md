@@ -104,10 +104,12 @@ Notes:
          >> openVulnQuery --oval --product Cisco
 
 --ios_xe 
-        Search by IOS XE version
+        Cisco IOS Software Checker has been integrated with openVulnAPI.
+        Search by Cisco IOS or Cisco IOS XE Software version. 
         Examples:
         >> openVulnQuery --cvrf --ios_xe 13.16.1S
         >> openVulnQuery --oval --ios_xe 13.16.1S
+        >> openVulnQuery --cvrf --ios_xe 12.4(24)YG1
 ```
 ####Parsing Fields (Optional)
 Notes:
