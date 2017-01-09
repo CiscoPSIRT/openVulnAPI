@@ -1,4 +1,4 @@
-# Troubleshoot openVulnQuery Installation Issues #
+# Troubleshooting openVulnQuery Installation Issues #
 
 This page is dedicated to resolving common installation issue encountered during installation of openVulnQuery.
 
