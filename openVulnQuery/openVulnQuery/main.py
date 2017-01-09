@@ -118,7 +118,7 @@ def main():
     args = process_command_line()
     api_resource_key, api_resource_value = args.api_resource
 
-    client = query_client.OpenVulnQueryClient(config.TEST_ClIENT_ID, config.TEST_CLIENT_SECRET)
+    client = query_client.OpenVulnQueryClient(config.ClIENT_ID, config.CLIENT_SECRET)
     query_client_func = getattr(client, 'get_by_{0}'.format(api_resource_key))
 
     if not args.fields:
