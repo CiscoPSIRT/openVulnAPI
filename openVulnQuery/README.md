@@ -214,6 +214,12 @@ After you install openVulnQuery package, you can use the query_client module to 
 >> query_client = query_client.QueryClient(client_id = "", client_secret = "")
 >> advisories = query_client.get_by_year(year = 2010, adv_format = "cvrf")
 ```
+If you want to use the additional date filters based on first published and last updated date. You can pass the appropriate class
+```
+>> advisories = query_client.get_by_severity(adv_format="cvrf", severity="high", FirstPublished(2016-01-01, 2016-02-02))
+>> advisories = query_client.get_by_severity(adv_format="oval", severity="low", LastUpdated(2016-01-01, 2016-02-02))
+```
+
 Here are the information stored in advisory object.
 #####Advisory
       * advisory_id
