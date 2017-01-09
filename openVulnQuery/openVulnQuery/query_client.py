@@ -96,8 +96,8 @@ class OpenVulnQueryClient(object):
         """Return advisories by product name"""
 
         advisories = self.get_request(
-            "{adv_format}/product/{product_name}".format(adv_format=adv_format,
-                                                         product_name=product_name))
+            "{adv_format}/product".format(adv_format=adv_format),
+            params={'product': product_name})
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_ios_xe(self, adv_format, ios_version):
@@ -123,7 +123,7 @@ class OpenVulnQueryClient(object):
         """
         self.logger.info("Sending Get Request %s", path)
         r = requests.get(
-            url="{base_url}/{path}".format(base_url=config.TEST_API_URL, path=path),
+            url="{base_url}/{path}".format(base_url=config.API_URL, path=path),
             headers=self.headers,
             params=params)
         r.raise_for_status()
@@ -157,12 +157,13 @@ class OpenVulnQueryClient(object):
                                     product_names=advisory_dict["productNames"],
                                     summary=advisory_dict["summary"])
             elif adv_format == "oval":
+                oval_url = advisory_dict['oval'] if 'oval' in advisory_dict else advisory_dict['ovalUrl']
                 adv = advisory.OVAL(advisory_id=advisory_dict["advisoryId"],
                                     sir=advisory_dict["sir"],
                                     first_published=advisory_dict["firstPublished"],
                                     last_updated=advisory_dict["lastUpdated"],
                                     cves=advisory_dict["cves"],
-                                    oval_url=advisory_dict["oval"],
+                                    oval_url=oval_url,
                                     bug_ids=advisory_dict["bugIDs"],
                                     cvss_base_score=advisory_dict["cvssBaseScore"],
                                     advisory_title=advisory_dict["advisoryTitle"],
