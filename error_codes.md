@@ -1,8 +1,8 @@
 # Error Codes
 ----
-Resource URIs: cvrf/advisory/{advisoryId} or /oval/advisory/{advisoryId}
+**Resource URIs:** cvrf/advisory/{advisoryId} or /oval/advisory/{advisoryId}
 
-Scenario: If advisoryId is not found 	
+**Scenario:** If advisoryId is not found 	
 
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <advisory>
@@ -11,11 +11,11 @@ Scenario: If advisoryId is not found
     </advisory>
 
 ----
-Resource URI: all
+**Resource URI:** all
 	
 Scenario: If the extension entered is not a valid extension
 
-Note: This will be common for all resource URIs.
+**Note:** This will be common for all resource URIs.
 	
 
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -25,9 +25,9 @@ Note: This will be common for all resource URIs.
     </advisory>
 
 ----
-Resource URIs: all
+**Resource URIs:** all
 
-Scenario:	Page index is not a valid index
+**Scenario:**	Page index is not a valid index
 
 Note: This will be common for all resource URIs.
 	
@@ -39,11 +39,11 @@ Note: This will be common for all resource URIs.
     </advisory>
 
 ----
-Resource URIs: all
+**Resource URIs:** all
 
-Scenario:	Page size is not a valid
+**Scenario:**	Page size is not a valid
 
-Note: This will be common for all resource URIs.
+**Note:** This will be common for all resource URIs.
 	
 
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -53,9 +53,9 @@ Note: This will be common for all resource URIs.
     </advisory>
     
 ----
-Resource URIs: /cvrf/severity/{severity} or /oval/severity/{severity}
+**Resource URIs:** /cvrf/severity/{severity} or /oval/severity/{severity}
 
-Scenario:	If the severity (security impact rating) is not found. 	
+**Scenario:**	If the severity (security impact rating) is not found. 	
 
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <advisory>
@@ -64,9 +64,9 @@ Scenario:	If the severity (security impact rating) is not found.
     </advisory>
 
 ----
-Resource URIs: /cvrf/cve/{cveId} or /oval/cve/{cveId}
+**Resource URIs:** /cvrf/cve/{cveId} or /oval/cve/{cveId}
 
-Scenario: If cve id is not found in database
+**Scenario:** If cve id is not found in database
 
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <advisory>
@@ -75,9 +75,9 @@ Scenario: If cve id is not found in database
     </advisory>
 
 ----
-Resource URIs: /cvrf/year/{year} or /oval/year/{year}
+**Resource URIs:** /cvrf/year/{year} or /oval/year/{year}
 
-Scenario:	Year must be between 1995 and current year 	
+**Scenario:**	Year must be between 1995 and current year 	
 
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <advisory>
@@ -95,9 +95,9 @@ If no advisory found for given year.
     </advisory>
 
 ----
-Resource URIs: /cvrf/latest/{advCount} or /oval/latest/{advCount}
+**Resource URIs:** /cvrf/latest/{advCount} or /oval/latest/{advCount}
 
-Scenario:	If latest count is invalid, it should be between 1 and 100 	
+**Scenario:**	If latest count is invalid, it should be between 1 and 100 	
 
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <advisory>
@@ -105,7 +105,7 @@ Scenario:	If latest count is invalid, it should be between 1 and 100
       <errorMessage>Minimum latest advisories count is 1,Maximum latest advisories count is 100</errorMessage>
     </advisory>
 
-Scenario: If latest count is invalid, it should be between 1 and 100
+**Scenario:** If latest count is invalid, it should be between 1 and 100
 	
 
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
