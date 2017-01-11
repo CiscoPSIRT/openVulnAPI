@@ -103,6 +103,13 @@ Notes:
          >> openVulnQuery --cvrf --product Cisco
          >> openVulnQuery --oval --product Cisco
 
+--ios
+        Search by IOS version
+        Examples:
+        >> openVulnQuery --cvrf --ios 15.6\(2\)SP  (*use \ to escape bracket in ios version)
+        >> openVulnQuery --oval --ios 15.6(\2\)SP
+ 
+
 --ios_xe 
         Search by IOS XE version
         Examples:

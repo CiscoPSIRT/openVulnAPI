@@ -69,7 +69,11 @@ def process_command_line():
                               type=(lambda x: ('ios_xe', x)),
                               help='Retrieve advisories affecting user inputted iso_xe version.'
                                    'Only one version at a time is allowed.')
-
+    api_resource.add_argument('--ios',
+                              dest='api_resource',
+                              type=(lambda x: ('ios', x)),
+                              help='Retrieve advisories affecting user inputted iso version.'
+                                   'Only one version at a time is allowed.')
     output_format.add_argument('--csv',
                                dest='output_format',
                                type=(lambda x: ('csv', x)),
@@ -82,10 +86,10 @@ def process_command_line():
                                    dest='first_published',
                                    type=valid_date,
                                    help='Filter advisories based on first_published date YYYY-MM-DD:YYYY-MM-DD')
-    additional_filter.add_argument('--last_updated',
-                                   dest='last_updated',
+    additional_filter.add_argument('--last_published',
+                                   dest='last_published',
                                    type=valid_date,
-                                   help='Filter advisories based on last_updated date YYYY-MM-DD:YYYY-MM-DD')
+                                   help='Filter advisories based on last_published date YYYY-MM-DD:YYYY-MM-DD')
 
     parser.add_argument('--count', '-c',
                         action='store_true',
@@ -98,8 +102,8 @@ def process_command_line():
 
     args = parser.parse_args()
     if args.api_resource[0] not in allows_filter:
-        if args.first_published or args.last_updated:
-            parser.error('Only %s based filter can have additional first_published or last_updated filter' % allows_filter)
+        if args.first_published or args.last_published:
+            parser.error('Only %s based filter can have additional first_published or last_published filter' % allows_filter)
     return args
 
 
@@ -118,7 +122,7 @@ def main():
     args = process_command_line()
     api_resource_key, api_resource_value = args.api_resource
 
-    client = query_client.OpenVulnQueryClient(config.ClIENT_ID, config.CLIENT_SECRET)
+    client = query_client.OpenVulnQueryClient(config.CLIENT_ID, config.CLIENT_SECRET)
     query_client_func = getattr(client, 'get_by_{0}'.format(api_resource_key))
 
     if not args.fields:
@@ -132,8 +136,8 @@ def main():
         if args.first_published:
             start_date, end_date = args.first_published
             filter = query_client.FirstPublishedFilter(start_date, end_date)
-        elif args.last_updated:
-            start_date, end_date = args.last_updated
+        elif args.last_published:
+            start_date, end_date = args.last_published
             filter = query_client.LastPublishedFilter(start_date, end_date)
         advisories = query_client_func(args.advisory_format, api_resource_value, filter)
     else:
