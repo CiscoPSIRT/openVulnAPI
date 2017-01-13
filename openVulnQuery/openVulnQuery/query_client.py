@@ -107,6 +107,13 @@ class OpenVulnQueryClient(object):
             "iosxe", params={'version': ios_version})
         return self.advisory_list(advisories['advisories'], adv_format)
 
+    def get_by_ios(self, adv_format, ios_version):
+        """Return advisories by Cisco IOS advisories version"""
+
+        advisories = self.get_request(
+            "ios", params={'version': ios_version})
+        return self.advisory_list(advisories['advisories'], adv_format)
+
     def get_request(self, path, params=None):
         """Send get request to OpenVuln API utilizing headers.
 
