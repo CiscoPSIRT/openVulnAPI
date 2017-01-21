@@ -116,7 +116,6 @@ Notes:
         Examples:
         >> openVulnQuery --cvrf --ios_xe 13.16.1S
         >> openVulnQuery --oval --ios_xe 13.16.1S
-        >> openVulnQuery --cvrf --ios_xe 12.4(24)YG1
 ```
 ####Parsing Fields (Optional)
 Notes:
