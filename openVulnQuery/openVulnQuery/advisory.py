@@ -1,51 +1,4 @@
 from abc import ABCMeta
-from lxml import etree
-import urllib2
-import cStringIO
-import logging
-
-
-def from_url(url):
-    """Helper method to get html from url"""
-    while True:
-        try:
-            r = urllib2.urlopen(url)
-        except URLError as e:
-            if hasattr(e, 'reason'):
-                logging.error("We failed to reach server")
-                logging.error("Reason : ", e.reason)
-            elif hasattr(e, 'code'):
-                logging.error("Server couldn't fulfill the request")
-                logging.error(e.code)
-        else:
-            xml = r.read()
-        if xml:
-            break
-    return xml
-
-
-def get_elem(tree, path):
-    """Helper method to extract node element in  xml by xpath"""
-
-    cvrf_ns = "http://www.icasi.org/CVRF/schema/cvrf/1.1"
-    prod_ns = "http://www.icasi.org/CVRF/schema/prod/1.1"
-    vuln_ns = "http://www.icasi.org/CVRF/schema/vuln/1.1"
-    result = tree.xpath("/cvrf_ns:cvrfdoc/%s" % path,
-                        namespaces={"cvrf_ns": cvrf_ns,
-                                    "prod_ns": prod_ns,
-                                    "vuln_ns": vuln_ns})
-    return result
-
-
-def get_text(tree, path):
-    """Helper method to return text value in  xml pointed by xpath"""
-
-    elems = get_elem(tree, path)
-    if len(elems) == 0:
-        return "NA"
-    if len(elems) == 1:
-        return elems.pop().text
-    return [e.text for e in elems]
 
 
 class Advisory(object):
@@ -81,39 +34,9 @@ class CVRF(Advisory):
 
     def __init__(self, *args, **kwargs):
         self.cvrf_url = kwargs.pop('cvrf_url', None)
+
         self._additional_fields = None
         super(CVRF, self).__init__(*args, **kwargs)
-
-    @property
-    def additional_fields(self):
-        """Dictionary of additional fields extracted from XML Document"""
-        if not self._additional_fields:
-            self._additional_fields = CVRF.fromXML(self.cvrf_url)
-        return self._additional_fields
-
-    def __getattr__(self, attr):
-        try:
-            return self.additional_fields[attr]
-        except:
-            raise AttributeError('Attribute doesnot exist')
-
-    @staticmethod
-    def fromXML(xml_url):
-        """Parses XML to prepare arguments for CVRF Advisory"""
-
-        xml = from_url(xml_url)
-        bad_xml = xml.decode('utf-8', errors='ignore')
-        good_xml = bad_xml.encode('utf-8')
-        tree = etree.parse(cStringIO.StringIO(good_xml))
-
-        vulnerability = get_elem(tree, 'vuln_ns:Vulnerability')
-        vuln_title = []
-        for i, r in enumerate(vulnerability, start=1):
-            vuln_title.append(get_text(tree, 'vuln_ns:Vulnerability[%s]/vuln_ns:Title' % i))
-        kwargs = {
-                'vuln_title': vuln_title
-            }
-        return kwargs
 
 
 class OVAL(Advisory):
@@ -122,3 +45,14 @@ class OVAL(Advisory):
     def __init__(self, *args, **kwargs):
         self.oval_url = kwargs.pop('oval_url', None)
         super(OVAL, self).__init__(*args, **kwargs)
+
+
+class AdvisoryIOS(Advisory):
+    """Advisory Object with additional information on IOS/IOSXE version """
+
+    def __init__(self, *args, **kwargs):
+        self.first_fixed = kwargs.pop('first_fixed', None)
+        self.ios_release = kwargs.pop('ios_release', None)
+        self.oval_url = kwargs.pop('oval_url', None)
+        self.cvrf_url = kwargs.pop('cvrf_url', None)
+        super(AdvisoryIOS, self).__init__(*args, **kwargs)

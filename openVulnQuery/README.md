@@ -106,15 +106,15 @@ Notes:
 --ios
         Search by IOS version
         Examples:
-        >> openVulnQuery --cvrf --ios 15.6\(2\)SP  (*use \ to escape bracket in ios version)
-        >> openVulnQuery --oval --ios 15.6(\2\)SP
+        >> openVulnQuery --ios 15.6\(2\)SP  (*use \ to escape bracket in ios version)
+        >> openVulnQuery --ios 15.6(\2\)SP
  
 
 --ios_xe 
         Search by IOS XE version
         Examples:
-        >> openVulnQuery --cvrf --ios_xe 13.16.1S
-        >> openVulnQuery --oval --ios_xe 13.16.1S
+        >> openVulnQuery --ios_xe 13.16.1S
+        >> openVulnQuery --ios_xe 13.16.1S
 ```
 ####Parsing Fields (Optional)
 Notes:
@@ -225,6 +225,7 @@ After you install openVulnQuery package, you can use the query_client module to 
 >> from openVulnQuery import query_client
 >> query_client = query_client.QueryClient(client_id = "", client_secret = "")
 >> advisories = query_client.get_by_year(year = 2010, adv_format = "cvrf")
+>> advisories = query_client.get_by_ios_xe('3.16.1S')
 ```
 If you want to use the additional date filters based on first published and last updated date. You can pass the appropriate class
 ```
@@ -260,23 +261,26 @@ After you install openVulnQuery package, you can use the query_client module to 
 >> advisories = query_client.get_by_year(year=2010, adv_format = 'cvrf', cvrf_parsed = True)
 ```
 Here are the information stored in advisory object.
-#####Advisory
-      * SIR
-      * First Published
-      * Last Updated
-      * CVES
-      * CVRF / OVAL URL
-
-       Cvrf
-          * Document Title
-          * Summary
-          * Publication URL
-          * Full Product Name
-          * List of Vulnerabilities
-
-              Vulnerability
-                * Title
-                * CVE
-                * BUG Ids
-                * Base Score
+#####Advisory (Abstract Base Class)
+       * advisory_id
+       * sir
+       * first_published
+       * last_updated
+       * cves
+       * bug_ids
+       * cvss_base_score
+       * advisory_title
+       * publication_url
+       * cwe
+       * product_names
+       * summary
+#####CVRF
+        * cvrf_url
+#####OVAL
+        * oval_url
+#####AdvisoryIOS
+        * ios_release
+        * first_fixed
+        * cvrf_url
+        * oval_url
 

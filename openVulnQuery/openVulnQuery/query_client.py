@@ -100,19 +100,19 @@ class OpenVulnQueryClient(object):
             params={'product': product_name})
         return self.advisory_list(advisories['advisories'], adv_format)
 
-    def get_by_ios_xe(self, adv_format, ios_version):
+    def get_by_ios_xe(self, ios_version):
         """Return advisories by Cisco IOS advisories version"""
 
         advisories = self.get_request(
             "iosxe", params={'version': ios_version})
-        return self.advisory_list(advisories['advisories'], adv_format)
+        return self.advisory_list(advisories['advisories'], None)
 
-    def get_by_ios(self, adv_format, ios_version):
+    def get_by_ios(self, ios_version):
         """Return advisories by Cisco IOS advisories version"""
 
         advisories = self.get_request(
             "ios", params={'version': ios_version})
-        return self.advisory_list(advisories['advisories'], adv_format)
+        return self.advisory_list(advisories['advisories'], None)
 
     def get_request(self, path, params=None):
         """Send get request to OpenVuln API utilizing headers.
@@ -178,8 +178,25 @@ class OpenVulnQueryClient(object):
                                     cwe=advisory_dict["cwe"],
                                     product_names=advisory_dict["productNames"],
                                     summary=advisory_dict["summary"])
-
+            elif not adv_format:
+                oval_url = advisory_dict['oval'] if 'oval' in advisory_dict else advisory_dict['ovalUrl']
+                adv = advisory.AdvisoryIOS(advisory_id=advisory_dict["advisoryId"],
+                                           sir=advisory_dict["sir"],
+                                           first_published=advisory_dict["firstPublished"],
+                                           last_updated=advisory_dict["lastUpdated"],
+                                           cves=advisory_dict["cves"],
+                                           oval_url=oval_url,
+                                           bug_ids=advisory_dict["bugIDs"],
+                                           cvss_base_score=advisory_dict["cvssBaseScore"],
+                                           advisory_title=advisory_dict["advisoryTitle"],
+                                           publication_url=advisory_dict["publicationUrl"],
+                                           cwe=advisory_dict["cwe"],
+                                           product_names=advisory_dict["productNames"],
+                                           summary=advisory_dict["summary"],
+                                           first_fixed=advisory_dict["firstFixed"],
+                                           ios_release=advisory_dict["iosRelease"])
             self.logger.debug("%s Advisory %s Created", type(adv).__name__, adv.advisory_id)
 
             advisory_list.append(adv)
         return advisory_list
+
