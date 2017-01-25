@@ -1,5 +1,4 @@
 import sys
-from prettytable import PrettyTable
 import csv
 import json
 
@@ -51,8 +50,6 @@ def output(advisories, output_format, file_handle):
         _to_json(advisories, file_handle)
     elif output_format == 'csv':
         _to_csv(advisories, file_handle, delimiter=",")
-    else:
-        _to_stdout(advisories)
 
 
 def _to_json(advisory_list, file_handle):
@@ -60,18 +57,6 @@ def _to_json(advisory_list, file_handle):
 
     json_data = json.dumps(advisory_list, sort_keys=True, indent=4)
     file_handle.write(json_data)
-
-
-def _to_stdout(advisories):
-    """Display data in pretty printed tabular format"""
-
-    header = advisories[0].keys()
-    table = PrettyTable(header)
-
-    for advisory in advisories:
-        row = _convert_list_to_string(advisory)
-        table.add_row(row.values())
-    print(table)
 
 
 def _to_csv(advisory_list, file_handle, delimiter):
