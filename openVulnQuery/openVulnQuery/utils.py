@@ -73,11 +73,11 @@ def _to_csv(advisory_list, file_handle, delimiter):
 def _convert_list_to_string(field_list):
     """Converts dictionary values that are list to string separated by space"""
 
-    return {k: '\t'.join(v) if isinstance(v, list) else v
+    return {k: u'\t'.join(v) if isinstance(v, list) else v.encode('utf-8').strip()
             for k, v in field_list.items()}
 
 
 def get_output_filehandle(file_path=None):
     """Returns file handle if file_path given else returns stdout handle"""
 
-    return open(file_path, "w") if file_path else sys.stdout;
+    return open(file_path, "w") if file_path else sys.stdout
