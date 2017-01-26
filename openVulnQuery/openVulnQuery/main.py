@@ -173,8 +173,7 @@ def main():
         returned_output = [vars(advisory) for advisory in advisories]
 
     output_format, file_path = args.output_format
-    if not args.fields:
-        output_format = 'json'
+
     with utils.get_output_filehandle(file_path) as f:
         utils.output(returned_output, output_format, f)
 
