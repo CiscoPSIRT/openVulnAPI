@@ -35,7 +35,6 @@ class CVRF(Advisory):
     def __init__(self, *args, **kwargs):
         self.cvrf_url = kwargs.pop('cvrf_url', None)
 
-        self._additional_fields = None
         super(CVRF, self).__init__(*args, **kwargs)
 
 

@@ -51,7 +51,7 @@ def process_command_line():
                               help='Retrieve advisories by cve id')
     api_resource.add_argument('--latest',
                               dest='api_resource',
-                              metavar = 'number',
+                              metavar='number',
                               type=(lambda x: ('latest', x)),
                               help='Retrieve latest (number) of advisories')
     api_resource.add_argument('--severity',
@@ -67,7 +67,7 @@ def process_command_line():
 
     api_resource.add_argument('--product',
                               dest='api_resource',
-                              metavar='product name',
+                              metavar='product_name',
                               type=(lambda x: ('product', x)),
                               help='Retrieve advisories by product names')
     api_resource.add_argument('--ios_xe',
