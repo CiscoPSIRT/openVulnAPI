@@ -74,13 +74,13 @@ def process_command_line():
                               dest='api_resource',
                               metavar='iosxe_version',
                               type=(lambda x: ('ios_xe', x)),
-                              help='Retrieve advisories affecting user inputted iso_xe version.'
+                              help='Retrieve advisories affecting user inputted ios_xe version.'
                                    'Only one version at a time is allowed.')
     api_resource.add_argument('--ios',
                               dest='api_resource',
                               metavar='ios_version',
                               type=(lambda x: ('ios', x)),
-                              help='Retrieve advisories affecting user inputted iso version.'
+                              help='Retrieve advisories affecting user inputted ios version.'
                                    'Only one version at a time is allowed.')
     output_format.add_argument('--csv',
                                dest='output_format',
