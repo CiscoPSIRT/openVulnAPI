@@ -165,7 +165,7 @@ Any field that has no information will return with with the field name and NA
               >> openVulnQuery --cvrf --year 2011 -f cves cvrf_url bug_ids summary product_names
 ```
 
-#### #Additional Filters
+##### Additional Filters
 User can be more specific on filtering advisories when searching all advisories or by severity. They can filter based on last updated and first published dates providing start and end date as a search range. Dates should be entered in YYYY-MM-DD format.
 ```
 >> openVulnQuery --cvrf --severity high --last_updated 2016-01-02:2016-04-02 --json filename.json
