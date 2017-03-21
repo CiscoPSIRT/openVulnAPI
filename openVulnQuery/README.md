@@ -1,22 +1,22 @@
-#openVulnQuery
+# openVulnQuery
 A python-based module(s) to query the Cisco PSIRT openVuln API.
 
 The Cisco Product Security Incident Response Team (PSIRT) openVuln API is a RESTful API that allows customers to obtain Cisco Security Vulnerability information in different machine-consumable formats. APIs are important for customers because they allow their technical staff and programmers to build tools that help them do their job more effectively (in this case, to keep up with security vulnerability information). More information about the API can be found at: https://developer.cisco.com/site/PSIRT/discover/overview/
 
-####PIP Installation
+#### PIP Installation
 - pip install openVulnQuery
 
   If you are experiencing any difficulty installing openVulnQuery.
   Here is the link to [common installation issues solutions]   (https://github.com/iamparas/openVulnAPI/blob/master/openVulnQuery/InstallationIssueSolutions.md).
 
-####Requirements
+Requirements
 - Tested on Python Version 2.7
 - argparse 1.4.0
 - PrettyTable 0.7.2
 - requests 2.10.0
 - lxml 3.6.0
 
-####Config File
+#### Config File
 Obtain client ID and Secret:
 
 1. https://apiconsole.cisco.com/
@@ -31,7 +31,7 @@ Obtain client ID and Secret:
   - To edit the config.py file if installing with pip, run the command pip show openVulnQuery and cd into the location of the package. Then cd into the openVulnQuery folder and open the config.py file in your favorite editor, modify and save.
   - OAuth2 Token automatically generated on each call to the API.
 
-####Run OpenVulnQuery in the Terminal
+#### Run OpenVulnQuery in the Terminal
 - If installed with pip run the program by typing
 ```
   >>OpenVulnQuery --Advisory Type --API Filters --Parsing Fields --Output Format -Count
@@ -44,14 +44,14 @@ Notes:
 
 -- Used for whole word commands, - Used for single character commands
 
-####Advisory Type (Required)
+#### Advisory Type (Required)
 ```
 --cvrf
         Filter openVuln API by only cvrf advisories
 --oval
         Filter openVuln API by only oval advisories
 ```
-####API Filters (Required)
+#### API Filters (Required)
 ```
 --all
         Return all advisories in cvrf or oval format
@@ -108,23 +108,23 @@ Notes:
         Examples:
         >> openVulnQuery --ios 15.6\(2\)SP  (*use \ to escape bracket in ios version)
         >> openVulnQuery --ios 15.6(\2\)SP
- 
 
---ios_xe 
+
+--ios_xe
         Cisco IOS Software Checker has been integrated with openVulnAPI.
-        Search by Cisco IOS or Cisco IOS XE Software version. 
+        Search by Cisco IOS or Cisco IOS XE Software version.
         Example:
         >> openVulnQuery --ios_xe 3.16.1S
 
 ```
-####Parsing Fields (Optional)
+#### Parsing Fields (Optional)
 Notes:
 
 If no fields are passed in the default API fields will be returned
 
 Any field that has no information will return with with the field name and NA
 
-##### Parsable Fields
+##### Available Fields
   - advisory_id
   - sir
   - first_published
@@ -165,15 +165,15 @@ Any field that has no information will return with with the field name and NA
               >> openVulnQuery --cvrf --year 2011 -f cves cvrf_url bug_ids summary product_names
 ```
 
-#####Additional Filters
-User can be more specific on filtering advisories when searching all advisories or by severity. They can filter based on last updated and first published dates providing start and end date as a search range. Dates should be entered in YYYY-MM-DD format. 
+#### #Additional Filters
+User can be more specific on filtering advisories when searching all advisories or by severity. They can filter based on last updated and first published dates providing start and end date as a search range. Dates should be entered in YYYY-MM-DD format.
 ```
 >> openVulnQuery --cvrf --severity high --last_updated 2016-01-02:2016-04-02 --json filename.json
 >> openVulnQuery --cvrf --all --last_updated 2016-01-02:2016-07-02
 >> openVulnQuery --cvrf --severity critical --first_published 2015:01:02:2015-01-01
 ```
 
-####Output Format (Optional)
+#### Output Format (Optional)
 ```
 Default
         Table style printed to screen
@@ -190,7 +190,7 @@ Default
         Example:
         >> openVulnQuery --cvrf --year 2016 --csv  /Users/bkorabik/Documents/2016_cvrf.csv
 ```
-####Count (Optional)
+#### Count (Optional)
 Returns the count of fields entered with -f or --fields. If no fields are entered the base API fields are counted and displayed
 ```
 -c
@@ -200,14 +200,14 @@ Returns the count of fields entered with -f or --fields. If no fields are entere
         >> openVulnQuery --cvrf --severity low -f sir cves bug_ids -c
 ```
 
-####Developers
+#### Developers
 - Update the config.py file with client id and secret
 - Directly interact with query_client.py to query the Open Vuln API
-- query_client.py returns Advisory Object 
+- query_client.py returns Advisory Object
 - advisory.py module has Advisory object a abstract class which is inherited by CVRF and OVAL data type
-- This abstraction hides the implementation details and the data source used to populate the data type. The data members of CVRF and OVAL advisories are populated from API results as well parsing the XML file obtained from the API results. 
+- This abstraction hides the implementation details and the data source used to populate the data type. The data members of CVRF and OVAL advisories are populated from API results as well parsing the XML file obtained from the API results.
 
-####Disclosures:
+#### Disclosures:
 No support for filtering based on --API fields, you can't use --year 2016 and --severity high
 
 Filtering with Grep:
@@ -219,9 +219,9 @@ Finding the Number of CVRF Advisories with a "Critical" sir in 2013
 
 If more than one API filter is entered, the last filter will be used for the API call
 
-####Run OpenVulnQuery as a Library
-After you install openVulnQuery package, you can use the query_client module to make API-call which returns 
- advisory objects. For each query to the API, you can pick the advisory format. 
+#### Run OpenVulnQuery as a Library
+After you install openVulnQuery package, you can use the query_client module to make API-call which returns
+ advisory objects. For each query to the API, you can pick the advisory format.
 ```
 >> from openVulnQuery import query_client
 >> query_client = query_client.QueryClient(client_id = "", client_secret = "")
@@ -235,7 +235,7 @@ If you want to use the additional date filters based on first published and last
 ```
 
 Here are the information stored in advisory object.
-#####Advisory
+##### Advisory
       * advisory_id
       * sir
       * first_published
@@ -248,11 +248,11 @@ Here are the information stored in advisory object.
       * cwe
       * product_names
       * summary
-      
-#####CVRF (inherits Advisory Abstract Class)
+
+##### CVRF (inherits Advisory Abstract Class)
             * cvrf_url
             * vuln_title
-#####OVAL (inherits Advisory Abstract Class)
+##### OVAL (inherits Advisory Abstract Class)
             * oval_url
 After you install openVulnQuery package, you can use the query_client module to make API-call which returns
  advisory objects. For each query to the API, you can pick advisory format and whether you want to parse the cvrf as we only support parsing cvrf xml files right now.
@@ -262,7 +262,7 @@ After you install openVulnQuery package, you can use the query_client module to 
 >> advisories = query_client.get_by_year(year=2010, adv_format = 'cvrf', cvrf_parsed = True)
 ```
 Here are the information stored in advisory object.
-#####Advisory (Abstract Base Class)
+##### Advisory (Abstract Base Class)
        * advisory_id
        * sir
        * first_published
@@ -275,13 +275,12 @@ Here are the information stored in advisory object.
        * cwe
        * product_names
        * summary
-#####CVRF
+##### CVRF
         * cvrf_url
-#####OVAL
+##### OVAL
         * oval_url
-#####AdvisoryIOS
+##### AdvisoryIOS
         * ios_release
         * first_fixed
         * cvrf_url
         * oval_url
-
