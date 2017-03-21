@@ -217,7 +217,13 @@ Finding the Number of CVRF Advisories with a "Critical" sir in 2013
         >> openVulnQuery --cvrf --severity critical -f first_published | grep -c "2013"
 ```
 
-If more than one API filter is entered, the last filter will be used for the API call
+If more than one API filter is entered, the last filter will be used for the API call.
+
+You can alternatively use the date range functionality, as shown below:
+
+```
+>> openVulnQuery --cvrf --severity critical --first_published 2015:01:02:2015-01-01
+```
 
 #### Run OpenVulnQuery as a Library
 After you install openVulnQuery package, you can use the query_client module to make API-call which returns
