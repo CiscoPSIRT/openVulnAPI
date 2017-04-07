@@ -134,11 +134,13 @@ def valid_date(date_text):
         end_date_obj = datetime.datetime.strptime(end_date, '%Y-%m-%d')
         if start_date_obj > end_date_obj:
             raise argparse.ArgumentTypeError('StartDate(%s) should me smaller than EndDate(%s)' % (start_date, end_date))
-        if start_date_obj > datetime.datetime.now().date() or end_date_obj > datetime.datetime.now().date():
+        if start_date_obj > datetime.datetime.now() or end_date_obj > datetime.datetime.now():
             raise argparse.ArgumentTypeError('Invalid date %s' % date_text)
         return start_date, end_date
     except ValueError:
         raise argparse.ArgumentTypeError('%s is not a valid date format. Enter date in YYYY-MM-DD:YYYY-MM-DD format' % date_text)
+    except Exception:
+        raise Exception("Hola")
 
 
 def main():
