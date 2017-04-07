@@ -170,7 +170,7 @@ User can be more specific on filtering advisories when searching all advisories 
 ```
 >> openVulnQuery --cvrf --severity high --last_updated 2016-01-02:2016-04-02 --json filename.json
 >> openVulnQuery --cvrf --all --last_updated 2016-01-02:2016-07-02
->> openVulnQuery --cvrf --severity critical --first_published 2015:01:02:2015-01-01
+>> openVulnQuery --cvrf --severity critical --first_published 2015-01-02:2015-01-04
 ```
 
 #### Output Format (Optional)
