@@ -2,14 +2,9 @@ import argparse
 import datetime
 
 import config
+import constants
 import query_client
 import utils
-
-# need to update this list if you add new fields to the advisory
-API_LABELS = ['advisory_id', 'sir', 'first_published', 'last_updated', 'cves', 'cvss_base_score',
-              'advisory_title', 'publication_url', 'cwe', 'product_names', 'summary',
-              'oval_url', 'cvrf_url', 'bug_ids', 'ios_release', 'first_fixed']
-allows_filter = ['all', 'severity']
 
 
 def process_command_line():
@@ -112,8 +107,8 @@ def process_command_line():
                         dest='fields',
                         nargs='+',
                         metavar='',
-                        choices=API_LABELS,
-                        help='Separate fields by spaces to return advisory information. Allowed values are: %s' % ', '.join(API_LABELS))
+                        choices=constants.API_LABELS + constants.IPS_SIGNATURES,
+                        help='Separate fields by spaces to return advisory information. Allowed values are: %s' % ', '.join(constants.API_LABELS))
 
     args = parser.parse_args()
     if not args.advisory_format:
@@ -121,9 +116,9 @@ def process_command_line():
         if key not in ['ios', 'ios_xe']:
             parser.error('Advisory format --cvrf or --oval required except for ios and ios_xe')
 
-    if args.api_resource[0] not in allows_filter:
+    if args.api_resource[0] not in constants.allows_filter:
         if args.first_published or args.last_published:
-            parser.error('Only %s based filter can have additional first_published or last_published filter' % allows_filter)
+            parser.error('Only %s based filter can have additional first_published or last_published filter' % constants.allows_filter)
     return args
 
 
@@ -139,8 +134,6 @@ def valid_date(date_text):
         return start_date, end_date
     except ValueError:
         raise argparse.ArgumentTypeError('%s is not a valid date format. Enter date in YYYY-MM-DD:YYYY-MM-DD format' % date_text)
-    except Exception:
-        raise Exception("Hola")
 
 
 def main():
@@ -153,7 +146,7 @@ def main():
     if not args.advisory_format:
         advisories = query_client_func(api_resource_value)
     else:
-        if api_resource_key in allows_filter:
+        if api_resource_key in constants.allows_filter:
             filter = query_client.Filter()
             if args.first_published:
                 start_date, end_date = args.first_published
@@ -172,7 +165,7 @@ def main():
         else:
             returned_output = utils.filter_advisories(advisories, args.fields)
     else:
-        returned_output = [vars(advisory) for advisory in advisories]
+        returned_output = utils.filter_advisories(advisories, constants.API_LABELS)
 
     output_format, file_path = args.output_format
 

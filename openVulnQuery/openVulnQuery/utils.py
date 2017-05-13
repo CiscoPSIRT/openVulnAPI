@@ -2,9 +2,16 @@ import sys
 import csv
 import json
 
+import constants
+
 
 def filter_advisories(advisories, fields):
     filtered_list = []
+    is_nested_ips_signature_field = any(field in constants.IPS_SIGNATURES for field in fields)
+    if is_nested_ips_signature_field:
+        fields.append('ips_signatures')
+    if 'ips_signatures' in fields and not is_nested_ips_signature_field:
+        fields.extend(constants.IPS_SIGNATURES)
     for advisory in advisories:
         filtered_list.append(advisory.filter(*fields))
     return filtered_list
@@ -62,22 +69,50 @@ def _to_json(advisory_list, file_handle):
 def _to_csv(advisory_list, file_handle, delimiter):
     """Write csv to a file, with option to specify a delimiter"""
 
-    header = advisory_list[0].keys()
+    flattened_advisory_list = flatten_list(advisory_list)
+
+    header = flattened_advisory_list[0].keys()
+
     w = csv.DictWriter(file_handle, header, delimiter=delimiter)
     w.writeheader()
 
+    for advisory in flattened_advisory_list:
+        w.writerow(advisory)
+
+
+def flatten_list(advisory_list):
+    adv_list = []
     for advisory in advisory_list:
-        w.writerow(_convert_list_to_string(advisory))
+        adv_list.append(_flatten_datastructure(advisory))
+    return adv_list
 
 
-def _convert_list_to_string(field_list):
-    """Converts dictionary values that are list to string separated by space"""
+def _flatten_datastructure(field_list):
+    final_dict = {}
+    for k, v in field_list.iteritems():
+        if isinstance(v, list):
+            if v and isinstance(v[0], dict):
+                final_dict.update(_reduce_list_dict(k, v))
+            else:
+                final_dict[k] = u'\t'.join(v)
+        else:
+            final_dict[k] = v
+    return final_dict
 
-    return {k: u'\t'.join(v) if isinstance(v, list) else v.encode('utf-8').strip()
-            for k, v in field_list.items()}
+
+def _reduce_list_dict(node, vals):
+    keys = vals[0].keys()
+    flattened_dict = {"%s_%s" % (node, k): "" for k in keys}
+    for v in vals:
+        for key in keys:
+            flattened_key = "%s_%s" % (node, key)
+            upd_val = "%s\t%s" % (flattened_dict[flattened_key], v[key])
+            flattened_dict[flattened_key] = upd_val
+    return flattened_dict
 
 
 def get_output_filehandle(file_path=None):
     """Returns file handle if file_path given else returns stdout handle"""
 
     return open(file_path, "w") if file_path else sys.stdout
+
