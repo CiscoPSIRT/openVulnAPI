@@ -148,7 +148,9 @@ class OpenVulnQueryClient(object):
 
         """
         advisory_list = []
+
         for advisory_dict in advisories:
+
             if adv_format == "cvrf":
                 adv = advisory.CVRF(advisory_id=advisory_dict["advisoryId"],
                                     sir=advisory_dict["sir"],
@@ -162,7 +164,8 @@ class OpenVulnQueryClient(object):
                                     publication_url=advisory_dict["publicationUrl"],
                                     cwe=advisory_dict["cwe"],
                                     product_names=advisory_dict["productNames"],
-                                    summary=advisory_dict["summary"])
+                                    summary=advisory_dict["summary"],
+                                    ips_signatures=advisory_dict["ipsSignatures"])
             elif adv_format == "oval":
                 oval_url = advisory_dict['oval'] if 'oval' in advisory_dict else advisory_dict['ovalUrl']
                 adv = advisory.OVAL(advisory_id=advisory_dict["advisoryId"],
@@ -177,7 +180,8 @@ class OpenVulnQueryClient(object):
                                     publication_url=advisory_dict["publicationUrl"],
                                     cwe=advisory_dict["cwe"],
                                     product_names=advisory_dict["productNames"],
-                                    summary=advisory_dict["summary"])
+                                    summary=advisory_dict["summary"],
+                                    ips_signatures=advisory_dict["ipsSignatures"])
             elif not adv_format:
                 oval_url = advisory_dict['oval'] if 'oval' in advisory_dict else advisory_dict['ovalUrl']
                 adv = advisory.AdvisoryIOS(advisory_id=advisory_dict["advisoryId"],
@@ -199,4 +203,3 @@ class OpenVulnQueryClient(object):
 
             advisory_list.append(adv)
         return advisory_list
-
