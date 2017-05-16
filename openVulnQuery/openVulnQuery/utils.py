@@ -3,6 +3,7 @@ import csv
 import json
 
 import constants
+from sets import Set
 
 
 def filter_advisories(advisories, fields):
@@ -48,6 +49,7 @@ def output(advisories, output_format, file_handle):
         advisories: List of advisory objects.
         output_format: Either set as csv or json or use default stdout.
         file_handle: The path to put the csv or json file with a file name or stdout if no path or filename.
+        csv_headers: headers that you want in your csv
 
     Returns:
         Output displayed in format (CSV, JSON, Pretty Printed Table).
@@ -56,7 +58,7 @@ def output(advisories, output_format, file_handle):
     if output_format == 'json':
         _to_json(advisories, file_handle)
     elif output_format == 'csv':
-        _to_csv(advisories, file_handle, delimiter=",")
+        _to_csv(advisories, file_handle, delimiter="," )
 
 
 def _to_json(advisory_list, file_handle):
@@ -70,10 +72,11 @@ def _to_csv(advisory_list, file_handle, delimiter):
     """Write csv to a file, with option to specify a delimiter"""
 
     flattened_advisory_list = flatten_list(advisory_list)
+    header = _get_headers(flattened_advisory_list)
+    if 'ips_signatures' in header:
+        header.remove('ips_signatures')
 
-    header = flattened_advisory_list[0].keys()
-
-    w = csv.DictWriter(file_handle, header, delimiter=delimiter)
+    w = csv.DictWriter(file_handle, header, delimiter=delimiter, extrasaction='ignore', restval='NA')
     w.writeheader()
 
     for advisory in flattened_advisory_list:
@@ -85,6 +88,14 @@ def flatten_list(advisory_list):
     for advisory in advisory_list:
         adv_list.append(_flatten_datastructure(advisory))
     return adv_list
+
+
+def _get_headers(advisories):
+    headers = Set()
+    for advisory in advisories:
+        for key in advisory.keys():
+            headers.add(key)
+    return list(headers)
 
 
 def _flatten_datastructure(field_list):
@@ -105,8 +116,11 @@ def _reduce_list_dict(node, vals):
     flattened_dict = {"%s_%s" % (node, k): "" for k in keys}
     for v in vals:
         for key in keys:
+            seperator = ""
             flattened_key = "%s_%s" % (node, key)
-            upd_val = "%s\t%s" % (flattened_dict[flattened_key], v[key])
+            if flattened_dict[flattened_key] != "":
+                seperator = "\t"
+            upd_val = "%s%s%s" % (flattened_dict[flattened_key], seperator, v[key])
             flattened_dict[flattened_key] = upd_val
     return flattened_dict
 
