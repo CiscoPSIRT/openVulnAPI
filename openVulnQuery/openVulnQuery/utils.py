@@ -73,7 +73,7 @@ def _to_csv(advisory_list, file_handle, delimiter):
 
     header = flattened_advisory_list[0].keys()
 
-    w = csv.DictWriter(file_handle, header, delimiter=delimiter)
+    w = csv.DictWriter(file_handle, header, delimiter=delimiter, extrasaction='ignore', restval='NA')
     w.writeheader()
 
     for advisory in flattened_advisory_list:
@@ -96,7 +96,7 @@ def _flatten_datastructure(field_list):
             else:
                 final_dict[k] = u'\t'.join(v)
         else:
-            final_dict[k] = v
+            final_dict[k] = v.encode('utf-8').strip() if v else None
     return final_dict
 
 
