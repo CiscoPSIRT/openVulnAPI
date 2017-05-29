@@ -107,7 +107,7 @@ def _flatten_datastructure(field_list):
             else:
                 final_dict[k] = u'\t'.join(v)
         else:
-            final_dict[k] = v
+            final_dict[k] = v.encode('utf-8').strip() if v else None
     return final_dict
 
 
