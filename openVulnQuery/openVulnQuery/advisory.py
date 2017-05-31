@@ -23,7 +23,7 @@ class Advisory(Filterable):
 
     def __init__(self, advisory_id, sir, first_published, last_updated, cves,
                  bug_ids, cvss_base_score, advisory_title, publication_url, cwe,
-                 product_names, summary, ips_signatures):
+                 product_names, summary):
         self.advisory_id = advisory_id
         self.sir = sir
         self.first_published = first_published
@@ -36,7 +36,6 @@ class Advisory(Filterable):
         self.cwe = cwe
         self.product_names = product_names
         self.summary = summary
-        self.ips_signatures = [IPSSignature(**kwargs) if not isinstance(kwargs, basestring) else "NA" for kwargs in ips_signatures]
 
 
 class CVRF(Advisory):
@@ -44,6 +43,7 @@ class CVRF(Advisory):
 
     def __init__(self, *args, **kwargs):
         self.cvrf_url = kwargs.pop('cvrf_url', None)
+        self.ips_signatures = [IPSSignature(**kw) if not isinstance(kw, basestring) else "NA" for kw in kwargs.pop('ips_signatures', None)]
         super(CVRF, self).__init__(*args, **kwargs)
 
 
@@ -52,6 +52,7 @@ class OVAL(Advisory):
 
     def __init__(self, *args, **kwargs):
         self.oval_url = kwargs.pop('oval_url', None)
+        self.ips_signatures = [IPSSignature(**kw) if not isinstance(kw, basestring) else "NA" for kw in kwargs.pop('ips_signatures', None)]
         super(OVAL, self).__init__(*args, **kwargs)
 
 

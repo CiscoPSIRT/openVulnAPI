@@ -102,17 +102,21 @@ class OpenVulnQueryClient(object):
 
     def get_by_ios_xe(self, ios_version):
         """Return advisories by Cisco IOS advisories version"""
-
-        advisories = self.get_request(
-            "iosxe", params={'version': ios_version})
-        return self.advisory_list(advisories['advisories'], None)
+        try:
+            advisories = self.get_request(
+                "iosxe", params={'version': ios_version})
+            return self.advisory_list(advisories['advisories'], None)
+        except requests.exceptions.HTTPError as e:
+            raise requests.exceptions.HTTPError(e.response.status_code, e.response.text)
 
     def get_by_ios(self, ios_version):
         """Return advisories by Cisco IOS advisories version"""
-
-        advisories = self.get_request(
-            "ios", params={'version': ios_version})
-        return self.advisory_list(advisories['advisories'], None)
+        try:
+            advisories = self.get_request(
+                "ios", params={'version': ios_version})
+            return self.advisory_list(advisories['advisories'], None)
+        except requests.exceptions.HTTPError as e:
+            raise requests.exceptions.HTTPError(e.response.status_code, e.response.text)
 
     def get_request(self, path, params=None):
         """Send get request to OpenVuln API utilizing headers.
