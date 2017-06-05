@@ -108,13 +108,6 @@ Class | Method | HTTP request | Description
 *CiscoPsirtOpenVulnApi.DefaultApi* | [**securityAdvisoriesOvalSeveritySeverityLastpublishedGet**](docs/DefaultApi.md#securityAdvisoriesOvalSeveritySeverityLastpublishedGet) | **GET** /security/advisories/oval/severity/{severity}/lastpublished | 
 
 
-## Documentation for Models
-
-
-
-## Documentation for Authorization
-
-
 ### psirt_openvuln_api_auth
 
 - **Type**: OAuth
