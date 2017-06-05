@@ -68,5 +68,5 @@ Class | Method | HTTP request | Description
 
 
 ## Author
-
-os@cisco.com
+Omar Santos
+os (at) cisco ( dot ) com
