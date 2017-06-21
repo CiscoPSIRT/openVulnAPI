@@ -1,8 +1,35 @@
-API_LABELS = ['advisory_id', 'sir', 'first_published', 'last_updated', 'cves', 'cvss_base_score',
-              'advisory_title', 'publication_url', 'cwe', 'product_names', 'summary',
-              'oval_url', 'cvrf_url', 'bug_ids', 'ios_release', 'first_fixed', 'ips_signatures']
-IPS_SIGNATURES = ['legacy_ips_id', 'release_version', 'software_version', 'legacy_ips_url']
+IPS_SIGNATURE_LABEL = 'ips_signatures'
 
+API_LABELS = (
+    'advisory_id',
+    'advisory_title',
+    'bug_ids',
+    'cves',
+    'cvrf_url',
+    'cvss_base_score',
+    'cwe',
+    'first_fixed',
+    'first_published',
+    'ios_release',
+    IPS_SIGNATURE_LABEL,
+    'last_updated',
+    'oval_url',
+    'product_names',
+    'publication_url',
+    'sir',
+    'summary',
+)
 
-allows_filter = ['all', 'severity']
+IPS_SIGNATURES = (
+    'legacy_ips_id',
+    'legacy_ips_url',
+    'release_version',
+    'software_version',
+)
 
+ALLOWS_FILTER = (
+    'all',
+    'severity',
+)
+
+NA_INDICATOR = 'NA'
