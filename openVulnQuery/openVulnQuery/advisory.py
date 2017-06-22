@@ -19,10 +19,9 @@ class Filterable(object):
         for arg in args:
             if hasattr(self, arg):
                 attr = getattr(self, arg)
-                if all([isinstance(attr, list),  # A list
-                        attr,  # Not empty
-                        isinstance(attr[0], Filterable)  # First is our 'type'
-                        ]):
+                if (isinstance(attr, list) and
+                        attr and
+                        isinstance(attr[0], Filterable)):
                     filtered_dict[arg] = [a.filter(*args) for a in attr]
                 else:
                     filtered_dict[arg] = attr
@@ -105,17 +104,15 @@ def advisory_factory(adv_data, adv_format, logger):
     :param logger: A logger (for now expecting to be ready to log)
     :returns advisory instance according to adv_format
     """
-    if adv_format not in ('cvrf', 'opal', 'ios'):
+    if adv_format not in constants.ADVISORY_FORMAT_TOKENS:
         raise ValueError(
             "Format {} not implemented in advisories".format(adv_format))
 
-    advisory_factory_map = {
-        'cvrf': CVRF,
-        'opal': OVAL,
-        'ios': AdvisoryIOS,
-    }
+    advisory_factory_map = dict(zip(
+        constants.ADVISORY_FORMAT_TOKENS,
+        (CVRF, OVAL, AdvisoryIOS)
+    ))
 
-    adv = adv_data
     adv_map = {
         'advisory_id': adv_data["advisoryId"],
         'sir': adv_data["sir"],
@@ -133,16 +130,16 @@ def advisory_factory(adv_data, adv_format, logger):
         # Pending Variant Slot ips or x_fixed/x_release
 
     }
-    if adv_format == 'cvrf':
+    if adv_format == constants.CVRF_ADVISORY_FORMAT_TOKEN:
         adv_map['cvrf_url'] = adv_data["cvrfUrl"]  # Variant::Union
         # cvrf and oval only attributes:
         adv_map[IPS_SIG] = adv_data["ipsSignatures"]
     else:  # implicit 'ios' flavor/format
-        if 'oval' in adv_data:
+        if constants.OVAL_ADVISORY_FORMAT_TOKEN in adv_data:
             oval_url = adv_data['oval']
         else:
             oval_url = adv_data['ovalUrl']
-        if adv_format == "oval":
+        if adv_format == constants.OVAL_ADVISORY_FORMAT_TOKEN:
             adv_map['oval_url'] = oval_url  # Variant::Union
             # cvrf and oval only attributes:
             adv_map['ips_signatures'] = adv_data["ipsSignatures"]

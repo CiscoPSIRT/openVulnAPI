@@ -68,9 +68,9 @@ def output(advisories, output_format, file_handle):
     :return Output displayed in format (CSV, JSON, Pretty Printed Table).
 
     """
-    if output_format == 'json':
+    if output_format == constants.JSON_OUTPUT_FORMAT_TOKEN:
         _to_json(advisories, file_handle)
-    elif output_format == 'csv':
+    elif output_format == constants.CSV_OUTPUT_FORMAT_TOKEN:
         _to_csv(advisories, file_handle, delimiter=",")
 
 

@@ -41,7 +41,7 @@ def valid_date(date_text):
 CLI_API_ADVISORY_FORMAT = (
     {
         'action': 'store_const',
-        'const': 'cvrf',
+        'const': constants.CVRF_ADVISORY_FORMAT_TOKEN,
         'dest': 'advisory_format',
         'help': (
             'Selects from cvrf advisories, required except for ios and ios_xe'
@@ -50,7 +50,7 @@ CLI_API_ADVISORY_FORMAT = (
     },
     {
         'action': 'store_const',
-        'const': 'oval',
+        'const': constants.OVAL_ADVISORY_FORMAT_TOKEN,
         'dest': 'advisory_format',
         'help': (
             'Selects from oval advisories, required except for ios and ios_xe'
@@ -136,14 +136,14 @@ CLI_API_OUTPUT_FORMAT = (
         'help': 'Output to CSV with file path',
         'metavar': 'filepath',
         'tokens': ('--csv',),
-        'type': (lambda x: ('csv', x)),
+        'type': (lambda x: (constants.CSV_OUTPUT_FORMAT_TOKEN, x)),
     },
     {
         'dest': 'output_format',
         'help': 'Output to JSON with file path',
         'metavar': 'filepath',
         'tokens': ('--json',),
-        'type': (lambda x: ('json', x)),
+        'type': (lambda x: (constants.JSON_OUTPUT_FORMAT_TOKEN, x)),
     },
 )
 
@@ -233,7 +233,7 @@ def parser_factory():
     p = argparse.ArgumentParser(
         prog='openVulnQuery',
         description='Cisco OpenVuln API Command Line Interface')
-    p.set_defaults(output_format=('json', None))
+    p.set_defaults(output_format=(constants.JSON_OUTPUT_FORMAT_TOKEN, None))
 
     add_options_to_parser(
         p.add_mutually_exclusive_group(required=False),
