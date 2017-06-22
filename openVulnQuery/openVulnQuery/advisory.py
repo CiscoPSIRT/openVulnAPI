@@ -10,6 +10,40 @@ base_str = (str, bytes, bytearray) if __is_future_version else basestring
 NA = constants.NA_INDICATOR
 IPS_SIG = constants.IPS_SIGNATURE_LABEL
 
+ADVISORIES_COMMONS_MAP = {
+    'advisory_id': "advisoryId",
+    'advisory_title': "advisoryTitle",
+    'bug_ids': "bugIDs",
+    'cves': "cves",
+    'cvss_base_score': "cvssBaseScore",
+    'cwe': "cwe",
+    'first_published': "firstPublished",
+    'last_updated': "lastUpdated",
+    'product_names': "productNames",
+    'publication_url': "publicationUrl",
+    'sir': "sir",
+    'summary': "summary",
+}
+
+IPS_SIG_MAP = {
+    IPS_SIG: 'ipsSignatures',
+}
+
+CVRF_URL_TOKEN = 'cvrf_url'
+CVRF_URL_MAP = {
+    CVRF_URL_TOKEN: 'cvrfUrl',
+}
+
+OVAL_URL_TOKEN = 'oval_url'
+OVAL_URL_MAP = {
+    CVRF_URL_TOKEN: 'ovalUrl',  # TODO how to model found variant 'oval'
+}
+
+IOS_ADD_ONS_MAP = {
+    'first_fixed': 'firstFixed',
+    'ios_release': 'iosRelease',
+}
+
 
 class Filterable(object):
     """Filterable mixin class"""
@@ -55,7 +89,7 @@ class CVRF(Advisory):
     """CVRF object inherits from Advisory"""
 
     def __init__(self, *args, **kwargs):
-        self.cvrf_url = kwargs.pop('cvrf_url')
+        self.cvrf_url = kwargs.pop('cvrf_url', None)
         self.ips_signatures = []
         if IPS_SIG in kwargs:
             self.ips_signatures = [
@@ -68,7 +102,7 @@ class OVAL(Advisory):
     """OVAL object as an Advisory"""
 
     def __init__(self, *args, **kwargs):
-        self.oval_url = kwargs.pop('oval_url')
+        self.oval_url = kwargs.pop('oval_url', None)
         self.ips_signatures = []
         if IPS_SIG in kwargs:
             self.ips_signatures = [
@@ -81,10 +115,10 @@ class AdvisoryIOS(Advisory):
     """Advisory Object with additional information on IOS/IOSXE version """
 
     def __init__(self, *args, **kwargs):
-        self.first_fixed = kwargs.pop('first_fixed')
-        self.ios_release = kwargs.pop('ios_release')
-        self.oval_url = kwargs.pop('oval_url')
-        self.cvrf_url = kwargs.pop('cvrf_url')
+        self.first_fixed = kwargs.pop('first_fixed', None)
+        self.ios_release = kwargs.pop('ios_release', None)
+        self.oval_url = kwargs.pop('oval_url', None)
+        self.cvrf_url = kwargs.pop('cvrf_url', None)
         super(AdvisoryIOS, self).__init__(*args, **kwargs)
 
 
@@ -95,6 +129,12 @@ class IPSSignature(Filterable):
         self.release_version = releaseVersion
         self.software_version = softwareVersion
         self.legacy_ips_url = legacyIpsUrl
+
+
+def advisory_format_factory_map():
+    """Map the advisory format tokens to callable instantiators."""
+    return dict(zip(
+        constants.ADVISORY_FORMAT_TOKENS, (CVRF, OVAL, AdvisoryIOS)))
 
 
 def advisory_factory(adv_data, adv_format, logger):
@@ -108,48 +148,30 @@ def advisory_factory(adv_data, adv_format, logger):
         raise ValueError(
             "Format {} not implemented in advisories".format(adv_format))
 
-    advisory_factory_map = dict(zip(
-        constants.ADVISORY_FORMAT_TOKENS,
-        (CVRF, OVAL, AdvisoryIOS)
-    ))
+    adv_map = {}  # Initial fill from shared common model key map:
+    for k, v in ADVISORIES_COMMONS_MAP.items():
+        adv_map[k] = adv_data[v]
 
-    adv_map = {
-        'advisory_id': adv_data["advisoryId"],
-        'sir': adv_data["sir"],
-        'first_published': adv_data["firstPublished"],
-        'last_updated': adv_data["lastUpdated"],
-        'cves': adv_data["cves"],
-        # Empty Union Variant Slot x_url
-        'bug_ids': adv_data["bugIDs"],
-        'cvss_base_score': adv_data["cvssBaseScore"],
-        'advisory_title': adv_data["advisoryTitle"],
-        'publication_url': adv_data["publicationUrl"],
-        'cwe': adv_data["cwe"],
-        'product_names': adv_data["productNames"],
-        'summary': adv_data["summary"],
-        # Pending Variant Slot ips or x_fixed/x_release
-
-    }
     if adv_format == constants.CVRF_ADVISORY_FORMAT_TOKEN:
         adv_map['cvrf_url'] = adv_data["cvrfUrl"]  # Variant::Union
-        # cvrf and oval only attributes:
-        adv_map[IPS_SIG] = adv_data["ipsSignatures"]
-    else:  # implicit 'ios' flavor/format
-        if constants.OVAL_ADVISORY_FORMAT_TOKEN in adv_data:
-            oval_url = adv_data['oval']
-        else:
-            oval_url = adv_data['ovalUrl']
-        if adv_format == constants.OVAL_ADVISORY_FORMAT_TOKEN:
-            adv_map['oval_url'] = oval_url  # Variant::Union
-            # cvrf and oval only attributes:
-            adv_map['ips_signatures'] = adv_data["ipsSignatures"]
-        else:  # TODO, was 'if not adv_format:', verify that OK
-            adv_map['oval_url'] = oval_url  # Variant::Union
-            # neither cvrf nor oval only attributes:
-            adv_map['first_fixed'] = adv_data["firstFixed"]
-            adv_map['ios_release'] = adv_data["iosRelease"]
+        for k, v in IPS_SIG_MAP.items():
+            adv_map[k] = adv_data[v]
+    else:  # Either OVAL or IOS advisory formats targeted:
 
-    an_adv = advisory_factory_map[adv_format](**adv_map)
+        if constants.OVAL_ADVISORY_FORMAT_TOKEN in adv_data:  # HACK A DID ACK
+            adv_map['oval_url'] = adv_data['oval']
+        else:
+            for k, v in OVAL_URL_MAP.items():
+                adv_map[k] = adv_data[v]
+
+        if adv_format == constants.OVAL_ADVISORY_FORMAT_TOKEN:
+            for k, v in IPS_SIG_MAP.items():
+                adv_map[k] = adv_data[v]
+        else:
+            for k, v in IOS_ADD_ONS_MAP.items():
+                adv_map[k] = adv_data[v]
+
+    an_adv = advisory_format_factory_map()[adv_format](**adv_map)
     logger.debug(
         "{} Advisory {} Created".format(adv_format, an_adv.advisory_id))
 

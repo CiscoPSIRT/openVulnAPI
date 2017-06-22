@@ -58,15 +58,12 @@ def get_count(advisory_field):
 
 
 def output(advisories, output_format, file_handle):
-    """Display data in different formats (CSV, JSON, Pretty Printed Table).
+    """Write data in CSV or JSON to file_handle .
 
     :param advisories: List of advisory objects.
     :param output_format: Either set as csv or json or use default stdout.
     :param file_handle: The path to put the csv or json file with a file name
         or stdout if no path or filename.
-
-    :return Output displayed in format (CSV, JSON, Pretty Printed Table).
-
     """
     if output_format == constants.JSON_OUTPUT_FORMAT_TOKEN:
         _to_json(advisories, file_handle)

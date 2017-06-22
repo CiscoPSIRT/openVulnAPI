@@ -163,7 +163,7 @@ CLI_API_ADDITIONAL_FILTERS = (
             'Filter advisories based on last_published date'
             ' YYYY-MM-DD:YYYY-MM-DD USAGE: followed by severity or all'),
         'metavar': 'YYYY-MM-DD:YYYY-MM-DD',
-        'tokens': ('--last_published',),
+        'tokens': ('--last_published', '--last_updated'),
         'type': valid_date,
     },
 )
@@ -195,7 +195,9 @@ CLI_API_PARSER_GENERIC = (
 CLI_API_CONFIG = (
     {
         'dest': 'json_config_path',
-        'help': ('Path to JSON file with config'),
+        'help': ('Path to JSON file with config (otherwise fallback to'
+                 ' environment variables CLIENT_ID and CLIENT_SECRET, or'
+                 ' config.py variables, or fail)'),
         'metavar': 'filepath',
         'tokens': ('--config',),
     },
@@ -251,6 +253,6 @@ def parser_factory():
     add_options_to_parser(p, CLI_API_PARSER_GENERIC)
 
     add_options_to_parser(
-        p.add_mutually_exclusive_group(required=True), CLI_API_CONFIG)
+        p.add_mutually_exclusive_group(required=False), CLI_API_CONFIG)
 
     return p
