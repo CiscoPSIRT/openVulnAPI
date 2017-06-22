@@ -1,8 +1,10 @@
+import logging
+
 import requests
+
 import advisory
 import authorization
 import config
-import logging
 
 
 class Filter(object):
@@ -14,15 +16,13 @@ class Filter(object):
 class LastPublishedFilter(object):
     def __init__(self, start_date, end_date):
         self.path = 'lastpublished'
-        self.params = {'startDate': start_date,
-                       'endDate': end_date}
+        self.params = {'startDate': start_date, 'endDate': end_date}
 
 
 class FirstPublishedFilter(object):
     def __init__(self, start_date, end_date):
         self.path = 'firstpublished'
-        self.params = {'startDate': start_date,
-                       'endDate': end_date}
+        self.params = {'startDate': start_date, 'endDate': end_date}
 
 
 class OpenVulnQueryClient(object):
@@ -34,20 +34,23 @@ class OpenVulnQueryClient(object):
 
     """
 
-    def __init__(self, client_id, client_secret):
+    def __init__(self, client_id, client_secret, user_agent='TestApp'):
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger(__name__)
-        self.auth_token = authorization.get_oauth_token(client_id, client_secret)
+        self.auth_token = authorization.get_oauth_token(client_id,
+                                                        client_secret)
         self.headers = {"Authorization": "Bearer %s" % self.auth_token,
                         "Accept": "application/json",
-                        "User-Agent": "TestApp"}
+                        "User-Agent": user_agent}
 
-    def get_by_all(self, adv_format, all_adv, filter):
-        """Return all the advisiories using requested advisory format"""
+    def get_by_all(self, adv_format, all_adv, a_filter):
+        """Return all the advisories using requested advisory format"""
 
         advisories = self.get_request(
-            "{adv_format}/{all}/{filter}".format(adv_format=adv_format, all=all_adv, filter=filter.path),
-            filter.params)
+            "{adv_format}/{all}/{filter}".format(adv_format=adv_format,
+                                                 all=all_adv,
+                                                 filter=a_filter.path),
+            a_filter.params)
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_cve(self, adv_format, cve):
@@ -58,22 +61,24 @@ class OpenVulnQueryClient(object):
                                             cve=cve))
         return self.advisory_list(advisories['advisories'], adv_format)
 
-    def get_by_advisory(self, adv_format, advisory):
+    def get_by_advisory(self, adv_format, an_advisory):
         """Return the advisory using requested advisory id"""
 
         advisories = {'advisories': [self.get_request(
             "{adv_format}/advisory/{advisory}".format(adv_format=adv_format,
-                                                      advisory=advisory))]}
+                                                      advisory=an_advisory))]}
         return self.advisory_list(advisories['advisories'], adv_format)
 
-    def get_by_severity(self, adv_format, severity, filter=Filter()):
+    def get_by_severity(self, adv_format, severity, a_filter=None):
         """Return the advisories using requested severity"""
-
+        if a_filter is None:
+            a_filter = Filter()
         advisories = self.get_request(
-            "{adv_format}/severity/{severity}/{filter}".format(adv_format=adv_format,
-                                                               severity=severity,
-                                                               filter=filter.path),
-            params=filter.params)
+            "{adv_format}/severity/{severity}/{filter}".format(
+                adv_format=adv_format,
+                severity=severity,
+                filter=a_filter.path),
+            params=a_filter.params)
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_year(self, adv_format, year):
@@ -107,7 +112,8 @@ class OpenVulnQueryClient(object):
                 "iosxe", params={'version': ios_version})
             return self.advisory_list(advisories['advisories'], None)
         except requests.exceptions.HTTPError as e:
-            raise requests.exceptions.HTTPError(e.response.status_code, e.response.text)
+            raise requests.exceptions.HTTPError(e.response.status_code,
+                                                e.response.text)
 
     def get_by_ios(self, ios_version):
         """Return advisories by Cisco IOS advisories version"""
@@ -116,7 +122,8 @@ class OpenVulnQueryClient(object):
                 "ios", params={'version': ios_version})
             return self.advisory_list(advisories['advisories'], None)
         except requests.exceptions.HTTPError as e:
-            raise requests.exceptions.HTTPError(e.response.status_code, e.response.text)
+            raise requests.exceptions.HTTPError(e.response.status_code,
+                                                e.response.text)
 
     def get_request(self, path, params=None):
         """Send get request to OpenVuln API utilizing headers.
@@ -141,69 +148,14 @@ class OpenVulnQueryClient(object):
         return r.json()
 
     def advisory_list(self, advisories, adv_format):
-        """ Converts json into a list of advisory objects
-
-        Args:
-            advisories: A list of dictionaries describing advisories.
-    : Boolean to determine whether to parse xml for fields.
-
-        Returns:
-            List of advisory objects.
-
+        """Converts json into a list of advisory objects.
+        :param advisories: A list of dictionaries describing advisories.
+        :param adv_format: The target format either in ('cvrf', 'oval') or
+            something that evaluates to False (TODO HACK A DID ACK ?) for ios.
+        :returns list of advisory instances
         """
-        advisory_list = []
-
-        for advisory_dict in advisories:
-
-            if adv_format == "cvrf":
-                adv = advisory.CVRF(advisory_id=advisory_dict["advisoryId"],
-                                    sir=advisory_dict["sir"],
-                                    first_published =advisory_dict["firstPublished"],
-                                    last_updated=advisory_dict["lastUpdated"],
-                                    cves=advisory_dict["cves"],
-                                    cvrf_url=advisory_dict["cvrfUrl"],
-                                    bug_ids=advisory_dict["bugIDs"],
-                                    cvss_base_score=advisory_dict["cvssBaseScore"],
-                                    advisory_title=advisory_dict["advisoryTitle"],
-                                    publication_url=advisory_dict["publicationUrl"],
-                                    cwe=advisory_dict["cwe"],
-                                    product_names=advisory_dict["productNames"],
-                                    summary=advisory_dict["summary"],
-                                    ips_signatures=advisory_dict["ipsSignatures"])
-            elif adv_format == "oval":
-                oval_url = advisory_dict['oval'] if 'oval' in advisory_dict else advisory_dict['ovalUrl']
-                adv = advisory.OVAL(advisory_id=advisory_dict["advisoryId"],
-                                    sir=advisory_dict["sir"],
-                                    first_published=advisory_dict["firstPublished"],
-                                    last_updated=advisory_dict["lastUpdated"],
-                                    cves=advisory_dict["cves"],
-                                    oval_url=oval_url,
-                                    bug_ids=advisory_dict["bugIDs"],
-                                    cvss_base_score=advisory_dict["cvssBaseScore"],
-                                    advisory_title=advisory_dict["advisoryTitle"],
-                                    publication_url=advisory_dict["publicationUrl"],
-                                    cwe=advisory_dict["cwe"],
-                                    product_names=advisory_dict["productNames"],
-                                    summary=advisory_dict["summary"],
-                                    ips_signatures=advisory_dict["ipsSignatures"])
-            elif not adv_format:
-                oval_url = advisory_dict['oval'] if 'oval' in advisory_dict else advisory_dict['ovalUrl']
-                adv = advisory.AdvisoryIOS(advisory_id=advisory_dict["advisoryId"],
-                                           sir=advisory_dict["sir"],
-                                           first_published=advisory_dict["firstPublished"],
-                                           last_updated=advisory_dict["lastUpdated"],
-                                           cves=advisory_dict["cves"],
-                                           oval_url=oval_url,
-                                           bug_ids=advisory_dict["bugIDs"],
-                                           cvss_base_score=advisory_dict["cvssBaseScore"],
-                                           advisory_title=advisory_dict["advisoryTitle"],
-                                           publication_url=advisory_dict["publicationUrl"],
-                                           cwe=advisory_dict["cwe"],
-                                           product_names=advisory_dict["productNames"],
-                                           summary=advisory_dict["summary"],
-                                           first_fixed=advisory_dict["firstFixed"],
-                                           ios_release=advisory_dict["iosRelease"])
-            self.logger.debug("%s Advisory %s Created", type(adv).__name__, adv.advisory_id)
-
-            advisory_list.append(adv)
-        return advisory_list
+        return [advisory.advisory_factory(
+                    adv,
+                    adv_format if adv_format in ('cvrf', 'opal') else 'ios',
+                    self.logger)
+                for adv in advisories]

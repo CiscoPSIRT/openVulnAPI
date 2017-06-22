@@ -1,43 +1,58 @@
-import sys
 import csv
 import json
+import sys
+from platform import python_version_tuple as p_v_t
 
 import constants
-from sets import Set
+
+__is_future_version = False if int(p_v_t()[0]) < 3 else True
+
+# noinspection PyCompatibility
+base_str = (str, bytes, bytearray) if __is_future_version else basestring
+
+TAB = '\t' if __is_future_version else u'\t'
+IPS_SIG = constants.IPS_SIGNATURE_LABEL
 
 
 def filter_advisories(advisories, fields):
-    filtered_list = []
-    is_nested_ips_signature_field = any(field in constants.IPS_SIGNATURES for field in fields)
+    """Filter the advisories per some criteria ...
+
+    :param advisories: An iterable with advisory entries
+    :param fields: The requested fields (TODO reverse documentation?)
+    :return list of advisories passing filter criteria
+    """
+    is_nested_ips_signature_field = any(
+        field in constants.IPS_SIGNATURES for field in fields)
+
+    filter_fields = list(fields)
     if is_nested_ips_signature_field:
-        fields.append('ips_signatures')
-    if 'ips_signatures' in fields and not is_nested_ips_signature_field:
-        fields.extend(constants.IPS_SIGNATURES)
-    for advisory in advisories:
-        filtered_list.append(advisory.filter(*fields))
-    return filtered_list
+        filter_fields.append(IPS_SIG)
+    elif IPS_SIG in fields:  # and not is_nested_ips_signature_field:
+        filter_fields.extend(constants.IPS_SIGNATURES)
+
+    return [adv.filter(*filter_fields) for adv in advisories]
 
 
 def count_fields(advisories, fields):
-
+    """Counter dict from fields over all advisories. """
     counts = dict.fromkeys(fields, 0)
-    for advisory in advisories:
+    for adv in advisories:
         for field in fields:
-            if hasattr(advisory, field):
-                counts[field] += get_count(getattr(advisory, field))
+            if hasattr(adv, field):
+                counts[field] += get_count(getattr(adv, field))
     return counts
 
 
 def get_count(advisory_field):
-    """Returns a count of the number of valid items in a particular advisory field"""
+    """Count of the number of valid items in a particular advisory field."""
 
     count = 0
-    if isinstance(advisory_field, (str, unicode)):
-        if advisory_field != 'NA':
+    if isinstance(advisory_field, base_str):  # TODO was '(str, unicode)):'
+        if advisory_field != constants.NA_INDICATOR:
             count = 1
     else:
         for item in advisory_field:
-            if item != 'NA':
+            if item != constants.NA_INDICATOR:
                 count += 1
     return count
 
@@ -45,27 +60,23 @@ def get_count(advisory_field):
 def output(advisories, output_format, file_handle):
     """Display data in different formats (CSV, JSON, Pretty Printed Table).
 
-    Args:
-        advisories: List of advisory objects.
-        output_format: Either set as csv or json or use default stdout.
-        file_handle: The path to put the csv or json file with a file name or stdout if no path or filename.
-        csv_headers: headers that you want in your csv
+    :param advisories: List of advisory objects.
+    :param output_format: Either set as csv or json or use default stdout.
+    :param file_handle: The path to put the csv or json file with a file name
+        or stdout if no path or filename.
 
-    Returns:
-        Output displayed in format (CSV, JSON, Pretty Printed Table).
+    :return Output displayed in format (CSV, JSON, Pretty Printed Table).
 
     """
     if output_format == 'json':
         _to_json(advisories, file_handle)
     elif output_format == 'csv':
-        _to_csv(advisories, file_handle, delimiter="," )
+        _to_csv(advisories, file_handle, delimiter=",")
 
 
 def _to_json(advisory_list, file_handle):
     """Write json to a file"""
-
-    json_data = json.dumps(advisory_list, sort_keys=True, indent=4)
-    file_handle.write(json_data)
+    file_handle.write(json.dumps(advisory_list, sort_keys=True, indent=4))
 
 
 def _to_csv(advisory_list, file_handle, delimiter):
@@ -73,29 +84,24 @@ def _to_csv(advisory_list, file_handle, delimiter):
 
     flattened_advisory_list = flatten_list(advisory_list)
     header = _get_headers(flattened_advisory_list)
-    if 'ips_signatures' in header:
-        header.remove('ips_signatures')
+    if IPS_SIG in header:
+        header.remove(IPS_SIG)
 
-    w = csv.DictWriter(file_handle, header, delimiter=delimiter, extrasaction='ignore', restval='NA')
+    w = csv.DictWriter(file_handle, header, delimiter=delimiter,
+                       extrasaction='ignore', restval=constants.NA_INDICATOR)
     w.writeheader()
-
     for advisory in flattened_advisory_list:
         w.writerow(advisory)
 
 
-def flatten_list(advisory_list):
-    adv_list = []
-    for advisory in advisory_list:
-        adv_list.append(_flatten_datastructure(advisory))
-    return adv_list
+def flatten_list(advisory_seq):
+    """Flatten the structures returned as list."""
+    return [_flatten_datastructure(adv) for adv in advisory_seq]
 
 
 def _get_headers(advisories):
-    headers = Set()
-    for advisory in advisories:
-        for key in advisory.keys():
-            headers.add(key)
-    return list(headers)
+    """Return list of unique headers."""
+    return list(set(key for adv in advisories for key in adv.keys()))
 
 
 def _flatten_datastructure(field_list):
@@ -105,7 +111,7 @@ def _flatten_datastructure(field_list):
             if v and isinstance(v[0], dict):
                 final_dict.update(_reduce_list_dict(k, v))
             else:
-                final_dict[k] = u'\t'.join(v)
+                final_dict[k] = TAB.join(v)
         else:
             final_dict[k] = v.encode('utf-8').strip() if v else None
     return final_dict
@@ -116,17 +122,16 @@ def _reduce_list_dict(node, vals):
     flattened_dict = {"%s_%s" % (node, k): "" for k in keys}
     for v in vals:
         for key in keys:
-            seperator = ""
+            separator = ""
             flattened_key = "%s_%s" % (node, key)
             if flattened_dict[flattened_key] != "":
-                seperator = "\t"
-            upd_val = "%s%s%s" % (flattened_dict[flattened_key], seperator, v[key])
+                separator = "\t"
+            upd_val = (
+                "%s%s%s" % (flattened_dict[flattened_key], separator, v[key]))
             flattened_dict[flattened_key] = upd_val
     return flattened_dict
 
 
 def get_output_filehandle(file_path=None):
-    """Returns file handle if file_path given else returns stdout handle"""
-
+    """File handle if file_path given else returns stdout handle"""
     return open(file_path, "w") if file_path else sys.stdout
-

@@ -27,22 +27,46 @@ Obtain client ID and Secret:
   - Under OAuth2.0 Credentials check Client Credentials
   - Under Select APIs choose Cisco PSIRT openVuln API
   - Agree to the terms and service and click Register
-  - Edit CLIENT_ID and CLIENT_SECRET in the config file with the ones provided from the steps above.
-  - To edit the config.py file if installing with pip, run the command pip show openVulnQuery and cd into the location of the package. Then cd into the openVulnQuery folder and open the config.py file in your favorite editor, modify and save.
-  - OAuth2 Token automatically generated on each call to the API.
+5. Take note of the "rate contract" presented like e.g.:
+    ```
+    Rate Limits
+    10	Calls per second
+    5,000	Calls per day
+    ```
+6. Note the value of "Client ID" (a string like e.g. 'abc12abcd13abcdefabcde1a')
+7. Note the value of "Client Secret" (a string like e.g. '1a2abcDEfaBcDefAbcDeFA3b')
+8. Create a valid JSON file (e.g. `credentials.json`) with these personal credentials similar to the below given (assuming the values are as in steps 6. and 7.):
+    ```
+    {
+    	"CLIENT_ID": "abc12abcd13abcdefabcde1a", 
+    	"CLIENT_SECRET": "1a2abcDEfaBcDefAbcDeFA3b"
+    }
+    ```
+9. Do not distribute the credentials file resulting from previous step
+
+**Notes**: 
+* The resulting OAuth2 Token will be automatically generated on every call to the API.
 
 #### Run OpenVulnQuery in the Terminal
 - If installed with pip run the program by typing
 ```
-  >>OpenVulnQuery --Advisory Type --API Filters --Parsing Fields --Output Format -Count
+  >>OpenVulnQuery --config PathToCredentialsFile --Advisory Type --API Filters --Parsing Fields --Output Format -Count
 ```
 - Or cd into the directory with the main.py file and run using
 ```
-  >>python main.py --Advisory Type --API Filters --Parsing Fields --Output Format -Count
+  >>python main.py --config PathToCredentialsFile --Advisory Type --API Filters --Parsing Fields --Output Format -Count
 ```
 Notes:
 
 -- Used for whole word commands, - Used for single character commands
+
+#### Configuration (Required)
+```
+--config FILE
+        Path to JSON file with credentials (as in above step 8)
+        A sample has been provided in the same folder as main.py:
+            sample:configuration.json
+```
 
 #### Advisory Type (Required)
 ```
@@ -117,6 +141,14 @@ Notes:
         >> openVulnQuery --ios_xe 3.16.1S
 
 ```
+
+#### Client Application (Optional)
+```
+--user-agent APPLICATION
+        Name of application to be sent as User-Agent header value in the request.
+        Default is TestApp.
+```
+
 #### Parsing Fields (Optional)
 Notes:
 
@@ -146,31 +178,31 @@ Any field that has no information will return with with the field name and NA
 
         API Fields
               Examples:
-              openVulnQuery --cvrf or --oval --any API filter -f  or --fields list of fields separated by space
-              >> openVulnQuery --cvrf --all -f sir cves cvrf_url
-              >> openVulnQuery --cvrf --severity critical -f last_updated cves
-              >> openVulnQuery --oval --all -f sir cves oval_url
-              >> openVulnQuery --oval --severity critical -f last_updated cves
+              openVulnQuery --config PathToCredentialsFile --cvrf or --oval --any API filter -f  or --fields list of fields separated by space
+              >> openVulnQuery --config PathToCredentialsFile --cvrf --all -f sir cves cvrf_url
+              >> openVulnQuery --config PathToCredentialsFile --cvrf --severity critical -f last_updated cves
+              >> openVulnQuery --config PathToCredentialsFile --oval --all -f sir cves oval_url
+              >> openVulnQuery --config PathToCredentialsFile --oval --severity critical -f last_updated cves
 
         CVRF XML Fields
               Examples:
-              openVulnQuery --cvrf --any API filter -f or --fields list of fields separated by space
-              >> openVulnQuery --cvrf --all -f bug_ids vuln_title product_names
-              >> openVulnQuery --cvrf --severity critical -f bug_ids summary
+              openVulnQuery --config PathToCredentialsFile --cvrf --any API filter -f or --fields list of fields separated by space
+              >> openVulnQuery --config PathToCredentialsFile --cvrf --all -f bug_ids vuln_title product_names
+              >> openVulnQuery --config PathToCredentialsFile --cvrf --severity critical -f bug_ids summary
 
         Combination
               Examples:
-              openVulnQuery --cvrf --any API filter -f or --fields list of fields separated by space
-              >> openVulnQuery --cvrf --all -f sir bug_ids cves vuln_title
-              >> openVulnQuery --cvrf --year 2011 -f cves cvrf_url bug_ids summary product_names
+              openVulnQuery --config PathToCredentialsFile --cvrf --any API filter -f or --fields list of fields separated by space
+              >> openVulnQuery --config PathToCredentialsFile --cvrf --all -f sir bug_ids cves vuln_title
+              >> openVulnQuery --config PathToCredentialsFile --cvrf --year 2011 -f cves cvrf_url bug_ids summary product_names
 ```
 
 ##### Additional Filters
 User can be more specific on filtering advisories when searching all advisories or by severity. They can filter based on last updated and first published dates providing start and end date as a search range. Dates should be entered in YYYY-MM-DD format.
 ```
->> openVulnQuery --cvrf --severity high --last_updated 2016-01-02:2016-04-02 --json filename.json
->> openVulnQuery --cvrf --all --last_updated 2016-01-02:2016-07-02
->> openVulnQuery --cvrf --severity critical --first_published 2015-01-02:2015-01-04
+>> openVulnQuery --config PathToCredentialsFile --cvrf --severity high --last_updated 2016-01-02:2016-04-02 --json filename.json
+>> openVulnQuery --config PathToCredentialsFile --cvrf --all --last_updated 2016-01-02:2016-07-02
+>> openVulnQuery --config PathToCredentialsFile --cvrf --severity critical --first_published 2015-01-02:2015-01-04
 ```
 
 #### Output Format (Optional)
@@ -178,17 +210,17 @@ User can be more specific on filtering advisories when searching all advisories 
 Default
         Table style printed to screen
         Example:
-        >> openVulnQuery --cvrf --year 2016
+        >> openVulnQuery --config PathToCredentialsFile --cvrf --year 2016
 
 --json file path
         Returns json in a file in the specified path
         Example:
-        >> openVulnQuery --cvrf --year 2016 --json  /Users/bkorabik/Documents/2016_cvrf.json
+        >> openVulnQuery --config PathToCredentialsFile --cvrf --year 2016 --json  /Users/bkorabik/Documents/2016_cvrf.json
 
 --csv file path
         Creates a CSV file in the specified path
         Example:
-        >> openVulnQuery --cvrf --year 2016 --csv  /Users/bkorabik/Documents/2016_cvrf.csv
+        >> openVulnQuery --config PathToCredentialsFile --cvrf --year 2016 --csv  /Users/bkorabik/Documents/2016_cvrf.csv
 ```
 #### Count (Optional)
 Returns the count of fields entered with -f or --fields. If no fields are entered the base API fields are counted and displayed
@@ -196,8 +228,8 @@ Returns the count of fields entered with -f or --fields. If no fields are entere
 -c
 
         Examples:
-        >> openVulnQuery --cvrf --year 2016 -c
-        >> openVulnQuery --cvrf --severity low -f sir cves bug_ids -c
+        >> openVulnQuery --config PathToCredentialsFile --cvrf --year 2016 -c
+        >> openVulnQuery --config PathToCredentialsFile --cvrf --severity low -f sir cves bug_ids -c
 ```
 
 #### Developers
@@ -213,8 +245,8 @@ No support for filtering based on --API fields, you can't use --year 2016 and --
 Filtering with Grep:
 ```
 Finding the Number of CVRF Advisories with a "Critical" sir in 2013
-        >> openVulnQuery --cvrf --year 2013 -f sir | grep -c "Critical"
-        >> openVulnQuery --cvrf --severity critical -f first_published | grep -c "2013"
+        >> openVulnQuery --config PathToCredentialsFile --cvrf --year 2013 -f sir | grep -c "Critical"
+        >> openVulnQuery --config PathToCredentialsFile --cvrf --severity critical -f first_published | grep -c "2013"
 ```
 
 If more than one API filter is entered, the last filter will be used for the API call.
@@ -222,7 +254,7 @@ If more than one API filter is entered, the last filter will be used for the API
 You can alternatively use the date range functionality, as shown below:
 
 ```
->> openVulnQuery --cvrf --severity critical --first_published 2015:01:02:2015-01-01
+>> openVulnQuery --config PathToCredentialsFile --cvrf --severity critical --first_published 2015:01:02:2015-01-01
 ```
 
 #### Run OpenVulnQuery as a Library
@@ -290,3 +322,12 @@ Here are the information stored in advisory object.
         * first_fixed
         * cvrf_url
         * oval_url
+
+
+### Running the tests
+
+To run the tests in the tests folder, the additional required `mock` module should be installed inside the `venv`with the usual:
+
+```
+pip install mock
+```
