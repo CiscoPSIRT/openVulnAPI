@@ -348,35 +348,39 @@ Sample run (expecting `pytest` has been installed e.g. via `pip install pytest`)
 ```
 $ cd /www/github.com/CiscoPSIRT/openVulnAPI/openVulnQuery
 
-$ pytest
+$ pytest                                                                
 =========================================================================================================== test session starts ============================================================================================================
 platform darwin -- Python 2.7.13, pytest-3.1.2, py-1.4.34, pluggy-0.4.0
 rootdir: /www/github.com/CiscoPSIRT/openVulnAPI/openVulnQuery, inifile:
 plugins: cov-2.5.1
-collected 43 items 
+collected 102 items 
 
-tests/test_cli_api.py ..........
+tests/test_advisory.py ...
+tests/test_cli_api.py ..............................................
 tests/test_config.py ....
 tests/test_constants.py ...........
+tests/test_main.py .............s......
 tests/test_query_client_cvrf.py ssssssss
 tests/test_utils.py ..........
 
-=================================================================================================== 35 passed, 8 skipped in 0.18 seconds ===================================================================================================
+=================================================================================================== 93 passed, 9 skipped in 0.75 seconds ===================================================================================================
 ```
 
 Including coverage info (requires `pip install pytest-cov` which includes `pip install coverage` ):
 
 ```
-$ pytest --cov=openVulnQuery --cov-report=term-missing
+$ pytest --cov=openVulnQuery --cov-report=term-missing --cov-report=html
 =========================================================================================================== test session starts ============================================================================================================
 platform darwin -- Python 2.7.13, pytest-3.1.2, py-1.4.34, pluggy-0.4.0
 rootdir: /www/github.com/CiscoPSIRT/openVulnAPI/openVulnQuery, inifile:
 plugins: cov-2.5.1
-collected 43 items 
+collected 102 items 
 
-tests/test_cli_api.py ..........
+tests/test_advisory.py ...
+tests/test_cli_api.py ..............................................
 tests/test_config.py ....
 tests/test_constants.py ...........
+tests/test_main.py .............s......
 tests/test_query_client_cvrf.py ssssssss
 tests/test_utils.py ..........
 
@@ -385,17 +389,18 @@ Name                             Stmts   Miss  Cover   Missing
 --------------------------------------------------------------
 openVulnQuery/__init__.py            0      0   100%
 openVulnQuery/advisory.py           90     38    58%   59, 95, 105-111, 118-122, 128-131, 136, 147-178
-openVulnQuery/authorization.py       6      3    50%   18-24
-openVulnQuery/cli_api.py            41      0   100%
+openVulnQuery/authorization.py       6      2    67%   23-24
+openVulnQuery/cli_api.py            75      4    95%   294-297, 311
 openVulnQuery/config.py              4      0   100%
 openVulnQuery/constants.py          11      0   100%
-openVulnQuery/main.py               66     66     0%   1-107
-openVulnQuery/query_client.py       88     53    40%   22, 27-28, 33-34, 39, 44, 60-64, 69-77, 81-87, 91-97, 101-109, 113-119, 123-129, 133-139, 143-149, 154-160, 165-180, 190-197, 207-208
+openVulnQuery/main.py               34     14    59%   17, 23, 26, 36, 39-52, 56
+openVulnQuery/query_client.py       88     48    45%   22, 33-34, 39, 44, 64, 69-77, 81-87, 91-97, 101-109, 113-119, 123-129, 133-139, 143-149, 154-160, 165-180, 190-197, 207-208
 openVulnQuery/rest_api.py            3      1    67%   167
 openVulnQuery/utils.py              76     30    61%   29, 31, 68-71, 76, 82-91, 108-111, 118-129, 134
 --------------------------------------------------------------
-TOTAL                              385    191    50%
+TOTAL                              387    137    65%
+Coverage HTML written to dir htmlcov
 
 
-=================================================================================================== 35 passed, 8 skipped in 0.32 seconds ===================================================================================================
+=================================================================================================== 93 passed, 9 skipped in 1.03 seconds ===================================================================================================
 ```

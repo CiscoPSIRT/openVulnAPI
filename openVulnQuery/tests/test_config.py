@@ -1,6 +1,7 @@
 """Note: Suggested as pre-commit hook, to block credentials being published."""
 
 import unittest
+import os
 
 from openVulnQuery import config
 
@@ -18,7 +19,11 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(config.REQUEST_TOKEN_URL, REQUEST_TOKEN_URL)
 
     def test_config_client_id_empty(self):
-        self.assertEqual(config.CLIENT_ID, CLIENT_ID)
+        self.assertTrue(
+            (config.CLIENT_ID == CLIENT_ID) or
+            (config.CLIENT_ID == os.getenv('CLIENT_ID')))
 
     def test_config_client_secret_empty(self):
-        self.assertEqual(config.CLIENT_SECRET, CLIENT_SECRET)
+        self.assertTrue(
+            (config.CLIENT_SECRET == CLIENT_SECRET) or
+            (config.CLIENT_SECRET == os.getenv('CLIENT_SECRET')))
