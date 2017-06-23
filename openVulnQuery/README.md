@@ -4,29 +4,27 @@ A python-based module(s) to query the Cisco PSIRT openVuln API.
 The Cisco Product Security Incident Response Team (PSIRT) openVuln API is a RESTful API that allows customers to obtain Cisco Security Vulnerability information in different machine-consumable formats. APIs are important for customers because they allow their technical staff and programmers to build tools that help them do their job more effectively (in this case, to keep up with security vulnerability information). More information about the API can be found at: https://developer.cisco.com/site/PSIRT/discover/overview/
 
 #### PIP Installation
-- pip install openVulnQuery
+- `pip install openVulnQuery`
 
   If you are experiencing any difficulty installing openVulnQuery.
   Here is the link to [common installation issues solutions]   (https://github.com/iamparas/openVulnAPI/blob/master/openVulnQuery/InstallationIssueSolutions.md).
 
 Requirements
-- Tested on Python Version 2.7
-- argparse 1.4.0
-- PrettyTable 0.7.2
-- requests 2.10.0
-- lxml 3.6.0
+- Tested on Python Version 2.7.13
+- `argparse >= 1.4.0`
+- requests >= 2.10.0`
 
 #### Config File
 Obtain client ID and Secret:
 
-1. https://apiconsole.cisco.com/
+1. Visit https://apiconsole.cisco.com/
 2. Sign In
-3. My Applications Tab
-4. Register a New Application
-  - Name
-  - Under OAuth2.0 Credentials check Client Credentials
-  - Under Select APIs choose Cisco PSIRT openVuln API
-  - Agree to the terms and service and click Register
+3. Select My Applications Tab
+4. Register a New Application by:
+   - Entering Application Name
+   - Under OAuth2.0 Credentials check Client Credentials
+   - Under Select APIs choose Cisco PSIRT openVuln API
+   - Agree to the terms and service and click Register
 5. Take note of the "rate contract" presented like e.g.:
     ```
     Rate Limits
@@ -35,13 +33,19 @@ Obtain client ID and Secret:
     ```
 6. Note the value of "Client ID" (a string like e.g. 'abc12abcd13abcdefabcde1a')
 7. Note the value of "Client Secret" (a string like e.g. '1a2abcDEfaBcDefAbcDeFA3b')
-8. Create a valid JSON file (e.g. `credentials.json`) with these personal credentials similar to the below given (assuming the values are as in steps 6. and 7.):
-    ```
-    {
-    	"CLIENT_ID": "abc12abcd13abcdefabcde1a", 
-    	"CLIENT_SECRET": "1a2abcDEfaBcDefAbcDeFA3b"
-    }
-    ```
+8. Provide the credentials to the application at runtime via two preferred alternativev ways:
+   * Either export two matching environment variables (below the syntax for bash and assuming the values are as in steps 6. and 7.):
+        ```
+        >> export CLIENT_ID="abc12abcd13abcdefabcde1a" 
+        >> export CLIENT_SECRET="1a2abcDEfaBcDefAbcDeFA3b"
+        ```
+   * Or create a valid JSON file (e.g. `credentials.json`) with these personal credentials similar to the below given (assuming the values are as in steps 6. and 7.):
+        ```
+        {
+            "CLIENT_ID": "abc12abcd13abcdefabcde1a", 
+            "CLIENT_SECRET": "1a2abcDEfaBcDefAbcDeFA3b"
+        }
+        ```
 9. Do not distribute the credentials file resulting from previous step
 
 **Notes**: 
@@ -60,12 +64,15 @@ Notes:
 
 -- Used for whole word commands, - Used for single character commands
 
-#### Configuration (Required)
+#### Configuration (Optional)
 ```
 --config FILE
         Path to JSON file with credentials (as in above step 8)
         A sample has been provided in the same folder as main.py:
             sample:configuration.json
+        The configuration will be tried first from config file, 
+        next from environemnt variables CLIENT_ID and CLIENT_SECRET,
+        last from config.py variable values, or fail.
 ```
 
 #### Advisory Type (Required)
@@ -200,9 +207,10 @@ Any field that has no information will return with with the field name and NA
 ##### Additional Filters
 User can be more specific on filtering advisories when searching all advisories or by severity. They can filter based on last updated and first published dates providing start and end date as a search range. Dates should be entered in YYYY-MM-DD format.
 ```
->> openVulnQuery --config PathToCredentialsFile --cvrf --severity high --last_updated 2016-01-02:2016-04-02 --json filename.json
->> openVulnQuery --config PathToCredentialsFile --cvrf --all --last_updated 2016-01-02:2016-07-02
->> openVulnQuery --config PathToCredentialsFile --cvrf --severity critical --first_published 2015-01-02:2015-01-04
+>> # export CLIENT_ID and CLIENT_SECRET or write to config.py ... then:
+>> openVulnQuery --cvrf --severity high --last_updated 2016-01-02:2016-04-02 --json filename.json
+>> openVulnQuery --cvrf --all --last_updated 2016-01-02:2016-07-02
+>> openVulnQuery --cvrf --severity critical --first_published 2015-01-02:2015-01-04
 ```
 
 #### Output Format (Optional)
@@ -229,7 +237,8 @@ Returns the count of fields entered with -f or --fields. If no fields are entere
 
         Examples:
         >> openVulnQuery --config PathToCredentialsFile --cvrf --year 2016 -c
-        >> openVulnQuery --config PathToCredentialsFile --cvrf --severity low -f sir cves bug_ids -c
+        >> # export CLIENT_ID and CLIENT_SECRET or write to config.py ... then:
+        >> openVulnQuery --cvrf --severity low -f sir cves bug_ids -c
 ```
 
 #### Developers
@@ -237,7 +246,7 @@ Returns the count of fields entered with -f or --fields. If no fields are entere
 - Directly interact with query_client.py to query the Open Vuln API
 - query_client.py returns Advisory Object
 - advisory.py module has Advisory object a abstract class which is inherited by CVRF and OVAL data type
-- This abstraction hides the implementation details and the data source used to populate the data type. The data members of CVRF and OVAL advisories are populated from API results as well parsing the XML file obtained from the API results.
+- This abstraction hides the implementation details and the data source used to populate the data type. The data members of CVRF and OVAL advisories are populated from API results.
 
 #### Disclosures:
 No support for filtering based on --API fields, you can't use --year 2016 and --severity high
@@ -262,14 +271,14 @@ After you install openVulnQuery package, you can use the query_client module to 
  advisory objects. For each query to the API, you can pick the advisory format.
 ```
 >> from openVulnQuery import query_client
->> query_client = query_client.QueryClient(client_id = "", client_secret = "")
->> advisories = query_client.get_by_year(year = 2010, adv_format = "cvrf")
->> advisories = query_client.get_by_ios_xe('3.16.1S')
+>> query_client = query_client.QueryClient(client_id="", client_secret="")
+>> advisories = query_client.get_by_year(year=2010, adv_format='cvrf')
+>> advisories = query_client.get_by_ios_xe('ios', '3.16.1S')
 ```
 If you want to use the additional date filters based on first published and last updated date. You can pass the appropriate class
 ```
->> advisories = query_client.get_by_severity(adv_format="cvrf", severity="high", FirstPublished(2016-01-01, 2016-02-02))
->> advisories = query_client.get_by_severity(adv_format="oval", severity="low", LastUpdated(2016-01-01, 2016-02-02))
+>> advisories = query_client.get_by_severity(adv_format='cvrf', severity='high', FirstPublished(2016-01-01, 2016-02-02))
+>> advisories = query_client.get_by_severity(adv_format='oval', severity='low', LastUpdated(2016-01-01, 2016-02-02))
 ```
 
 Here are the information stored in advisory object.
@@ -293,11 +302,11 @@ Here are the information stored in advisory object.
 ##### OVAL (inherits Advisory Abstract Class)
             * oval_url
 After you install openVulnQuery package, you can use the query_client module to make API-call which returns
- advisory objects. For each query to the API, you can pick advisory format and whether you want to parse the cvrf as we only support parsing cvrf xml files right now.
+ advisory objects. For each query to the API, you can pick advisory format.
 ```
 >> from openVulnQuery import query_client
 >> query_client = query_client.OpenVulnQueryClient(client_id='', client_secret='')
->> advisories = query_client.get_by_year(year=2010, adv_format = 'cvrf', cvrf_parsed = True)
+>> advisories = query_client.get_by_year(year=2010, adv_format='cvrf')
 ```
 Here are the information stored in advisory object.
 ##### Advisory (Abstract Base Class)
@@ -329,5 +338,64 @@ Here are the information stored in advisory object.
 To run the tests in the tests folder, the additional required `mock` module should be installed inside the `venv`with the usual:
 
 ```
-pip install mock
+pip install mock pytest
+```
+
+There are unit tests in `tests/` and some sample like system level test (`tests/test_query_client_cvrf.py`) skipped in below sample runs, as it contacting the real API.
+
+Sample run (expecting `pytest` has been installed e.g. via `pip install pytest`):
+
+```
+$ cd /www/github.com/CiscoPSIRT/openVulnAPI/openVulnQuery
+
+$ pytest
+=========================================================================================================== test session starts ============================================================================================================
+platform darwin -- Python 2.7.13, pytest-3.1.2, py-1.4.34, pluggy-0.4.0
+rootdir: /www/github.com/CiscoPSIRT/openVulnAPI/openVulnQuery, inifile:
+plugins: cov-2.5.1
+collected 43 items 
+
+tests/test_cli_api.py ..........
+tests/test_config.py ....
+tests/test_constants.py ...........
+tests/test_query_client_cvrf.py ssssssss
+tests/test_utils.py ..........
+
+=================================================================================================== 35 passed, 8 skipped in 0.18 seconds ===================================================================================================
+```
+
+Including coverage info (requires `pip install pytest-cov` which includes `pip install coverage` ):
+
+```
+$ pytest --cov=openVulnQuery --cov-report=term-missing
+=========================================================================================================== test session starts ============================================================================================================
+platform darwin -- Python 2.7.13, pytest-3.1.2, py-1.4.34, pluggy-0.4.0
+rootdir: /www/github.com/CiscoPSIRT/openVulnAPI/openVulnQuery, inifile:
+plugins: cov-2.5.1
+collected 43 items 
+
+tests/test_cli_api.py ..........
+tests/test_config.py ....
+tests/test_constants.py ...........
+tests/test_query_client_cvrf.py ssssssss
+tests/test_utils.py ..........
+
+---------- coverage: platform darwin, python 2.7.13-final-0 ----------
+Name                             Stmts   Miss  Cover   Missing
+--------------------------------------------------------------
+openVulnQuery/__init__.py            0      0   100%
+openVulnQuery/advisory.py           90     38    58%   59, 95, 105-111, 118-122, 128-131, 136, 147-178
+openVulnQuery/authorization.py       6      3    50%   18-24
+openVulnQuery/cli_api.py            41      0   100%
+openVulnQuery/config.py              4      0   100%
+openVulnQuery/constants.py          11      0   100%
+openVulnQuery/main.py               66     66     0%   1-107
+openVulnQuery/query_client.py       88     53    40%   22, 27-28, 33-34, 39, 44, 60-64, 69-77, 81-87, 91-97, 101-109, 113-119, 123-129, 133-139, 143-149, 154-160, 165-180, 190-197, 207-208
+openVulnQuery/rest_api.py            3      1    67%   167
+openVulnQuery/utils.py              76     30    61%   29, 31, 68-71, 76, 82-91, 108-111, 118-129, 134
+--------------------------------------------------------------
+TOTAL                              385    191    50%
+
+
+=================================================================================================== 35 passed, 8 skipped in 0.32 seconds ===================================================================================================
 ```

@@ -1,5 +1,6 @@
 import json
 import unittest
+import pytest
 
 import mock
 from openVulnQuery import advisory
@@ -148,6 +149,8 @@ def mocked_requests_lib_get(*args, **kwargs):
         return MockResponse(406, response_error)
 
 
+@pytest.mark.skip(reason='Out of sync and requires / triggers token usage as'
+                         ' well as api access')
 class OpenVulnQueryClientTestCvrf(unittest.TestCase):
     """Unit Test for all function in OpenVulnQueryClient"""
 

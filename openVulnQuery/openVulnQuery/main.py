@@ -27,8 +27,18 @@ def process_command_line():
                 ' last_published filter' % constants.ALLOWS_FILTER)
 
     if not args.json_config_path:
-        parser.error(
-            ' --conf <FILE> ? Missing configuration file (with credentials)')
+        # Try next environment variables are set, then config.py, or fail:
+        keys_required = ('CLIENT_ID', 'CLIENT_SECRET')
+        env_config = {k: os.getenv(k, None) for k in keys_required}
+
+        if all([v for v in env_config.values()]):  # OK, take env values:
+            for key in keys_required:
+                setattr(config, key, env_config[key])
+        elif all([getattr(config, k, None) for k in keys_required]):
+            pass  # Fallback to the credentials in config.py (non-empty!)
+        else:
+            parser.error(
+                ' --conf <FILE> ? Missing configuration file (credentials)')
     else:
         if not os.path.isfile(args.json_config_path):
             parser.error(
@@ -50,6 +60,25 @@ def main():
     args = process_command_line()
     api_resource_key, api_resource_value = args.api_resource
 
+    topic = api_resource_key
+
+    if args.advisory_format:
+        adv_format = args.advisory_format
+    else:
+        adv_format = constants.ADVISORY_FORMAT_TOKENS[-1]
+
+    f_cfg = {'a_filter': None}
+    if api_resource_key in constants.ALLOWS_FILTER:
+        # Process eventual filter parameters:
+        if args.first_published:
+            f_cfg['a_filter'] = query_client.TemporalFilter(
+                query_client.PUBLISHED_FIRST, *args.first_published)
+        elif args.last_published:
+            f_cfg['a_filter'] = query_client.TemporalFilter(
+                query_client.PUBLISHED_LAST, *args.last_published)
+        else:  # Default is 'empty' filter
+            f_cfg['a_filter'] = query_client.Filter()
+
     client_cfg = {
         'client_id': config.CLIENT_ID,
         'client_secret': config.CLIENT_SECRET
@@ -57,26 +86,8 @@ def main():
     if args.user_agent:
         client_cfg['user_agent'] = args.user_agent
     client = query_client.OpenVulnQueryClient(**client_cfg)
-    query_client_func = getattr(client, 'get_by_{0}'.format(api_resource_key))
-    if not args.advisory_format:
-        advisories = query_client_func(api_resource_value)
-    else:
-        if api_resource_key in constants.ALLOWS_FILTER:
-            a_filter = query_client.Filter()
-            if args.first_published:
-                start_date, end_date = args.first_published
-                a_filter = query_client.FirstPublishedFilter(
-                    start_date, end_date)
-            elif args.last_published:
-                start_date, end_date = args.last_published
-                a_filter = query_client.LastPublishedFilter(
-                    start_date, end_date)
-            advisories = query_client_func(
-                args.advisory_format, api_resource_value, a_filter)
-        else:
-            advisories = query_client_func(
-                args.advisory_format, api_resource_value)
 
+    advisories = client.get_by(topic, adv_format, api_resource_value, **f_cfg)
     if args.fields:
         if args.count:
             returned_output = [utils.count_fields(advisories, args.fields)]

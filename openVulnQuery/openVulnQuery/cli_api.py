@@ -41,7 +41,7 @@ def valid_date(date_text):
 CLI_API_ADVISORY_FORMAT = (
     {
         'action': 'store_const',
-        'const': 'cvrf',
+        'const': constants.CVRF_ADVISORY_FORMAT_TOKEN,
         'dest': 'advisory_format',
         'help': (
             'Selects from cvrf advisories, required except for ios and ios_xe'
@@ -50,7 +50,7 @@ CLI_API_ADVISORY_FORMAT = (
     },
     {
         'action': 'store_const',
-        'const': 'oval',
+        'const': constants.OVAL_ADVISORY_FORMAT_TOKEN,
         'dest': 'advisory_format',
         'help': (
             'Selects from oval advisories, required except for ios and ios_xe'
@@ -136,14 +136,14 @@ CLI_API_OUTPUT_FORMAT = (
         'help': 'Output to CSV with file path',
         'metavar': 'filepath',
         'tokens': ('--csv',),
-        'type': (lambda x: ('csv', x)),
+        'type': (lambda x: (constants.CSV_OUTPUT_FORMAT_TOKEN, x)),
     },
     {
         'dest': 'output_format',
         'help': 'Output to JSON with file path',
         'metavar': 'filepath',
         'tokens': ('--json',),
-        'type': (lambda x: ('json', x)),
+        'type': (lambda x: (constants.JSON_OUTPUT_FORMAT_TOKEN, x)),
     },
 )
 
@@ -163,7 +163,7 @@ CLI_API_ADDITIONAL_FILTERS = (
             'Filter advisories based on last_published date'
             ' YYYY-MM-DD:YYYY-MM-DD USAGE: followed by severity or all'),
         'metavar': 'YYYY-MM-DD:YYYY-MM-DD',
-        'tokens': ('--last_published',),
+        'tokens': ('--last_published', '--last_updated'),
         'type': valid_date,
     },
 )
@@ -195,7 +195,9 @@ CLI_API_PARSER_GENERIC = (
 CLI_API_CONFIG = (
     {
         'dest': 'json_config_path',
-        'help': ('Path to JSON file with config'),
+        'help': ('Path to JSON file with config (otherwise fallback to'
+                 ' environment variables CLIENT_ID and CLIENT_SECRET, or'
+                 ' config.py variables, or fail)'),
         'metavar': 'filepath',
         'tokens': ('--config',),
     },
@@ -233,7 +235,7 @@ def parser_factory():
     p = argparse.ArgumentParser(
         prog='openVulnQuery',
         description='Cisco OpenVuln API Command Line Interface')
-    p.set_defaults(output_format=('json', None))
+    p.set_defaults(output_format=(constants.JSON_OUTPUT_FORMAT_TOKEN, None))
 
     add_options_to_parser(
         p.add_mutually_exclusive_group(required=False),
@@ -251,6 +253,6 @@ def parser_factory():
     add_options_to_parser(p, CLI_API_PARSER_GENERIC)
 
     add_options_to_parser(
-        p.add_mutually_exclusive_group(required=True), CLI_API_CONFIG)
+        p.add_mutually_exclusive_group(required=False), CLI_API_CONFIG)
 
     return p
