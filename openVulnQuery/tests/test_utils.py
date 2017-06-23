@@ -72,3 +72,34 @@ class UtilsTest(unittest.TestCase):
     def test_get_count_fields_with_NA(self):
         self.assertEqual(utils.get_count(getattr(mock_advisory, "cwe")), 0)
         self.assertEqual(utils.get_count(getattr(mock_advisory, "cves")), 1)
+
+    def test_flatten_list_void_pair(self):
+        naive_void = [{}, {}]
+        self.assertListEqual(utils.flatten_list(naive_void), naive_void)
+
+    def test_flatten_list_distinct_pair(self):
+        naive_distinct = [{'foo': 'bar'}, {'baz': ''}]
+        naive_distinct_side_effected = [{'foo': 'bar'}, {'baz': None}]
+        self.assertListEqual(
+            utils.flatten_list(naive_distinct), naive_distinct_side_effected)
+
+    # def test_flatten_list_distinct_nested_pair(self):
+    #     naive_distinct = [{'foo': 'bar'}, {'baz': {'yes': 'no'}}]
+    #     naive_distinct_side_effected = [{'foo': 'bar'}, {'baz': None}]
+    #     self.assertListEqual(
+    #         utils.flatten_list(naive_distinct), naive_distinct_side_effected)
+    #
+    # def test_private_reduce_list_dict(self):
+    #     k = 'no'
+    #     v = [{'no': {'foo': 'bar', 'baz': 'yes'}},
+    #          {'no': {'foo': 'bar', 'baz': 'yes'}},
+    #          {'yes': {'foo': 'bar', 'baz': 'maybe'}}]
+    #     whatever = []
+    #     self.assertListEqual(
+    #         utils._reduce_list_dict(k, v), whatever)
+
+    def test_private_get_headers_distinct(self):
+        naive_distinct = [{'foo': 'bar'}, {'baz': ''}]
+        expected = ['baz', 'foo']
+        self.assertListEqual(
+            sorted(utils._get_headers(naive_distinct)), expected)
