@@ -353,9 +353,9 @@ $ pytest
 platform darwin -- Python 2.7.13, pytest-3.1.2, py-1.4.34, pluggy-0.4.0
 rootdir: /www/github.com/CiscoPSIRT/openVulnAPI/openVulnQuery, inifile:
 plugins: cov-2.5.1
-collected 102 items 
+collected 114 items 
 
-tests/test_advisory.py ...
+tests/test_advisory.py ...............
 tests/test_cli_api.py ..............................................
 tests/test_config.py ....
 tests/test_constants.py ...........
@@ -363,7 +363,7 @@ tests/test_main.py .............s......
 tests/test_query_client_cvrf.py ssssssss
 tests/test_utils.py ..........
 
-=================================================================================================== 93 passed, 9 skipped in 0.75 seconds ===================================================================================================
+================================================================================================== 105 passed, 9 skipped in 0.81 seconds ===================================================================================================
 ```
 
 Including coverage info (requires `pip install pytest-cov` which includes `pip install coverage` ):
@@ -374,9 +374,9 @@ $ pytest --cov=openVulnQuery --cov-report=term-missing --cov-report=html
 platform darwin -- Python 2.7.13, pytest-3.1.2, py-1.4.34, pluggy-0.4.0
 rootdir: /www/github.com/CiscoPSIRT/openVulnAPI/openVulnQuery, inifile:
 plugins: cov-2.5.1
-collected 102 items 
+collected 114 items 
 
-tests/test_advisory.py ...
+tests/test_advisory.py ...............
 tests/test_cli_api.py ..............................................
 tests/test_config.py ....
 tests/test_constants.py ...........
@@ -388,7 +388,7 @@ tests/test_utils.py ..........
 Name                             Stmts   Miss  Cover   Missing
 --------------------------------------------------------------
 openVulnQuery/__init__.py            0      0   100%
-openVulnQuery/advisory.py           90     38    58%   59, 95, 105-111, 118-122, 128-131, 136, 147-178
+openVulnQuery/advisory.py           90     13    86%   59, 148, 157-158, 162, 167-178
 openVulnQuery/authorization.py       6      2    67%   23-24
 openVulnQuery/cli_api.py            75      4    95%   294-297, 311
 openVulnQuery/config.py              4      0   100%
@@ -398,9 +398,9 @@ openVulnQuery/query_client.py       88     48    45%   22, 33-34, 39, 44, 64, 69
 openVulnQuery/rest_api.py            3      1    67%   167
 openVulnQuery/utils.py              76     30    61%   29, 31, 68-71, 76, 82-91, 108-111, 118-129, 134
 --------------------------------------------------------------
-TOTAL                              387    137    65%
+TOTAL                              387    112    71%
 Coverage HTML written to dir htmlcov
 
 
-=================================================================================================== 93 passed, 9 skipped in 1.03 seconds ===================================================================================================
+================================================================================================== 105 passed, 9 skipped in 1.10 seconds ===================================================================================================
 ```

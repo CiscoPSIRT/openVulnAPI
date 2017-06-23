@@ -36,3 +36,72 @@ class AdvisoryTest(unittest.TestCase):
 
     def test_advisory_filterable_succeeds(self):
         self.assertTrue(advisory.Filterable())
+
+    def test_advisory_advisory_succeeds(self):
+        adv_map = {}
+        for k, v in advisory.ADVISORIES_COMMONS_MAP.items():
+            adv_map[k] = NA
+        self.assertTrue(advisory.Advisory(**adv_map))
+
+    def test_advisory_cvrf_succeeds(self):
+        adv_map = {}
+        for k, v in advisory.ADVISORIES_COMMONS_MAP.items():
+            adv_map[k] = NA
+        self.assertTrue(advisory.CVRF(**adv_map))
+
+    def test_advisory_oval_succeeds(self):
+        adv_map = {}
+        for k, v in advisory.ADVISORIES_COMMONS_MAP.items():
+            adv_map[k] = NA
+        self.assertTrue(advisory.OVAL(**adv_map))
+
+    def test_advisory_advisoryios_succeeds(self):
+        adv_map = {}
+        for k, v in advisory.ADVISORIES_COMMONS_MAP.items():
+            adv_map[k] = NA
+        self.assertTrue(advisory.AdvisoryIOS(**adv_map))
+
+    def test_advisory_ipssignature_succeeds(self):
+        self.assertTrue(advisory.IPSSignature(*('',) * 4))
+
+    def test_advisory_cvrf_with_ips_sig_succeeds(self):
+        adv_map = {IPS_SIG: ''}
+        for k, v in advisory.ADVISORIES_COMMONS_MAP.items():
+            adv_map[k] = NA
+        self.assertTrue(advisory.CVRF(**adv_map))
+
+    def test_advisory_oval_with_ips_sig_succeeds(self):
+        adv_map = {IPS_SIG: ''}
+        for k, v in advisory.ADVISORIES_COMMONS_MAP.items():
+            adv_map[k] = NA
+        self.assertTrue(advisory.OVAL(**adv_map))
+
+    def test_advisory_format_factory_map_succeeds(self):
+        self.assertTrue(advisory.advisory_format_factory_map())
+
+    def test_advisory_unchanged_format_factory_map(self):
+        frozen = dict(
+            zip(constants.ADVISORY_FORMAT_TOKENS,
+                (advisory.CVRF, advisory.OVAL, advisory.AdvisoryIOS)))
+        self.assertDictEqual(advisory.advisory_format_factory_map(), frozen)
+
+    def test_advisory_advisory_factory_cvrf_missing_key_cvrf_url(self):
+        adv_map = {}
+        for k, v in advisory.ADVISORIES_COMMONS_MAP.items():
+            adv_map[v] = k
+        self.assertRaises(KeyError, advisory.advisory_factory,
+                          adv_map, constants.CVRF_ADVISORY_FORMAT_TOKEN, None)
+
+    def test_advisory_advisory_factory_oval_missing_key_oval_url(self):
+        adv_map = {}
+        for k, v in advisory.ADVISORIES_COMMONS_MAP.items():
+            adv_map[v] = k
+        self.assertRaises(KeyError, advisory.advisory_factory,
+                          adv_map, constants.OVAL_ADVISORY_FORMAT_TOKEN, None)
+
+    def test_advisory_advisory_factory_advisoryios_missing_key_oval_url(self):
+        adv_map = {}
+        for k, v in advisory.ADVISORIES_COMMONS_MAP.items():
+            adv_map[v] = k
+        self.assertRaises(KeyError, advisory.advisory_factory,
+                          adv_map, constants.IOS_ADVISORY_FORMAT_TOKEN, None)
