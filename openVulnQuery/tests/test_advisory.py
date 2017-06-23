@@ -27,6 +27,11 @@ mock_advisory = advisory.CVRF(**adv_cfg)
 mock_advisories = [mock_advisory]
 
 
+class MockLogger(object):
+    def debug(self, *args, **kwargs):
+        pass
+
+
 class AdvisoryTest(unittest.TestCase):
     def test_advisory_unchanged_na(self):
         self.assertEquals(advisory.NA, NA)
@@ -85,6 +90,13 @@ class AdvisoryTest(unittest.TestCase):
                 (advisory.CVRF, advisory.OVAL, advisory.AdvisoryIOS)))
         self.assertDictEqual(advisory.advisory_format_factory_map(), frozen)
 
+    def test_advisory_advisory_factory_cvrf_wrong_format(self):
+        adv_map = {}
+        for k, v in advisory.ADVISORIES_COMMONS_MAP.items():
+            adv_map[v] = k
+        self.assertRaises(ValueError, advisory.advisory_factory,
+                          adv_map, 'this_is_an_unknown_format_token', None)
+
     def test_advisory_advisory_factory_cvrf_missing_key_cvrf_url(self):
         adv_map = {}
         for k, v in advisory.ADVISORIES_COMMONS_MAP.items():
@@ -105,3 +117,62 @@ class AdvisoryTest(unittest.TestCase):
             adv_map[v] = k
         self.assertRaises(KeyError, advisory.advisory_factory,
                           adv_map, constants.IOS_ADVISORY_FORMAT_TOKEN, None)
+
+    def test_advisory_advisory_factory_cvrf_with_key_cvrf_url_miss_ips(self):
+        adv_map = {advisory.CVRF_URL_MAP[advisory.CVRF_URL_TOKEN]: ''}
+        for k, v in advisory.ADVISORIES_COMMONS_MAP.items():
+            adv_map[v] = k
+        self.assertRaises(KeyError, advisory.advisory_factory,
+                          adv_map, constants.CVRF_ADVISORY_FORMAT_TOKEN, None)
+
+    def test_advisory_advisory_factory_oval_with_key_oval_url_miss_ips(self):
+        adv_map = {constants.OVAL_ADVISORY_FORMAT_TOKEN: ''}
+        for k, v in advisory.ADVISORIES_COMMONS_MAP.items():
+            adv_map[v] = k
+        self.assertRaises(KeyError, advisory.advisory_factory,
+                          adv_map, constants.OVAL_ADVISORY_FORMAT_TOKEN, None)
+
+    def test_advisory_advisory_factory_oval_with_key_oval_miss_ips(self):
+        adv_map = {advisory.OVAL_URL_MAP[advisory.OVAL_URL_TOKEN]: ''}
+        for k, v in advisory.ADVISORIES_COMMONS_MAP.items():
+            adv_map[v] = k
+        self.assertRaises(KeyError, advisory.advisory_factory,
+                          adv_map, constants.OVAL_ADVISORY_FORMAT_TOKEN, None)
+
+    def test_advisory_advisory_factory_cvrf_with_key_cvrf_url_and_ips(self):
+        adv_map = {
+            advisory.CVRF_URL_MAP[advisory.CVRF_URL_TOKEN]: '',
+            advisory.IPS_SIG_MAP[advisory.IPS_SIG]: '',
+        }
+        for k, v in advisory.ADVISORIES_COMMONS_MAP.items():
+            adv_map[v] = k
+        self.assertTrue(advisory.advisory_factory(
+                        adv_map,
+                        constants.CVRF_ADVISORY_FORMAT_TOKEN,
+                        MockLogger()))
+
+    def test_advisory_advisory_factory_oval_with_key_oval_url_and_ips(self):
+        adv_map = {
+            advisory.OVAL_URL_MAP[advisory.OVAL_URL_TOKEN]: '',
+            advisory.IPS_SIG_MAP[advisory.IPS_SIG]: '',
+        }
+        for k, v in advisory.ADVISORIES_COMMONS_MAP.items():
+            adv_map[v] = k
+        self.assertTrue(advisory.advisory_factory(
+                        adv_map,
+                        constants.OVAL_ADVISORY_FORMAT_TOKEN,
+                        MockLogger()))
+
+    def test_advisory_advisory_factory_advisoryios_with_key_oval_url_and_rel(
+            self):
+        adv_map = {
+            advisory.OVAL_URL_MAP[advisory.OVAL_URL_TOKEN]: '',
+            advisory.IOS_ADD_ONS_MAP['first_fixed']: '',
+            advisory.IOS_ADD_ONS_MAP['ios_release']: '',
+        }
+        for k, v in advisory.ADVISORIES_COMMONS_MAP.items():
+            adv_map[v] = k
+        self.assertTrue(advisory.advisory_factory(
+                        adv_map,
+                        constants.IOS_ADVISORY_FORMAT_TOKEN,
+                        MockLogger()))

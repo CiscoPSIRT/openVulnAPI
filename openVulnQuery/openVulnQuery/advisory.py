@@ -36,7 +36,7 @@ CVRF_URL_MAP = {
 
 OVAL_URL_TOKEN = 'oval_url'
 OVAL_URL_MAP = {
-    CVRF_URL_TOKEN: 'ovalUrl',  # TODO how to model found variant 'oval'
+    OVAL_URL_TOKEN: 'ovalUrl',  # TODO how to model found variant 'oval'
 }
 
 IOS_ADD_ONS_MAP = {
