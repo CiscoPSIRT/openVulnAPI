@@ -1,10 +1,8 @@
-import argparse
 import unittest
-import pytest
-import requests.adapters
 
-from openVulnQuery import main
+import pytest
 from openVulnQuery import config
+from openVulnQuery import main
 
 DATE_PARSER_FORMAT = '%Y-%m-%d'
 DATE_SEP_TOKEN = ':'
@@ -133,7 +131,7 @@ class MainTest(unittest.TestCase):
     def test_main_cvrf_all_fails_wrong_token_url(self):
         string_list = '--cvrf --all'.split()
         config.REQUEST_TOKEN_URL = BAD_REQUEST_TOKEN_URL
-        self.assertRaises(requests.adapters.SSLError, main.main, string_list)
+        self.assertRaises(Exception, main.main, string_list)
 
     @pytest.mark.skip(
         reason='Marker set, as implementation does not check trivia locally')

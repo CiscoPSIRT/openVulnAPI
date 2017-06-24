@@ -7,7 +7,7 @@ import authorization
 import config
 import constants
 import rest_api
-
+import json
 
 ADV_TOKENS = constants.ADVISORY_FORMAT_TOKENS
 
@@ -48,19 +48,25 @@ class OpenVulnQueryClient(object):
     """Client sends get request for advisory information from OpenVuln API.
 
     :var auth_token: OAuth2 Token for API authorization.
-    :var headers: Headers containing OAuth2 Token and data type for request.
+    :var headers: Headers containing OAuth2 Token and data type for
+     request.
     """
 
-    def __init__(self, client_id, client_secret, user_agent='TestApp'):
+    def __init__(self, client_id, client_secret, auth_url=None,
+                 user_agent='TestApp'):
         """
         :param client_id: Client application Id as retrieved from API provider
         :param client_secret: Client secret as retrieved from API provider
+        :param auth_url: POST URL to request auth token response (default
+            from config)
         :param user_agent: Communicates the name of the app per request.
+
         """
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger(__name__)
-        self.auth_token = authorization.get_oauth_token(client_id,
-                                                        client_secret)
+        self.auth_url = auth_url if auth_url else config.REQUEST_TOKEN_URL
+        self.auth_token = authorization.get_oauth_token(
+            client_id, client_secret, request_token_url=self.auth_url)
         self.headers = rest_api.rest_with_auth_headers(
             self.auth_token, user_agent)
 
@@ -71,9 +77,8 @@ class OpenVulnQueryClient(object):
             'all': all_adv,
             'filter': a_filter.path,
         }
-        advisories = self.get_request(
-            "{adv_format}/{all}/{filter}".format(**req_cfg),
-            a_filter.params)
+        req_path = "{adv_format}/{all}/{filter}".format(**req_cfg)
+        advisories = self.get_request(req_path, a_filter.params)
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_cve(self, adv_format, cve, a_filter=None):
@@ -82,8 +87,8 @@ class OpenVulnQueryClient(object):
             'adv_format': ensure_adv_format_token(adv_format),
             'cve': cve,
         }
-        advisories = self.get_request(
-            "{adv_format}/cve/{cve}".format(**req_cfg))
+        req_path = "{adv_format}/cve/{cve}".format(**req_cfg)
+        advisories = self.get_request(req_path)
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_advisory(self, adv_format, an_advisory, a_filter=None):
@@ -92,8 +97,8 @@ class OpenVulnQueryClient(object):
             'adv_format': ensure_adv_format_token(adv_format),
             'advisory': an_advisory,
         }
-        advisories = {'advisories': [self.get_request(
-            "{adv_format}/advisory/{advisory}".format(**req_cfg))]}
+        req_path = "{adv_format}/advisory/{advisory}".format(**req_cfg)
+        advisories = {'advisories': [self.get_request(req_path)]}
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_severity(self, adv_format, severity, a_filter=None):
@@ -103,9 +108,9 @@ class OpenVulnQueryClient(object):
             'severity': severity,
             'filter': Filter().path if a_filter is None else a_filter.path,
         }
-        advisories = self.get_request(
-            "{adv_format}/severity/{severity}/{filter}".format(**req_cfg),
-            params=a_filter.params)
+        req_path = ("{adv_format}/severity/{severity}/{filter}"
+                    "".format(**req_cfg))
+        advisories = self.get_request(req_path, params=a_filter.params)
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_year(self, adv_format, year, a_filter=None):
@@ -114,8 +119,8 @@ class OpenVulnQueryClient(object):
             'adv_format': ensure_adv_format_token(adv_format),
             'year': year,
         }
-        advisories = self.get_request(
-            "{adv_format}/year/{year}".format(**req_cfg))
+        req_path = "{adv_format}/year/{year}".format(**req_cfg)
+        advisories = self.get_request(req_path)
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_latest(self, adv_format, latest, a_filter=None):
@@ -124,8 +129,8 @@ class OpenVulnQueryClient(object):
             'adv_format': ensure_adv_format_token(adv_format),
             'latest': latest,
         }
-        advisories = self.get_request(
-            "{adv_format}/latest/{latest}".format(**req_cfg))
+        req_path = "{adv_format}/latest/{latest}".format(**req_cfg)
+        advisories = self.get_request(req_path)
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_product(self, adv_format, product_name, a_filter=None):
@@ -133,16 +138,17 @@ class OpenVulnQueryClient(object):
         req_cfg = {
             'adv_format': ensure_adv_format_token(adv_format),
         }
+        req_path = "{adv_format}/product".format(**req_cfg)
         advisories = self.get_request(
-            "{adv_format}/product".format(**req_cfg),
-            params={'product': product_name})
+            req_path, params={'product': product_name})
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_ios_xe(self, adv_format, ios_version, a_filter=None):
         """Return advisories by Cisco IOS advisories version"""
+        req_path = "iosxe"
         try:
             advisories = self.get_request(
-                "iosxe",
+                req_path,
                 params={'version': ios_version})
             return self.advisory_list(advisories['advisories'], None)
         except requests.exceptions.HTTPError as e:
@@ -151,9 +157,10 @@ class OpenVulnQueryClient(object):
 
     def get_by_ios(self, adv_format, ios_version, a_filter=None):
         """Return advisories by Cisco IOS advisories version"""
+        req_path = "ios"
         try:
             advisories = self.get_request(
-                "ios",
+                req_path,
                 params={'version': ios_version})
             return self.advisory_list(advisories['advisories'], None)
         except requests.exceptions.HTTPError as e:
@@ -189,8 +196,9 @@ class OpenVulnQueryClient(object):
         """
         self.logger.info("Sending Get Request %s", path)
         req_cfg = {'base_url': config.API_URL, 'path': path}
+        req_url = "{base_url}/{path}".format(**req_cfg)
         r = requests.get(
-            url="{base_url}/{path}".format(**req_cfg),
+            url=req_url,
             headers=self.headers,
             params=params)
         r.raise_for_status()
