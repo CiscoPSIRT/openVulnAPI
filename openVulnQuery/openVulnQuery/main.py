@@ -22,15 +22,17 @@ def filter_config(resource, first_pub_pair, last_pub_pair):
     if resource in constants.ALLOWS_FILTER:
         # Process eventual filter parameters:
         if first_pub_pair:
-            return query_client.TemporalFilter(
+            a_filter = query_client.TemporalFilter(
                 query_client.PUBLISHED_FIRST, *first_pub_pair)
         elif last_pub_pair:
-            return query_client.TemporalFilter(
+            a_filter = query_client.TemporalFilter(
                 query_client.PUBLISHED_LAST, *last_pub_pair)
         else:  # Default is 'empty' filter
-            return query_client.Filter()
+            a_filter = query_client.Filter()
     else:
-        return {'a_filter': None}
+        a_filter = None
+
+    return {'a_filter': a_filter}
 
 
 def advisory_format_from_call(adv_format):

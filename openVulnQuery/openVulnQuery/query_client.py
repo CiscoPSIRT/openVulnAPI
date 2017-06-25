@@ -8,6 +8,9 @@ import config
 import constants
 import rest_api
 import json
+import os
+import uuid
+import datetime as dt
 
 ADV_TOKENS = constants.ADVISORY_FORMAT_TOKENS
 
@@ -15,6 +18,10 @@ TEMPORAL_FILTER_KEYS = ('startDate', 'endDate')
 PUBLISHED_FIRST = 'firstpublished'
 PUBLISHED_LAST = 'lastpublished'
 TEMPORAL_PUBLICATION_ASPECTS = (PUBLISHED_FIRST, PUBLISHED_LAST)
+
+DEBUG_API_USAGE = os.getenv('CISCO_OPEN_VULN_API_DEBUG', None)
+DEBUG_API_PATH = os.getenv('CISCO_OPEN_VULN_API_PATH', None)
+DEBUG_TIME_STAMP_FORMAT = "%Y%m%dT%H%M%S.%f"
 
 
 def ensure_adv_format_token(adv_format):
@@ -197,11 +204,16 @@ class OpenVulnQueryClient(object):
         self.logger.info("Sending Get Request %s", path)
         req_cfg = {'base_url': config.API_URL, 'path': path}
         req_url = "{base_url}/{path}".format(**req_cfg)
-        r = requests.get(
-            url=req_url,
-            headers=self.headers,
-            params=params)
+        request_data = {
+            'url': req_url,
+            'headers': self.headers,
+            'params': params,
+        }
+        request_id = request_snapshot(request_data)
+        r = requests.get(**request_data)
         r.raise_for_status()
+        if request_id:
+            response_snapshots(r.json(), request_id)
         return r.json()
 
     def advisory_list(self, advisories, adv_format):
@@ -215,3 +227,77 @@ class OpenVulnQueryClient(object):
         adv_format = ensure_adv_format_token(adv_format)
         return [advisory.advisory_factory(adv, adv_format, self.logger)
                 for adv in advisories]
+
+
+def snapshot_timestamp():
+    """Generate timestamp in format DEBUG_TIME_STAMP_FORMAT."""
+    return dt.datetime.now().strftime(DEBUG_TIME_STAMP_FORMAT)
+
+
+def snapshot_name(kind, correlating_id, time_stamp=None):
+    """Generate a snapshot name for kind and correlating id (by request).
+    :var kind: A string that will be lower cased and postfixed (before
+        extension) to the filename.
+    :var correlating_id: A string id to correlate multiple snapshots.
+    :var time_stamp: A string rep of a time stamp or None
+    :return A filename.
+    """
+    if time_stamp is None:
+        time_stamp = snapshot_timestamp()
+    return ('ts-{}_id-{}_snapshot-of-{}.json'
+            ''.format(time_stamp, correlating_id, kind.lower()))
+
+
+def request_snapshot(data):
+    """If env has CISCO_OPEN_VULN_API_DEBUG set (and evaluates to True)
+    dump the data from the request to an existing folder as set by either env
+    variable CISCO_OPEN_VULN_API_PATH or default taking the current folder.
+
+    :var data: Request data as dict.
+    :return unique request id, to ease matching to response snapshots or None
+        if no debugging requested.
+    """
+    if not DEBUG_API_USAGE:
+        return None
+    request_id = str(uuid.uuid4())
+    file_path = snapshot_name('request', request_id)
+    if DEBUG_API_PATH:
+        file_path = os.path.join(DEBUG_API_PATH, file_path)
+    try:
+        with open(file_path, 'w') as f:
+            json.dump(data, f, encoding='utf-8')
+    except (OSError, ValueError):
+        pass  # Best effort snapshots ;-)
+
+    return request_id
+
+
+def response_snapshots(data, request_id):
+    """If env has CISCO_OPEN_VULN_API_DEBUG set (and evaluates to True)
+    dump the data from the response to an existing folder as set by either env
+    variable CISCO_OPEN_VULN_API_PATH or default taking the current folder.
+
+    :var data: Repsonse data as received from requests json method (no json!).
+    :var unique request id, to ease matching to request snapshot.
+    """
+    if not DEBUG_API_USAGE:
+        return None
+
+    time_stamp = snapshot_timestamp()
+    file_path = snapshot_name('response-raw', request_id, time_stamp)
+    if DEBUG_API_PATH:
+        file_path = os.path.join(DEBUG_API_PATH, file_path)
+    try:
+        with open(file_path, 'w') as f:
+            json.dump(data, f, encoding='utf-8')
+    except (OSError, ValueError):
+        pass  # Best effort snapshots ;-)
+
+    file_path = snapshot_name('response-formatted', request_id, time_stamp)
+    if DEBUG_API_PATH:
+        file_path = os.path.join(DEBUG_API_PATH, file_path)
+    try:
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=4, encoding='utf-8')
+    except (OSError, ValueError):
+        pass  # ditto (cf. above)

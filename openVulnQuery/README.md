@@ -281,6 +281,33 @@ If you want to use the additional date filters based on first published and last
 >> advisories = query_client.get_by_severity(adv_format='oval', severity='low', LastUpdated(2016-01-01, 2016-02-02))
 ```
 
+##### Debugging Requests and Responses
+
+If the run time environment has the variable `CISCO_OPEN_VULN_API_DEBUG` 
+set (and the value evaluates to True) the data forming every request as well 
+as raw and formatted variants of successful responses (`HTTP 200/OK`)
+will be written to files in JSON format.
+
+The file names follow the pattern: `ts-{ts}_id-{id}_snapshot-of-{kind}.json`, 
+where: 
+
+* `{ts}` receives a date time stamp as ruled by the module variable 
+`DEBUG_TIME_STAMP_FORMAT` (default `%Y%m%dT%H%M%S.%f`) and noted in local
+time,
+* `{id}` is a string holding a UUID4 generated for the request and useful to
+ correlate request and response data files
+* `{kind}` is one of three strings speaking for themselves: 
+  + `request`
+  + `response-raw`
+  + `response-formated`
+
+The files will be written either to the current folder, or to a path stored
+in the environment variable `CISCO_OPEN_VULN_API_PATH` (if it is set).
+
+*Note*: The folder at that later path is expected to exist and be writeable 
+by the user. Please note also, that Filesystem and JSON serialization errors
+are ignored.
+
 Here are the information stored in advisory object.
 ##### Advisory
       * advisory_id
