@@ -5,7 +5,7 @@ import query_client
 import utils
 
 
-def filter_or_aggregate(advisories, fields, count):
+def filter_or_aggregate(advisories, fields=None, count=None):
     """Post process depending on requested fields and count aggregation."""
     if fields:
         if count:
@@ -16,8 +16,8 @@ def filter_or_aggregate(advisories, fields, count):
         return utils.filter_advisories(advisories, constants.API_LABELS)
 
 
-def filter_config(resource, first_pub_pair, last_pub_pair):
-    """Provide rule conforming filter config from request of filtes and API
+def filter_config(resource, first_pub_pair=None, last_pub_pair=None):
+    """Provide rule conforming filter config from request of filters and API
     resource(s) requested."""
     if resource in constants.ALLOWS_FILTER:
         # Process eventual filter parameters:
