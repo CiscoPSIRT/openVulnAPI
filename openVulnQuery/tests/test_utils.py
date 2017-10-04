@@ -1,9 +1,16 @@
 import unittest
+import mock
+import sys
+import json
+import pytest
 from openVulnQuery import constants
 from openVulnQuery import utils
 from openVulnQuery import advisory
 
 NA = constants.NA_INDICATOR
+CSV_OUTPUT_FORMAT_TOKEN = constants.CSV_OUTPUT_FORMAT_TOKEN
+JSON_OUTPUT_FORMAT_TOKEN = constants.JSON_OUTPUT_FORMAT_TOKEN
+
 mock_advisory_title = "Mock Advisory Title"
 adv_cfg = {
     'advisory_id': "Cisco-SA-20111107-CVE-2011-0941",
@@ -47,6 +54,30 @@ class UtilsTest(unittest.TestCase):
     def test_filter_advisories_invalid_fields(self):
         fields = ["advisory_title", "v_score"]
         expected_output = [{'advisory_title': '%s' % mock_advisory_title}]
+        output = utils.filter_advisories(mock_advisories, fields)
+        self.assertIsInstance(output, list)
+        self.assertDictEqual(output[0], expected_output[0])
+
+    def test_filter_advisories_ips_sig_fields(self):
+        fields = ["advisory_title", constants.IPS_SIGNATURE_LABEL]
+        expected_output = [
+            {
+                'advisory_title': '%s' % mock_advisory_title,
+                constants.IPS_SIGNATURE_LABEL: [],
+             }
+        ]
+        output = utils.filter_advisories(mock_advisories, fields)
+        self.assertIsInstance(output, list)
+        self.assertDictEqual(output[0], expected_output[0])
+
+    def test_filter_advisories_ips_sig_fields_nested(self):
+        fields = ["advisory_title"] + list(constants.IPS_SIGNATURES)
+        expected_output = [
+            {
+                'advisory_title': '%s' % mock_advisory_title,
+                constants.IPS_SIGNATURE_LABEL: [],
+             }
+        ]
         output = utils.filter_advisories(mock_advisories, fields)
         self.assertIsInstance(output, list)
         self.assertDictEqual(output[0], expected_output[0])
@@ -103,3 +134,39 @@ class UtilsTest(unittest.TestCase):
         expected = ['baz', 'foo']
         self.assertListEqual(
             sorted(utils._get_headers(naive_distinct)), expected)
+
+    @mock.patch("openVulnQuery.utils.open", create=True)
+    def test_get_output_filehandle(self, mock_open):
+        mock_open.side_effect = [
+            mock.mock_open(read_data='name').return_value,
+            mock.mock_open(read_data='empty').return_value,
+        ]
+
+        self.assertTrue(utils.get_output_filehandle('foo'))
+        mock_open.assert_called_once_with('foo', 'w')
+        mock_open.reset_mock()
+
+        self.assertEqual(sys.stdout, utils.get_output_filehandle(None))
+        mock_open.assert_not_called()
+
+    @mock.patch("openVulnQuery.utils.open", create=True)
+    def test_output_trial(self, mock_open):
+        filtered_advisories = utils.filter_advisories(
+            mock_advisories, constants.API_LABELS)
+        s_rep = json.dumps(filtered_advisories)
+        mock_open.side_effect = [
+            mock.mock_open(read_data=s_rep).return_value,
+        ]
+        self.assertIsNone(utils.output(
+            filtered_advisories, JSON_OUTPUT_FORMAT_TOKEN, mock_open))
+
+    @mock.patch("openVulnQuery.utils.open", create=True)
+    def test_output_csv_succeeds(self, mock_open):
+        s_empty = ',\n,'
+        mock_open.side_effect = [
+            mock.mock_open(read_data=s_empty).return_value,
+        ]
+        filtered_advisories = utils.filter_advisories(
+            mock_advisories, constants.API_LABELS)
+        self.assertIsNone(utils.output(
+            filtered_advisories, CSV_OUTPUT_FORMAT_TOKEN, mock_open))

@@ -281,6 +281,33 @@ If you want to use the additional date filters based on first published and last
 >> advisories = query_client.get_by_severity(adv_format='oval', severity='low', LastUpdated(2016-01-01, 2016-02-02))
 ```
 
+##### Debugging Requests and Responses
+
+If the run time environment has the variable `CISCO_OPEN_VULN_API_DEBUG` 
+set (and the value evaluates to True) the data forming every request as well 
+as raw and formatted variants of successful responses (`HTTP 200/OK`)
+will be written to files in JSON format.
+
+The file names follow the pattern: `ts-{ts}_id-{id}_snapshot-of-{kind}.json`, 
+where: 
+
+* `{ts}` receives a date time stamp as ruled by the module variable 
+`DEBUG_TIME_STAMP_FORMAT` (default `%Y%m%dT%H%M%S.%f`) and noted in local
+time,
+* `{id}` is a string holding a UUID4 generated for the request and useful to
+ correlate request and response data files
+* `{kind}` is one of three strings speaking for themselves: 
+  + `request`
+  + `response-raw`
+  + `response-formated`
+
+The files will be written either to the current folder, or to a path stored
+in the environment variable `CISCO_OPEN_VULN_API_PATH` (if it is set).
+
+*Note*: The folder at that later path is expected to exist and be writeable 
+by the user. Please note also, that Filesystem and JSON serialization errors
+are ignored.
+
 Here are the information stored in advisory object.
 ##### Advisory
       * advisory_id
@@ -353,49 +380,58 @@ $ pytest
 platform darwin -- Python 2.7.13, pytest-3.1.2, py-1.4.34, pluggy-0.4.0
 rootdir: /www/github.com/CiscoPSIRT/openVulnAPI/openVulnQuery, inifile:
 plugins: cov-2.5.1
-collected 43 items 
+collected 159 items 
 
-tests/test_cli_api.py ..........
+tests/test_advisory.py ......................
+tests/test_authorization.py ...
+tests/test_cli_api.py ..............................................
 tests/test_config.py ....
 tests/test_constants.py ...........
+tests/test_main.py ...........................s......
+tests/test_query_client.py ................
 tests/test_query_client_cvrf.py ssssssss
-tests/test_utils.py ..........
+tests/test_utils.py ...............
 
-=================================================================================================== 35 passed, 8 skipped in 0.18 seconds ===================================================================================================
+================================================================================================== 150 passed, 9 skipped in 1.16 seconds ===================================================================================================
 ```
 
 Including coverage info (requires `pip install pytest-cov` which includes `pip install coverage` ):
 
 ```
-$ pytest --cov=openVulnQuery --cov-report=term-missing
+$ pytest --cov=openVulnQuery --cov-report=term-missing --cov-report=html
 =========================================================================================================== test session starts ============================================================================================================
 platform darwin -- Python 2.7.13, pytest-3.1.2, py-1.4.34, pluggy-0.4.0
 rootdir: /www/github.com/CiscoPSIRT/openVulnAPI/openVulnQuery, inifile:
 plugins: cov-2.5.1
-collected 43 items 
+collected 159 items 
 
-tests/test_cli_api.py ..........
+tests/test_advisory.py ......................
+tests/test_authorization.py ...
+tests/test_cli_api.py ..............................................
 tests/test_config.py ....
 tests/test_constants.py ...........
+tests/test_main.py ...........................s......
+tests/test_query_client.py ................
 tests/test_query_client_cvrf.py ssssssss
-tests/test_utils.py ..........
+tests/test_utils.py ...............
 
 ---------- coverage: platform darwin, python 2.7.13-final-0 ----------
 Name                             Stmts   Miss  Cover   Missing
 --------------------------------------------------------------
 openVulnQuery/__init__.py            0      0   100%
-openVulnQuery/advisory.py           90     38    58%   59, 95, 105-111, 118-122, 128-131, 136, 147-178
-openVulnQuery/authorization.py       6      3    50%   18-24
-openVulnQuery/cli_api.py            41      0   100%
+openVulnQuery/advisory.py           90      1    99%   59
+openVulnQuery/authorization.py       6      0   100%
+openVulnQuery/cli_api.py            75      4    95%   294-297, 311
 openVulnQuery/config.py              4      0   100%
 openVulnQuery/constants.py          11      0   100%
-openVulnQuery/main.py               66     66     0%   1-107
-openVulnQuery/query_client.py       88     53    40%   22, 27-28, 33-34, 39, 44, 60-64, 69-77, 81-87, 91-97, 101-109, 113-119, 123-129, 133-139, 143-149, 154-160, 165-180, 190-197, 207-208
-openVulnQuery/rest_api.py            3      1    67%   167
-openVulnQuery/utils.py              76     30    61%   29, 31, 68-71, 76, 82-91, 108-111, 118-129, 134
+openVulnQuery/main.py               38      6    84%   57, 60-65, 70
+openVulnQuery/query_client.py      100     16    84%   128-134, 148-155, 160-167
+openVulnQuery/rest_api.py            3      0   100%
+openVulnQuery/utils.py              76     12    84%   109, 118-129
 --------------------------------------------------------------
-TOTAL                              385    191    50%
+TOTAL                              403     39    90%
+Coverage HTML written to dir htmlcov
 
 
-=================================================================================================== 35 passed, 8 skipped in 0.32 seconds ===================================================================================================
+================================================================================================== 150 passed, 9 skipped in 1.60 seconds ===================================================================================================
 ```

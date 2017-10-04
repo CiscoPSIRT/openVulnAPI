@@ -7,7 +7,10 @@ import authorization
 import config
 import constants
 import rest_api
-
+import json
+import os
+import uuid
+import datetime as dt
 
 ADV_TOKENS = constants.ADVISORY_FORMAT_TOKENS
 
@@ -15,6 +18,10 @@ TEMPORAL_FILTER_KEYS = ('startDate', 'endDate')
 PUBLISHED_FIRST = 'firstpublished'
 PUBLISHED_LAST = 'lastpublished'
 TEMPORAL_PUBLICATION_ASPECTS = (PUBLISHED_FIRST, PUBLISHED_LAST)
+
+DEBUG_API_USAGE = os.getenv('CISCO_OPEN_VULN_API_DEBUG', None)
+DEBUG_API_PATH = os.getenv('CISCO_OPEN_VULN_API_PATH', None)
+DEBUG_TIME_STAMP_FORMAT = "%Y%m%dT%H%M%S.%f"
 
 
 def ensure_adv_format_token(adv_format):
@@ -48,19 +55,25 @@ class OpenVulnQueryClient(object):
     """Client sends get request for advisory information from OpenVuln API.
 
     :var auth_token: OAuth2 Token for API authorization.
-    :var headers: Headers containing OAuth2 Token and data type for request.
+    :var headers: Headers containing OAuth2 Token and data type for
+     request.
     """
 
-    def __init__(self, client_id, client_secret, user_agent='TestApp'):
+    def __init__(self, client_id, client_secret, auth_url=None,
+                 user_agent='TestApp'):
         """
         :param client_id: Client application Id as retrieved from API provider
         :param client_secret: Client secret as retrieved from API provider
+        :param auth_url: POST URL to request auth token response (default
+            from config)
         :param user_agent: Communicates the name of the app per request.
+
         """
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger(__name__)
-        self.auth_token = authorization.get_oauth_token(client_id,
-                                                        client_secret)
+        self.auth_url = auth_url if auth_url else config.REQUEST_TOKEN_URL
+        self.auth_token = authorization.get_oauth_token(
+            client_id, client_secret, request_token_url=self.auth_url)
         self.headers = rest_api.rest_with_auth_headers(
             self.auth_token, user_agent)
 
@@ -71,9 +84,8 @@ class OpenVulnQueryClient(object):
             'all': all_adv,
             'filter': a_filter.path,
         }
-        advisories = self.get_request(
-            "{adv_format}/{all}/{filter}".format(**req_cfg),
-            a_filter.params)
+        req_path = "{adv_format}/{all}/{filter}".format(**req_cfg)
+        advisories = self.get_request(req_path, a_filter.params)
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_cve(self, adv_format, cve, a_filter=None):
@@ -82,8 +94,8 @@ class OpenVulnQueryClient(object):
             'adv_format': ensure_adv_format_token(adv_format),
             'cve': cve,
         }
-        advisories = self.get_request(
-            "{adv_format}/cve/{cve}".format(**req_cfg))
+        req_path = "{adv_format}/cve/{cve}".format(**req_cfg)
+        advisories = self.get_request(req_path)
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_advisory(self, adv_format, an_advisory, a_filter=None):
@@ -92,8 +104,8 @@ class OpenVulnQueryClient(object):
             'adv_format': ensure_adv_format_token(adv_format),
             'advisory': an_advisory,
         }
-        advisories = {'advisories': [self.get_request(
-            "{adv_format}/advisory/{advisory}".format(**req_cfg))]}
+        req_path = "{adv_format}/advisory/{advisory}".format(**req_cfg)
+        advisories = {'advisories': [self.get_request(req_path)]}
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_severity(self, adv_format, severity, a_filter=None):
@@ -103,9 +115,9 @@ class OpenVulnQueryClient(object):
             'severity': severity,
             'filter': Filter().path if a_filter is None else a_filter.path,
         }
-        advisories = self.get_request(
-            "{adv_format}/severity/{severity}/{filter}".format(**req_cfg),
-            params=a_filter.params)
+        req_path = ("{adv_format}/severity/{severity}/{filter}"
+                    "".format(**req_cfg))
+        advisories = self.get_request(req_path, params=a_filter.params)
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_year(self, adv_format, year, a_filter=None):
@@ -114,8 +126,8 @@ class OpenVulnQueryClient(object):
             'adv_format': ensure_adv_format_token(adv_format),
             'year': year,
         }
-        advisories = self.get_request(
-            "{adv_format}/year/{year}".format(**req_cfg))
+        req_path = "{adv_format}/year/{year}".format(**req_cfg)
+        advisories = self.get_request(req_path)
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_latest(self, adv_format, latest, a_filter=None):
@@ -124,8 +136,8 @@ class OpenVulnQueryClient(object):
             'adv_format': ensure_adv_format_token(adv_format),
             'latest': latest,
         }
-        advisories = self.get_request(
-            "{adv_format}/latest/{latest}".format(**req_cfg))
+        req_path = "{adv_format}/latest/{latest}".format(**req_cfg)
+        advisories = self.get_request(req_path)
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_product(self, adv_format, product_name, a_filter=None):
@@ -133,16 +145,17 @@ class OpenVulnQueryClient(object):
         req_cfg = {
             'adv_format': ensure_adv_format_token(adv_format),
         }
+        req_path = "{adv_format}/product".format(**req_cfg)
         advisories = self.get_request(
-            "{adv_format}/product".format(**req_cfg),
-            params={'product': product_name})
+            req_path, params={'product': product_name})
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_ios_xe(self, adv_format, ios_version, a_filter=None):
         """Return advisories by Cisco IOS advisories version"""
+        req_path = "iosxe"
         try:
             advisories = self.get_request(
-                "iosxe",
+                req_path,
                 params={'version': ios_version})
             return self.advisory_list(advisories['advisories'], None)
         except requests.exceptions.HTTPError as e:
@@ -151,9 +164,10 @@ class OpenVulnQueryClient(object):
 
     def get_by_ios(self, adv_format, ios_version, a_filter=None):
         """Return advisories by Cisco IOS advisories version"""
+        req_path = "ios"
         try:
             advisories = self.get_request(
-                "ios",
+                req_path,
                 params={'version': ios_version})
             return self.advisory_list(advisories['advisories'], None)
         except requests.exceptions.HTTPError as e:
@@ -189,11 +203,17 @@ class OpenVulnQueryClient(object):
         """
         self.logger.info("Sending Get Request %s", path)
         req_cfg = {'base_url': config.API_URL, 'path': path}
-        r = requests.get(
-            url="{base_url}/{path}".format(**req_cfg),
-            headers=self.headers,
-            params=params)
+        req_url = "{base_url}/{path}".format(**req_cfg)
+        request_data = {
+            'url': req_url,
+            'headers': self.headers,
+            'params': params,
+        }
+        request_id = request_snapshot(request_data)
+        r = requests.get(**request_data)
         r.raise_for_status()
+        if request_id:
+            response_snapshots(r.json(), request_id)
         return r.json()
 
     def advisory_list(self, advisories, adv_format):
@@ -207,3 +227,77 @@ class OpenVulnQueryClient(object):
         adv_format = ensure_adv_format_token(adv_format)
         return [advisory.advisory_factory(adv, adv_format, self.logger)
                 for adv in advisories]
+
+
+def snapshot_timestamp():
+    """Generate timestamp in format DEBUG_TIME_STAMP_FORMAT."""
+    return dt.datetime.now().strftime(DEBUG_TIME_STAMP_FORMAT)
+
+
+def snapshot_name(kind, correlating_id, time_stamp=None):
+    """Generate a snapshot name for kind and correlating id (by request).
+    :var kind: A string that will be lower cased and postfixed (before
+        extension) to the filename.
+    :var correlating_id: A string id to correlate multiple snapshots.
+    :var time_stamp: A string rep of a time stamp or None
+    :return A filename.
+    """
+    if time_stamp is None:
+        time_stamp = snapshot_timestamp()
+    return ('ts-{}_id-{}_snapshot-of-{}.json'
+            ''.format(time_stamp, correlating_id, kind.lower()))
+
+
+def request_snapshot(data):
+    """If env has CISCO_OPEN_VULN_API_DEBUG set (and evaluates to True)
+    dump the data from the request to an existing folder as set by either env
+    variable CISCO_OPEN_VULN_API_PATH or default taking the current folder.
+
+    :var data: Request data as dict.
+    :return unique request id, to ease matching to response snapshots or None
+        if no debugging requested.
+    """
+    if not DEBUG_API_USAGE:
+        return None
+    request_id = str(uuid.uuid4())
+    file_path = snapshot_name('request', request_id)
+    if DEBUG_API_PATH:
+        file_path = os.path.join(DEBUG_API_PATH, file_path)
+    try:
+        with open(file_path, 'w') as f:
+            json.dump(data, f, encoding='utf-8')
+    except (OSError, ValueError):
+        pass  # Best effort snapshots ;-)
+
+    return request_id
+
+
+def response_snapshots(data, request_id):
+    """If env has CISCO_OPEN_VULN_API_DEBUG set (and evaluates to True)
+    dump the data from the response to an existing folder as set by either env
+    variable CISCO_OPEN_VULN_API_PATH or default taking the current folder.
+
+    :var data: Repsonse data as received from requests json method (no json!).
+    :var unique request id, to ease matching to request snapshot.
+    """
+    if not DEBUG_API_USAGE:
+        return None
+
+    time_stamp = snapshot_timestamp()
+    file_path = snapshot_name('response-raw', request_id, time_stamp)
+    if DEBUG_API_PATH:
+        file_path = os.path.join(DEBUG_API_PATH, file_path)
+    try:
+        with open(file_path, 'w') as f:
+            json.dump(data, f, encoding='utf-8')
+    except (OSError, ValueError):
+        pass  # Best effort snapshots ;-)
+
+    file_path = snapshot_name('response-formatted', request_id, time_stamp)
+    if DEBUG_API_PATH:
+        file_path = os.path.join(DEBUG_API_PATH, file_path)
+    try:
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=4, encoding='utf-8')
+    except (OSError, ValueError):
+        pass  # ditto (cf. above)
