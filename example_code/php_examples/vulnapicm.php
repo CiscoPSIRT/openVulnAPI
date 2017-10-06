@@ -79,7 +79,7 @@
       // to Psr\Http\Message\RequestInterface.
       $request = $provider->getAuthenticatedRequest(
       'GET',
-      'https://api-stage.cisco.com/security/advisories/cvrf/cve/CVE-2012-2486',
+      'https://api.cisco.com/security/advisories/cvrf/cve/CVE-2012-2486',
       $accessToken
     );
 
@@ -87,7 +87,7 @@
 
     $client = new Client([
       // Base URI is used with relative requests
-      'base_uri' => 'https://api-stage.cisco.com',
+      'base_uri' => 'https://api.cisco.com',
       // You can set any number of default request options.
       'timeout'  => 2.0,
     ]);
