@@ -263,7 +263,7 @@ If more than one API filter is entered, the last filter will be used for the API
 You can alternatively use the date range functionality, as shown below:
 
 ```
->> openVulnQuery --config PathToCredentialsFile --cvrf --severity critical --first_published 2015:01:02:2015-01-01
+>> openVulnQuery --config PathToCredentialsFile --cvrf --severity critical --first_published 2017-01-02:2017-10-01
 ```
 
 #### Run OpenVulnQuery as a Library
