@@ -1,6 +1,6 @@
 import requests
 
-import config
+from . import config
 
 
 def get_oauth_token(client_id, client_secret, request_token_url=None):

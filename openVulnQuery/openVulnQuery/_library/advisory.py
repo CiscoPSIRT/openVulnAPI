@@ -1,7 +1,7 @@
 from abc import ABCMeta
 from platform import python_version_tuple as p_v_t
 
-import constants
+from . import constants
 __is_future_version = False if int(p_v_t()[0]) < 3 else True
 
 # noinspection PyCompatibility

@@ -3,8 +3,8 @@ import datetime as dt
 import json
 import os
 
-import config
-import constants
+from . import config
+from . import constants
 
 
 # Validator function required before referencing:
