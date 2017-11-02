@@ -1,16 +1,11 @@
 import csv
 import json
 import sys
-from platform import python_version_tuple as p_v_t
 
 from . import constants
+from ._compatibility import is_unicode_or_bytes
 
-__is_future_version = False if int(p_v_t()[0]) < 3 else True
-
-# noinspection PyCompatibility
-base_str = (str, bytes, bytearray) if __is_future_version else basestring
-
-TAB = '\t' if __is_future_version else u'\t'
+TAB = u'\t'
 IPS_SIG = constants.IPS_SIGNATURE_LABEL
 
 
@@ -47,7 +42,7 @@ def get_count(advisory_field):
     """Count of the number of valid items in a particular advisory field."""
 
     count = 0
-    if isinstance(advisory_field, base_str):  # TODO was '(str, unicode)):'
+    if is_unicode_or_bytes(advisory_field):
         if advisory_field != constants.NA_INDICATOR:
             count = 1
     else:

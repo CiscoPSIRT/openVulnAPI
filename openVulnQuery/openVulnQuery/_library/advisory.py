@@ -1,11 +1,7 @@
 from abc import ABCMeta
-from platform import python_version_tuple as p_v_t
 
 from . import constants
-__is_future_version = False if int(p_v_t()[0]) < 3 else True
-
-# noinspection PyCompatibility
-base_str = (str, bytes, bytearray) if __is_future_version else basestring
+from ._compatibility import is_unicode_or_bytes
 
 NA = constants.NA_INDICATOR
 IPS_SIG = constants.IPS_SIGNATURE_LABEL
@@ -93,7 +89,7 @@ class CVRF(Advisory):
         self.ips_signatures = []
         if IPS_SIG in kwargs:
             self.ips_signatures = [
-                IPSSignature(**kw) if not isinstance(kw, base_str) else NA
+                IPSSignature(**kw) if not is_unicode_or_bytes(kw) else NA
                 for kw in kwargs.pop(IPS_SIG)]
         super(CVRF, self).__init__(*args, **kwargs)
 
@@ -106,7 +102,7 @@ class OVAL(Advisory):
         self.ips_signatures = []
         if IPS_SIG in kwargs:
             self.ips_signatures = [
-                IPSSignature(**kw) if not isinstance(kw, base_str) else NA
+                IPSSignature(**kw) if not is_unicode_or_bytes(kw) else NA
                 for kw in kwargs.pop(IPS_SIG)]
         super(OVAL, self).__init__(*args, **kwargs)
 
