@@ -103,7 +103,7 @@ def _get_headers(advisories):
 
 def _flatten_datastructure(field_list):
     final_dict = {}
-    for k, v in field_list.iteritems():
+    for k, v in field_list.items():
         if isinstance(v, list):
             if v and isinstance(v[0], dict):
                 final_dict.update(_reduce_list_dict(k, v))
