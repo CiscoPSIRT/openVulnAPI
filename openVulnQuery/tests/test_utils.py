@@ -110,7 +110,7 @@ class UtilsTest(unittest.TestCase):
 
     def test_flatten_list_distinct_pair(self):
         naive_distinct = [{'foo': 'bar'}, {'baz': ''}]
-        naive_distinct_side_effected = [{'foo': 'bar'}, {'baz': None}]
+        naive_distinct_side_effected = [{'foo': b'bar'}, {'baz': None}]
         self.assertListEqual(
             utils.flatten_list(naive_distinct), naive_distinct_side_effected)
 

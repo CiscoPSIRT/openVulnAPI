@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name='OpenVulnQuery',
       version='1.25',
@@ -7,7 +7,7 @@ setup(name='OpenVulnQuery',
       author='Bradley Korabik, Parash Ghimire',
       author_email='bkorabik@cisco.com, pghimire@cisco.com',
       license='The MIT License (MIT)',
-      packages=['openVulnQuery'],
+      packages=find_packages(exclude=["tests"]),
       entry_points={
           'console_scripts':
               ['openVulnQuery=openVulnQuery.main:main']
