@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 
 setup(name='OpenVulnQuery',
-      version='1.25',
+      version='1.26',
       description='A python-based module(s) to query the Cisco PSIRT openVuln API.',
       url='https://github.com/CiscoPSIRT/openVulnAPI/tree/master/openVulnQuery',
-      author='Bradley Korabik, Parash Ghimire',
-      author_email='bkorabik@cisco.com, pghimire@cisco.com',
+      author='Bradley Korabik, Parash Ghimire, Omar Santos',
+      author_email='bkorabik@cisco.com, pghimire@cisco.com, os@cisco.com',
       license='The MIT License (MIT)',
       packages=find_packages(exclude=["tests"]),
       entry_points={
