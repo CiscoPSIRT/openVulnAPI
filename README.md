@@ -16,6 +16,36 @@ https://developer.cisco.com/site/PSIRT/
 The following are the methods supported by the openVuln API:
 The base URL of the API is: https://api.cisco.com/security/advisories
 
+* [Querying by Advisory ID](#querying-by-advisory-id)
+   * [Responses](#responses)
+   * [Error Codes](#error-codes)
+* [Obtaining All Advisories](#obtaining-all-advisories)
+   * [Responses](#responses-1)
+   * [Error Codes](#error-codes-1)
+* [Querying by CVE ID](#querying-by-cve-id)
+   * [Responses](#responses-2)
+   * [Error Codes](#error-codes-2)
+* [Querying the Latest Advisories](#querying-the-latest-advisories)
+   * [Responses](#responses-3)
+   * [Error Codes](#error-codes-3)
+* [Querying by the Product Name](#querying-by-the-product-name)
+   * [Responses](#responses-4)
+   * [Error Codes](#error-codes-4)
+* [Querying by the Security Impact Rating (SIR)](#querying-by-the-security-impact-rating-sir)
+   * [Responses](#responses-5)
+   * [Error Codes](#error-codes-5)
+* [Querying by the Year the Advisory was Published](#querying-by-the-year-the-advisory-was-published)
+   * [Responses](#responses-6)
+   * [Error Codes](#error-codes-6)
+* [Querying by a Given Cisco IOS Software Version](#querying-by-a-given-cisco-ios-software-version)
+   * [Responses](#responses-7)
+   * [Error Codes](#error-codes-7)
+* [Querying by a Given Cisco IOS-XE Software Version](#querying-by-a-given-cisco-ios-xe-software-version)
+   * [Responses](#responses-8)
+   * [Error Codes](#error-codes-8)
+* [Pagination](#pagination)
+
+
 ### Querying by Advisory ID
 |Method | `GET /security/advisories/advisory/{advisory_id}`|
 |---|---|
