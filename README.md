@@ -5,7 +5,7 @@ The Cisco PSIRT openVuln API is a RESTful API that allows customers to obtain Ci
 
 This API allows technical staff and programmers to build tools that help them do their job more effectively. In this case, it enables them to easily keep up with security vulnerability information specific to their network. That frees up more time for them to manage their network and deploy new capabilities in their infrastructure.
 
-The API also allows Cisco customers and partners to leverage machine readable data to keep-up with Cisco security advisories. It further simplifies the evaluation process and reduces the time between when a vulnerability is announced and the fix is actually implemented. T
+The API also allows Cisco customers and partners to leverage machine readable data to keep-up with Cisco security advisories. It further simplifies the evaluation process and reduces the time between when a vulnerability is announced and the fix is actually implemented.
 
 For more information about the openVuln API and how to access it visit:
 https://developer.cisco.com/site/PSIRT/
