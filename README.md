@@ -30,13 +30,25 @@ Status: 200 - Successful response
 
 #### Error Codes
 
-Scenario: If `advisory_id` is not found.
+Scenario: The following error will be returned if the `advisory_id` is not found.
 
 ```
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <advisory>
   <errorCode>ADVISORYID_NOT_FOUND</errorCode>
   <errorMessage>Advisory-id not found</errorMessage>
+</advisory>
+```
+
+Scenario: The following error will be returned if the extension entered is not a valid extension
+
+**Note**: This applies to all resource URIs.
+
+```
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<advisory>
+  <errorCode>INVALID_EXTENSION</errorCode>
+  <errorMessage>Not supported extension type. Supported extension types are .json and .xml</errorMessage>
 </advisory>
 ```
 
@@ -65,7 +77,29 @@ The same concept applies when querying advisories that have a given security imp
 Status: 200 - Successful response
 
 #### Error Codes
+Scenario:	The following error will be returned if the page index is not a valid index
 
+**Note**: This applies to all resource URIs.
+
+```
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<advisory>
+  <errorCode>INVALID_PAGEINDEX</errorCode>
+  <errorMessage>Incorrect page index value</errorMessage>
+</advisory>
+
+```
+Scenario:	The following error will be returned if the page size is not a valid
+
+**Note**: This applies to all resource URIs.
+
+```
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<advisory>
+  <errorCode>MIN_PAGESIZE , MAX_PAGESIZE</errorCode>
+  <errorMessage>Incorrect page size. Minimum page size value = 1 and Maximum page size = 100</errorMessage>
+</advisory>
+```
 
 ---
 
@@ -81,6 +115,17 @@ Example:
 
 #### Responses
 Status: 200 - Successful response
+
+#### Error Codes
+Scenario: The following error will be returned if the `cve_id` is not found in the database.
+
+```
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<advisory>
+  <errorCode>NO_DATA_FOUND</errorCode>
+  <errorMessage>CVE_ID not found</errorMessage>
+</advisory>
+```
 
 ---
 
@@ -98,6 +143,17 @@ This will return the latest 5 security advisories.
 #### Responses
 Status: 200 - Successful response
 
+#### Error Codes
+Scenario: The following error will be returned if the `latest` count is invalid. The `latest` count should be between 1 and 100.
+
+```
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<advisory>
+  <errorCode>MIN_ADV_COUNT,MAX_ADV_COUNT</errorCode>
+  <errorMessage>Minimum latest advisories count is 1,Maximum latest advisories count is 100</errorMessage>
+</advisory>
+```
+
 ---
 
 ### Querying by the Product Name
@@ -112,6 +168,16 @@ Example:
 #### Responses
 Status: 200 - Successful response
 
+#### Error Codes
+Scenario: The following error will be returned if the product name is not found:
+
+```
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<advisory>
+  <errorCode>NO_DATA_FOUND</errorCode>
+  <errorMessage>No data found</errorMessage>
+</advisory>
+```
 ---
 
 ### Querying by the Security Impact Rating (SIR)
@@ -125,6 +191,17 @@ Example:
 
 #### Responses
 Status: 200 - Successful response
+
+#### Error Codes
+Scenario: The following error will be returned if no advisories by a given severity are found:
+
+```
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<advisory>
+  <errorCode>NO_DATA_FOUND</errorCode>
+  <errorMessage>No data found</errorMessage>
+</advisory>
+```
 
 ---
 
@@ -140,6 +217,27 @@ Example:
 #### Responses
 Status: 200 - Successful response
 
+#### Error Codes
+Scenario: The following error will be returned if the year is incorrect. The `year` must be between 1995 and current year.
+
+```
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<advisory>
+  <errorCode>INVALID_YEAR</errorCode>
+  <errorMessage>Year should be in range 1995 to current year</errorMessage>
+</advisory>
+```
+
+Scenario: The following error will be returned if no advisories are found for a given year.
+
+```
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<advisory>
+  <errorCode>NO_DATA_FOUND</errorCode>
+  <errorMessage>No data found</errorMessage>
+</advisory>
+```
+
 ---
 
 ### Querying by a Given Cisco IOS Software Version
@@ -154,6 +252,17 @@ Example:
 #### Responses
 Status: 200 - Successful response
 
+#### Error Codes
+Scenario: The following error will be returned if no advisories are found for a given Cisco IOS Software version.
+
+```
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<advisory>
+  <errorCode>NO_DATA_FOUND</errorCode>
+  <errorMessage>No data found</errorMessage>
+</advisory>
+```
+
 ---
 
 ### Querying by a Given Cisco IOS-XE Software Version
@@ -167,6 +276,18 @@ Example:
 
 #### Responses
 Status: 200 - Successful response
+
+
+#### Error Codes
+Scenario: The following error will be returned if no advisories are found for a given Cisco IOS-XE Software version.
+
+```
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<advisory>
+  <errorCode>NO_DATA_FOUND</errorCode>
+  <errorMessage>No data found</errorMessage>
+</advisory>
+```
 
 ---
 
