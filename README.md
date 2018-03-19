@@ -101,6 +101,7 @@ You can query advisories using a "first published" date range, as shown below:
 The same concept applies when querying advisories that have a given security impact rating:
 
 `https://api.cisco.com/security/advisories/severity/critical/lastpublished?startDate=2017-01-01&endDate=2017-02-15`
+
 `https://api.cisco.com/security/advisories/severity/high/firstpublished?startDate=2017-01-01&endDate=2017-02-15`
 
 #### Responses
