@@ -271,7 +271,7 @@ After you install openVulnQuery package, you can use the query_client module to 
  advisory objects. For each query to the API, you can pick the advisory format.
 ```
 >> from openVulnQuery import query_client
->> query_client = query_client.QueryClient(client_id="", client_secret="")
+>> query_client = query_client.OpenVulnQueryClient(client_id="", client_secret="")
 >> advisories = query_client.get_by_year(year=2010, adv_format='cvrf')
 >> advisories = query_client.get_by_ios_xe('ios', '3.16.1S')
 ```
