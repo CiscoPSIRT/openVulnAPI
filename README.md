@@ -188,13 +188,13 @@ Scenario: The following error will be returned if the `latest` count is invalid.
 ---
 
 ### Querying by the Product Name
-|Method | `GET /security/advisories/product/{product_keyword}`|
+|Method | `GET /security/advisories/cvrf/product/{product_keyword}`|
 |---|---|
 | Description | Used to obtain all the advisories that affects the given product name.|
 
 Example:
 
-`curl -X GET "https://api.cisco.com/security/advisories/product?product="`
+`curl -X GET "https://api.cisco.com/security/cvrf/advisories/product?product="`
 
 #### Responses
 Status: 200 - Successful response
