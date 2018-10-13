@@ -1,209 +1,215 @@
 import unittest
-import mock
-import sys
-sys.path.append("openVulnQuery")
-import main
-import advisory_object
+
+from openVulnQuery import advisory
+from openVulnQuery import config
+from openVulnQuery import constants
+from openVulnQuery import main
+
+DATE_SEP_TOKEN = ':'
+BAD_REQUEST_TOKEN_URL = "https://example.com/as/token.oauth2"
+REQUEST_TOKEN_URL = config.REQUEST_TOKEN_URL
+
+NA = constants.NA_INDICATOR
+CVRF_TOKEN = constants.CVRF_ADVISORY_FORMAT_TOKEN
+OVAL_TOKEN = constants.OVAL_ADVISORY_FORMAT_TOKEN
+IOS_TOKEN = constants.IOS_ADVISORY_FORMAT_TOKEN
+
+mock_advisory_title = "Mock Advisory Title"
+adv_cfg = {
+    'advisory_id': "Cisco-SA-20111107-CVE-2011-0941",
+    'sir': "Medium",
+    'first_published': "2011-11-07T21:36:55+0000",
+    'last_updated': "2011-11-07T21:36:55+0000",
+    'cves': ["CVE-2011-0941", NA],
+    'cvrf_url': (
+        "http://tools.cisco.com/security/center/contentxml/"
+        "CiscoSecurityAdvisory/Cisco-SA-20111107-CVE-2011-0941/cvrf/"
+        "Cisco-SA-20111107-CVE-2011-0941_cvrf.xml"),
+    'bug_ids': "BUGISidf",
+    'cvss_base_score': "7.0",
+    'advisory_title': "{}".format(mock_advisory_title),
+    'publication_url': "https://tools.cisco.com/mockurl",
+    'cwe': NA,
+    'product_names': ["product_name_1", "product_name_2"],
+    'summary': "This is summary"
+}
+mock_advisory = advisory.CVRF(**adv_cfg)
+mock_advisories = [mock_advisory]
+
 
 class MainTest(unittest.TestCase):
+    def test_main_smoke_user_error(self):
+        with self.assertRaises(SystemExit) as e:
+            main.main()
+        self.assertEqual(e.exception.code, 2)
 
-    def test_xml_parse_needed(self):
-        # API Fields
-        adv_format = "cvrf"
-        fields = ['sir', 'cves']
-        parse_xml = main.xml_parse_needed(adv_format, fields)
-        self.assertEqual(parse_xml, False)
+    def test_main_smoke_help(self):
+        with self.assertRaises(SystemExit) as e:
+            main.main(['--help'])
+        self.assertEqual(e.exception.code, 0)
 
-        # API + VULN Fields
-        adv_format = "cvrf"
-        fields = ['last_updated', 'vuln_title']
-        parse_xml = main.xml_parse_needed(adv_format, fields)
-        self.assertEqual(parse_xml, True)
+    def test_main_smoke_help_short(self):
+        with self.assertRaises(SystemExit) as e:
+            main.main(['-h'])
+        self.assertEqual(e.exception.code, 0)
 
-        # API + CVRF Fields
-        fields = ['advisory_id', 'publication_url']
-        parse_xml = main.xml_parse_needed(adv_format, fields)
-        self.assertEqual(parse_xml, True)
+    def test_main_missing_adv_format(self):
+        string_list = '--severity critical'.split()
+        with self.assertRaises(SystemExit) as e:
+            main.main(string_list)
+        self.assertEqual(e.exception.code, 2)
 
-        # API + CVRF + VULN Fields
-        fields = ['sir', 'document_title', 'vuln_bug_ids']
-        parse_xml = main.xml_parse_needed(adv_format, fields)
-        self.assertEqual(parse_xml, True)
+    def test_main_unknown_adv_format(self):
+        string_list = '--unknown'.split()
+        with self.assertRaises(SystemExit) as e:
+            main.main(string_list)
+        self.assertEqual(e.exception.code, 2)
 
-        # CVRF + VULN Fields
-        fields = ['summary', 'vuln_title']
-        parse_xml = main.xml_parse_needed(adv_format, fields)
-        self.assertEqual(parse_xml, True)
+    def test_main_filter_forbidden_by_api(self):
+        se = '2017-06-20', '2017-06-21'
+        s_e = DATE_SEP_TOKEN.join(se)
+        string_list = (
+            '--cvrf --product foo --first_published {}'.format(s_e).split())
+        with self.assertRaises(SystemExit) as e:
+            main.main(string_list)
+        self.assertEqual(e.exception.code, 2)
 
-    def test_filter_entered_fields(self):
-        # API Fields
-        fields = ['test', 'sir', 'first_published', 'invalid']
-        api_fields, cvrf_fields, vuln_fields = main.filter_entered_fields(fields)
-        self.assertEqual(api_fields, ['sir', 'first_published'])
-        self.assertEqual(cvrf_fields, [])
-        self.assertEqual(vuln_fields, [])
+    def test_main_filter_date_format_end_missing(self):
+        se = '2017-06-20', ''
+        s_e = DATE_SEP_TOKEN.join(se)
+        string_list = (
+            '--cvrf --product foo --first_published {}'.format(s_e).split())
+        with self.assertRaises(SystemExit) as e:
+            main.main(string_list)
+        self.assertEqual(e.exception.code, 2)
 
-        # API + VULN Fields
-        fields = ['last_updated', 'invalid', 'vuln_title']
-        api_fields, cvrf_fields, vuln_fields = main.filter_entered_fields(fields)
-        self.assertEqual(api_fields, ['last_updated'])
-        self.assertEqual(cvrf_fields, [])
-        self.assertEqual(vuln_fields, ['vuln_title'])
+    def test_main_filter_date_format_sep_bad(self):
+        se = '2017-06-20', '2017-06-21'
+        s_e = 'P'.join(se)
+        string_list = (
+            '--cvrf --product foo --first_published {}'.format(s_e).split())
+        with self.assertRaises(SystemExit) as e:
+            main.main(string_list)
+        self.assertEqual(e.exception.code, 2)
 
-        # API + CVRF Fields
-        fields = ['invalid', 'advisory_id', 'publication_url']
-        api_fields, cvrf_fields, vuln_fields = main.filter_entered_fields(fields)
-        self.assertEqual(api_fields, ['advisory_id'])
-        self.assertEqual(cvrf_fields, ['publication_url'])
-        self.assertEqual(vuln_fields, [])
+    def test_main_filter_date_format_end_bad(self):
+        se = '2017-06-20', '2017-06-00'
+        s_e = DATE_SEP_TOKEN.join(se)
+        string_list = (
+            '--cvrf --product foo --first_published {}'.format(s_e).split())
+        with self.assertRaises(SystemExit) as e:
+            main.main(string_list)
+        self.assertEqual(e.exception.code, 2)
 
-        # API + CVRF + VULN Fields
-        fields = ['sir', 'test', 'document_title', 'test', 'vuln_bug_ids']
-        api_fields, cvrf_fields, vuln_fields = main.filter_entered_fields(fields)
-        self.assertEqual(api_fields, ['sir'])
-        self.assertEqual(cvrf_fields, ['document_title'])
-        self.assertEqual(vuln_fields, ['vuln_bug_ids'])
+    def test_main_ios_severity_fails(self):
+        string_list = '--ios \'15.5(2)T1\' --severity ontologicalyoff'.split()
+        with self.assertRaises(SystemExit) as e:
+            main.main(string_list)
+        self.assertEqual(e.exception.code, 2)
 
-        # CVRF + VULN Fields
-        fields = ['test', 'summary', 'vuln_title', 'test']
-        api_fields, cvrf_fields, vuln_fields = main.filter_entered_fields(fields)
-        self.assertEqual(api_fields, [])
-        self.assertEqual(cvrf_fields, ['summary'])
-        self.assertEqual(vuln_fields, ['vuln_title'])
+    def test_main_ios_product_fails(self):
+        string_list = '--ios \'15.5(2)T1\' --product ontologicalyoff'.split()
+        with self.assertRaises(SystemExit) as e:
+            main.main(string_list)
+        self.assertEqual(e.exception.code, 2)
 
-    def test_map_vulnerabilites_to_advisory(self):
-        # Test with Vuln Data
-        advisories = [{'sir': u'Low', 'vulns': [{'vuln_bug_ids': 'CSCuw64516'}]},
-                      {'sir': u'Low', 'vulns': [{'vuln_bug_ids': 'CSCur27459'}]},
-                      {'sir': u'Low', 'vulns': [{'vuln_bug_ids': 'NA'}]},
-                      {'sir': u'Low', 'vulns': [{'vuln_bug_ids': 'CSCsb12598'}, {'vuln_bug_ids': 'CSCsb40304'}, {'vuln_bug_ids': 'CSCsd92405'}]},
-                      {'sir': u'Low', 'vulns': [{'vuln_bug_ids': 'NA'}, {'vuln_bug_ids': 'NA'}]},
-                      {'sir': u'Low', 'vulns': [{'vuln_bug_ids': 'CSCef90002'}]},
-                      {'sir': u'Low', 'vulns': [{'vuln_bug_ids': 'CSCsb25337'}]},
-                      {'sir': u'Low', 'vulns': [{'vuln_bug_ids': 'CSCek37177'}]},
-                      {'sir': u'Low', 'vulns': [{'vuln_bug_ids': 'CSCsf28840'}]},
-                      {'sir': u'Low', 'vulns': [{'vuln_bug_ids': 'NA'}]},
-                      {'sir': u'Low', 'vulns': [{'vuln_bug_ids': 'NA'}]},
-                      {'sir': u'Low', 'vulns': [{'vuln_bug_ids': 'NA'}]},
-                      {'sir': u'Low', 'vulns': [{'vuln_bug_ids': 'NA'}]}]
-        updated_advisories = main.map_vulnerabilites_to_advisory(advisories)
-        updated_advisories_output = [{'sir': u'Low', 'vuln_bug_ids': 'CSCuw64516'},
-                                     {'sir': u'Low', 'vuln_bug_ids': 'CSCur27459'},
-                                     {'sir': u'Low', 'vuln_bug_ids': 'NA'},
-                                     {'sir': u'Low', 'vuln_bug_ids': 'CSCsb12598'},
-                                     {'sir': u'Low', 'vuln_bug_ids': 'CSCsb40304'},
-                                     {'sir': u'Low', 'vuln_bug_ids': 'CSCsd92405'},
-                                     {'sir': u'Low', 'vuln_bug_ids': 'NA'},
-                                     {'sir': u'Low', 'vuln_bug_ids': 'NA'},
-                                     {'sir': u'Low', 'vuln_bug_ids': 'CSCef90002'},
-                                     {'sir': u'Low', 'vuln_bug_ids': 'CSCsb25337'},
-                                     {'sir': u'Low', 'vuln_bug_ids': 'CSCek37177'},
-                                     {'sir': u'Low', 'vuln_bug_ids': 'CSCsf28840'},
-                                     {'sir': u'Low', 'vuln_bug_ids': 'NA'},
-                                     {'sir': u'Low', 'vuln_bug_ids': 'NA'},
-                                     {'sir': u'Low', 'vuln_bug_ids': 'NA'},
-                                     {'sir': u'Low', 'vuln_bug_ids': 'NA'}]
-        self.assertEqual(updated_advisories, updated_advisories_output)
+    def test_main_ios_cve_fails(self):
+        string_list = '--ios \'15.5(2)T1\' --cve CVE-2017'.split()
+        with self.assertRaises(SystemExit) as e:
+            main.main(string_list)
+        self.assertEqual(e.exception.code, 2)
 
-        # Test without Vuln Data
-        advisories = [{'sir': u'Low'},
-                      {'sir': u'Low'},
-                      {'sir': u'Low'},
-                      {'sir': u'Low'},
-                      {'sir': u'Low'},
-                      {'sir': u'Low'},
-                      {'sir': u'Low'},
-                      {'sir': u'Low'},
-                      {'sir': u'Low'},
-                      {'sir': u'Low'},
-                      {'sir': u'Low'},
-                      {'sir': u'Low'},
-                      {'sir': u'Low'}]
-        updated_advisories = main.map_vulnerabilites_to_advisory(advisories)
-        updated_advisories_output = [{'sir': u'Low'},
-                                     {'sir': u'Low'},
-                                     {'sir': u'Low'},
-                                     {'sir': u'Low'},
-                                     {'sir': u'Low'},
-                                     {'sir': u'Low'},
-                                     {'sir': u'Low'},
-                                     {'sir': u'Low'},
-                                     {'sir': u'Low'},
-                                     {'sir': u'Low'},
-                                     {'sir': u'Low'},
-                                     {'sir': u'Low'},
-                                     {'sir': u'Low'}]
-        self.assertEqual(updated_advisories, updated_advisories_output)
+    def test_main_ios_latest_fails(self):
+        string_list = '--ios \'15.5(2)T1\' --latest 42'.split()
+        with self.assertRaises(SystemExit) as e:
+            main.main(string_list)
+        self.assertEqual(e.exception.code, 2)
 
-    def test_convert_list_to_string(self):
-        field_list = {'sir' : 'low', 'cves' : ["CVE1", "CVE2", "CVE3"]}
-        convert_list_to_string = main._convert_list_to_string(field_list)
-        self.assertEqual(convert_list_to_string, {'sir': 'low', 'cves': 'CVE1    CVE2    CVE3'})
+    def test_main_ios_advisory_fails(self):
+        string_list = '--ios \'15.5(2)T1\' --advisory ontologicalyoff'.split()
+        with self.assertRaises(SystemExit) as e:
+            main.main(string_list)
+        self.assertEqual(e.exception.code, 2)
 
-    def test_count_field(self):
-        # Test count with list
-        advisory_field = [u'CVE-2007-2033', u'CVE-2007-2035']
-        count = main.count_field(advisory_field)
-        self.assertEqual(count, 2)
+    def test_main_ios_all_fails(self):
+        string_list = '--ios \'15.5(2)T1\' --all'.split()
+        with self.assertRaises(SystemExit) as e:
+            main.main(string_list)
+        self.assertEqual(e.exception.code, 2)
 
-        # Test count with string
-        advisory_field = "Low"
-        count = main.count_field(advisory_field)
-        self.assertEqual(count, 1)
+    def test_main_ios_year_fails(self):
+        string_list = '--ios \'15.5(2)T1\' --year 2017'.split()
+        with self.assertRaises(SystemExit) as e:
+            main.main(string_list)
+        self.assertEqual(e.exception.code, 2)
 
-    def test_create_api_advisory_object(self):
-        advisory = {u'sir': u'Low',
-                    u'cvrfUrl': u'http://tools.cisco.com/security/center/contentxml/CiscoSecurityAdvisory/cisco-sa-20151210-tvcs/cvrf/cisco-sa-20151210-tvcs_cvrf.xml',
-                    u'lastUpdated': u'2015-12-10T06:00:00+0000',
-                    u'firstPublished': u'2015-12-10T06:00:00+0000',
-                    u'advisoryId': u'cisco-sa-20151210-tvcs',
-                    u'cves': [u'CVE-2015-6414']}
-        cvrf_parsed = False
-        adv_format = 'cvrf'
-        adv_object = advisory_object.Advisory(advisory, cvrf_parsed, adv_format)
-        return [adv_object]
+    def test_main_ios_unknown_out_format_fails(self):
+        string_list = '--ios \'15.5(2)T1\' --yaml so-what.yaml'.split()
+        with self.assertRaises(SystemExit) as e:
+            main.main(string_list)
+        self.assertEqual(e.exception.code, 2)
 
-    def mock_XML():
-        document_title = "Document Title"
-        summary = "Summary"
-        publication_url = "https://www.cisco.com"
-        full_product_name_list = ["Product 1", "Product 2"]
-        vuln_list = [{"title" : "Vuln Title", "cve" : "CVE123", "bug_ids" : ["ID1", "ID2"], "base_score" : "7.0"}]
-        return advisory_object.Cvrf(document_title, summary, publication_url, full_product_name_list, vuln_list)
+    def test_main_cvrf_version_fails(self):
+        string_list = '--cvrf --version 15.5'.split()
+        with self.assertRaises(SystemExit) as e:
+            main.main(string_list)
+        self.assertEqual(e.exception.code, 2)
 
-    @mock.patch('advisory_object.Cvrf.fromXML', side_effect=mock_XML)
-    def test_create_xml_advisory_object(self, mock_xml):
-        advisory = {u'sir': u'Low',
-                    u'cvrfUrl': u'http://tools.cisco.com/security/center/contentxml/CiscoSecurityAdvisory/cisco-sa-20151210-tvcs/cvrf/cisco-sa-20151210-tvcs_cvrf.xml',
-                    u'lastUpdated': u'2015-12-10T06:00:00+0000',
-                    u'firstPublished': u'2015-12-10T06:00:00+0000',
-                    u'advisoryId': u'cisco-sa-20151210-tvcs',
-                    u'cves': [u'CVE-2015-6414']}
-        cvrf_parsed = True
-        adv_format = 'cvrf'
-        adv_object = advisory_object.Advisory(advisory, cvrf_parsed, adv_format)
-        return [adv_object]
+    def test_main_cvrf_all_fails_wrong_token_url(self):
+        string_list = '--cvrf --all'.split()
+        config.REQUEST_TOKEN_URL = BAD_REQUEST_TOKEN_URL
+        self.assertRaises(Exception, main.main, string_list)
 
-    def test_parse_advisory_objects(self):
-        # Parse Advisory Object with API Data
-        advisory = self.test_create_api_advisory_object()
-        api_fields = ["sir", "cvrf_url"]
-        cvrf_fields = []
-        vuln_fields = []
-        parsed_object = main.parse_advisory_objects(advisory, api_fields, cvrf_fields, vuln_fields)
-        result = ({'sir': 1, 'cvrf_url': 1},
-                 [{'sir': u'Low', 'cvrf_url': u'http://tools.cisco.com/security/center/contentxml/CiscoSecurityAdvisory/cisco-sa-20151210-tvcs/cvrf/cisco-sa-20151210-tvcs_cvrf.xml'}])
-        self.assertEqual(parsed_object, result)
+    def test_main_advisory_format_from_call_cvrf(self):
+        self.assertEqual(
+            main.advisory_format_from_call(CVRF_TOKEN), CVRF_TOKEN)
 
-        # Parse Advisory Object with API and XML Data
-        advisory = self.test_create_xml_advisory_object()
-        api_fields = ["cves", "sir"]
-        cvrf_fields = ["publication_url"]
-        vuln_fields = ["vuln_title"]
-        parsed_object = main.parse_advisory_objects(advisory, api_fields, cvrf_fields, vuln_fields)
-        result = ({'vuln_title': 1, 'sir': 1, 'publication_url': 1, 'cves': 1},
-                 [{'vulns': [{'vuln_title': 'Cisco TelePresence Video Communication Server Information Disclosure Vulnerability'}],
-                 'sir': u'Low',
-                 'publication_url': 'http://tools.cisco.com/security/center/content/CiscoSecurityAdvisory/cisco-sa-20151210-tvcs',
-                 'cves': [u'CVE-2015-6414']}])
-        self.assertEqual(parsed_object, result)
+    def test_main_advisory_format_from_call_oval(self):
+        self.assertEqual(
+            main.advisory_format_from_call(OVAL_TOKEN), OVAL_TOKEN)
+
+    def test_main_advisory_format_from_call_none(self):
+        self.assertEqual(
+            main.advisory_format_from_call(None), IOS_TOKEN)
+
+    def test_main_advisory_format_from_call_false(self):
+        self.assertEqual(
+            main.advisory_format_from_call(False), IOS_TOKEN)
+
+    def test_main_advisory_format_from_call_true(self):
+        self.assertEqual(
+            main.advisory_format_from_call(True), IOS_TOKEN)
+
+    def test_main_advisory_format_from_call_empty(self):
+        self.assertEqual(
+            main.advisory_format_from_call(''), IOS_TOKEN)
+
+    def test_main_filter_or_aggregate_succeeds(self):
+        self.assertTrue(main.filter_or_aggregate(mock_advisories, None, None))
+
+    def test_main_filter_or_aggregate_fields_succeeds(self):
+        self.assertTrue(main.filter_or_aggregate(mock_advisories, ['sir'], ''))
+
+    def test_main_filter_or_aggregate_fields_count_succeeds(self):
+        self.assertTrue(main.filter_or_aggregate(mock_advisories, ['sir'], 42))
+
+    def test_main_filter_config_succeeds(self):
+        self.assertTrue(main.filter_config('no_resource_matches', None, None))
+
+    def test_main_filter_config_all_succeeds(self):
+        self.assertTrue(main.filter_config(
+            constants.ALLOWS_FILTER[0], '', ''))
+
+    def test_main_filter_config_severity_succeeds(self):
+        self.assertTrue(main.filter_config(
+            constants.ALLOWS_FILTER[-1], '', ''))
+
+    def test_main_filter_config_all_first_succeeds(self):
+        se = '2017-06-20', '2017-06-21'
+        self.assertTrue(main.filter_config(
+            constants.ALLOWS_FILTER[0], se, ''))
+
+    def test_main_filter_config_all_last_succeeds(self):
+        se = '2017-06-20', '2017-06-21'
+        self.assertTrue(main.filter_config(
+            constants.ALLOWS_FILTER[0], '', se))

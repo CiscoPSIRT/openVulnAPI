@@ -4,7 +4,9 @@ info:
   title: 'Cisco PSIRT openVuln API'
   description: |
     The Cisco Product Security Incident Response Team (PSIRT) openVuln API is a RESTful API that allows customers to obtain Cisco Security Vulnerability information in different machine-consumable formats. APIs are important for customers because they allow their technical staff and programmers to build tools that help them do their job more effectively (in this case, to keep up with security vulnerability information).
-    For more information about the Cisco PSIRT openVuln API visit https://developer.cisco.com/site/PSIRT
+    For more information about the Cisco PSIRT openVuln API visit https://developer.cisco.com/site/PSIRT/discover/overview
+    
+    For detail steps on how to use the API go to:https://developer.cisco.com/site/PSIRT/get-started/getting-started.gsp
 
     This is a beta release of a swagger YAML for the Cisco PSIRT openVuln API
 
@@ -33,7 +35,7 @@ schemes:
 host: api.cisco.com
 
 securityDefinitions:
-  psirt_openvuin_api_auth:
+  psirt_openvuln_api_auth:
     type: oauth2
     authorizationUrl: 'https://cloudsso.cisco.com/as/token.oauth2'
     flow: implicit
@@ -56,7 +58,7 @@ paths:
         in JSON. To obtain the output in XML use the .xml extension. For example,
         /advisories/cvrf/all.xml
       security:
-       - psirt_openvuin_api_auth :
+       - psirt_openvuln_api_auth:
            - 'read:cvrf'
            - 'read:oval'
       responses:
@@ -78,7 +80,7 @@ paths:
           type: string
           format: CVE-YYYY-NNNN
       security:
-       - psirt_openvuin_api_auth:
+       - psirt_openvuln_api_auth:
            - 'read:cvrf'
            - 'read:oval'
       responses:
@@ -98,7 +100,7 @@ paths:
           type: string
           format: cisco-sa-XXX
       security:
-       - psirt_openvuin_api_auth:
+       - psirt_openvuln_api_auth:
            - 'read:cvrf'
            - 'read:oval'
       responses:
@@ -106,6 +108,30 @@ paths:
           description: Successful response
 
   /security/advisories/cvrf/severity/{severity}:
+    get:
+      description: >
+        Used to obtain all security advisories for a given security impact rating
+        (critical, high, medium, or low) in CVRF format.
+      parameters:
+        - name: severity
+          in: path
+          description: Critical, High, Medium, Low
+          required: true
+          type: string
+          enum:
+            - critical
+            - high
+            - medium
+            - low
+          format: enum
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:cvrf'
+           - 'read:oval'
+      responses:
+        '200':
+          description: Successful response
+  /security/advisories/cvrf/severity/{severity}/lastpublished:
     get:
       description: >
         Used to obtain all security advisories for a given security impact rating
@@ -122,14 +148,60 @@ paths:
             - medium
             - low
           format: enum
+        - name: startDate
+          in: query
+          required: true
+          type: string
+          format: date
+        - name: endDate
+          in: query
+          required: true
+          type: string
+          format: date
+
       security:
-       - psirt_openvuin_api_auth:
+       - psirt_openvuln_api_auth:
            - 'read:cvrf'
            - 'read:oval'
       responses:
         '200':
           description: Successful response
+  /security/advisories/cvrf/severity/{severity}/firstpublished:
+    get:
+      description: >
+        Used to obtain all security advisories for a given security impact rating
+        (critical, high, medium, or low) in CVRF format and additionally filter based of firstpublished
+        start date and enddate
+      parameters:
+        - name: severity
+          in: path
+          description: Used to obtain all advisories that have a security impact rating of critical
+          required: true
+          type: string
+          enum:
+            - critical
+            - high
+            - medium
+            - low
+          format: enum
+        - name: startDate
+          in: query
+          required: true
+          type: string
+          format: date
+        - name: endDate
+          in: query
+          required: true
+          type: string
+          format: date
 
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:cvrf'
+           - 'read:oval'
+      responses:
+        '200':
+          description: Successful response
   /security/advisories/cvrf/year/{year}:
     get:
       description: >
@@ -143,7 +215,7 @@ paths:
           type: string
           format: YYYY
       security:
-       - psirt_openvuin_api_auth:
+       - psirt_openvuln_api_auth:
            - 'read:cvrf'
            - 'read:oval'
       responses:
@@ -163,13 +235,67 @@ paths:
           type: integer
           format: number
       security:
-       - psirt_openvuin_api_auth:
+       - psirt_openvuln_api_auth:
            - 'read:cvrf'
            - 'read:oval'
       responses:
         '200':
           description: Successful response
 
+  /security/advisories/cvrf/product:
+    get:
+      description: >
+        Used to obtain all the advisories that affects the given product name.
+      parameters:
+        - name: product
+          in: query
+          description: An product name to obtain security advisories that matches given product name.
+          required: true
+          type: string
+          format: string
+      security:
+        - psirt_openvuln_api_auth:
+          - 'read:cvrf'
+          - 'read:oval'
+      responses:
+        '200':
+          description: Successful response
+  /security/advisories/ios:
+    get:
+      description: >
+        Used to obtain all advisories that affects the given ios version
+      parameters:
+        - name: version
+          in: query
+          description: IOS version to obtain security advisories
+          required: true
+          type: string
+          format: string
+      security:
+        - psirt_openvuln_api_auth:
+          - 'read:cvrf'
+          - 'read:oval'
+      responses:
+        '200':
+          description: Successful response
+  /security/advisories/iosxe:
+    get:
+      description: >
+        Used to obtain all advisories that affects the given ios version
+      parameters:
+        - name: version
+          in: query
+          description: IOS version to obtain security advisories
+          required: true
+          type: string
+          format: string
+      security:
+        - psirt_openvuln_api_auth:
+          - 'read:cvrf'
+          - 'read:oval'
+      responses:
+        '200':
+          description: Successful response
   /security/advisories/oval/all:
     get:
       description: >
@@ -179,7 +305,7 @@ paths:
         . By default the output is in JSON. To obtain the output in XML use the
         .xml extension. For example, /advisories/oval/all.xml
       security:
-       - psirt_openvuin_api_auth:
+       - psirt_openvuln_api_auth:
            - 'read:cvrf'
            - 'read:oval'
       responses:
@@ -198,7 +324,7 @@ paths:
           type: string
           format: CVE-YYYY-NNNN
       security:
-       - psirt_openvuin_api_auth:
+       - psirt_openvuln_api_auth:
            - 'read:cvrf'
            - 'read:oval'
       responses:
@@ -218,7 +344,7 @@ paths:
           type: string
           format: cisco-sa-XXX
       security:
-       - psirt_openvuin_api_auth:
+       - psirt_openvuln_api_auth:
            - 'read:cvrf'
            - 'read:oval'
       responses:
@@ -243,13 +369,82 @@ paths:
             - low
           format: enum
       security:
-       - psirt_openvuin_api_auth:
+       - psirt_openvuln_api_auth:
            - 'read:cvrf'
            - 'read:oval'
       responses:
         '200':
           description: Successful response
+  /security/advisories/oval/severity/{severity}/lastpublished:
+    get:
+      description: >
+        Used to obtain all security advisories for a given security impact rating
+        (critical, high, medium, or low) in OVAL format.
+      parameters:
+        - name: severity
+          in: path
+          description: Critical, High, Medium, Low
+          required: true
+          type: string
+          enum:
+            - critical
+            - high
+            - medium
+            - low
+          format: enum
+        - name: startDate
+          in: query
+          required: true
+          type: string
+          format: date
+        - name: endDate
+          in: query
+          required: true
+          type: string
+          format: date
 
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:cvrf'
+           - 'read:oval'
+      responses:
+        '200':
+          description: Successful response
+  /security/advisories/oval/severity/{severity}/firstpublished:
+    get:
+      description: >
+        Used to obtain all security advisories for a given security impact rating
+        (critical, high, medium, or low) in OVAL format.
+      parameters:
+        - name: severity
+          in: path
+          description: Critical, High, Medium, Low
+          required: true
+          type: string
+          enum:
+            - critical
+            - high
+            - medium
+            - low
+          format: enum
+        - name: startDate
+          in: query
+          required: true
+          type: string
+          format: date
+        - name: endDate
+          in: query
+          required: true
+          type: string
+          format: date
+
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:cvrf'
+           - 'read:oval'
+      responses:
+        '200':
+          description: Successful response
   /security/advisories/oval/latest/{number}:
     get:
       description: >
@@ -263,9 +458,27 @@ paths:
           type: integer
           format: number
       security:
-       - psirt_openvuin_api_auth:
+       - psirt_openvuln_api_auth:
            - 'read:cvrf'
            - 'read:oval'
+      responses:
+        '200':
+          description: Successful response
+  /security/advisories/oval/product:
+    get:
+      description: >
+        Used to obtain all the oval advisories that affects the given product name.
+      parameters:
+        - name: product
+          in: query
+          description: An product name to obtain security advisories that matches given product name.
+          required: true
+          type: string
+          format: string
+      security:
+        - psirt_openvuln_api_auth:
+          - 'read:cvrf'
+          - 'read:oval'
       responses:
         '200':
           description: Successful response
