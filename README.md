@@ -8,7 +8,7 @@ This API allows technical staff and programmers to build tools that help them do
 The API also allows Cisco customers and partners to leverage machine readable data to keep-up with Cisco security advisories. It further simplifies the evaluation process and reduces the time between when a vulnerability is announced and the fix is actually implemented.
 
 For more information about the openVuln API and how to access it visit:
-https://developer.cisco.com/site/PSIRT/
+https://developer.cisco.com/psirt
 
 ---
 
