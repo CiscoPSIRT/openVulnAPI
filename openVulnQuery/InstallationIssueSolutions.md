@@ -19,6 +19,7 @@ This page is dedicated to resolving common installation issue encountered during
     ```
     Here venv is name of your virtual environment
 	To activate the virtual environment
+  
 	```sh 
 	$ source venv/bin/activate
 	```
@@ -33,5 +34,3 @@ This page is dedicated to resolving common installation issue encountered during
 	```
 	
 	You can find more information in this [guide to python page](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
-		
-		

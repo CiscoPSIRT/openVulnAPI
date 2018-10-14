@@ -82,7 +82,6 @@ class AdvisoryDefault(Advisory):
                 for kw in kwargs.pop(IPS_SIG)]
         super(AdvisoryDefault, self).__init__(*args, **kwargs)
 
-
 class AdvisoryIOS(Advisory):
     """Advisory Object with additional information on IOS/IOSXE version """
 
@@ -106,7 +105,6 @@ def advisory_format_factory_map():
     return dict(zip(
         constants.ADVISORY_FORMAT_TOKENS, (AdvisoryDefault, AdvisoryIOS)))
 
-
 def advisory_factory(adv_data, adv_format, logger):
     """Converts json into a list of advisory objects.
     :param adv_data: A dictionary describing an advisory.
@@ -114,10 +112,10 @@ def advisory_factory(adv_data, adv_format, logger):
     :param logger: A logger (for now expecting to be ready to log)
     :returns advisory instance according to adv_format
     """
-
     adv_map = {}  # Initial fill from shared common model key map:
     for k, v in ADVISORIES_COMMONS_MAP.items():
         adv_map[k] = adv_data[v]
+
 
     if adv_format == constants.DEFAULT_ADVISORY_FORMAT_TOKEN:
         for k, v in IPS_SIG_MAP.items():

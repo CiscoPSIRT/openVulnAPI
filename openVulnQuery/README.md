@@ -138,7 +138,7 @@ Notes:
         Search by IOS version
         Examples:
         >> openVulnQuery --ios 15.6\(2\)SP  (*use \ to escape bracket in ios version)
-        >> openVulnQuery --ios 15.6\(2\)SP
+        >> openVulnQuery --ios 15.6(\2\)SP
 
 
 --ios_xe

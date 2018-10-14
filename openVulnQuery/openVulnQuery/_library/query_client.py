@@ -25,6 +25,9 @@ DEBUG_TIME_STAMP_FORMAT = "%Y%m%dT%H%M%S.%f"
 
 
 def ensure_adv_format_token(adv_format):
+  ''' 
+  This used to be the legacy cvrf and oval advisory formats.
+  '''
     return adv_format if adv_format in ADV_TOKENS else ADV_TOKENS[-1]
 
 
@@ -134,6 +137,7 @@ class OpenVulnQueryClient(object):
 
     def get_by_product(self, adv_format, product_name, a_filter=None):
         """Return advisories by product name"""
+
         '''
         TODO: It was discovered that the endpoint url in the documentation
         is incorrect. get_by_product should work AFTER the endpoint url path
