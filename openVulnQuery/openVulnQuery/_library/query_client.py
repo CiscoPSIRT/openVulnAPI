@@ -94,7 +94,6 @@ class OpenVulnQueryClient(object):
         advisories = self.get_request(req_path)
         return self.advisory_list(advisories['advisories'], adv_format)
 
-    # TODO: figure out what's wrong with get by advisory
     def get_by_advisory(self, adv_format, an_advisory, a_filter=None):
         """Return the advisory using requested advisory id"""
         req_cfg = {
@@ -133,12 +132,14 @@ class OpenVulnQueryClient(object):
         advisories = self.get_request(req_path)
         return self.advisory_list(advisories['advisories'], adv_format)
 
-    #TODO: It was discovered that the endpoint url in the documentation
-    #is incorrect. get_by_product should work AFTER the endpoint url path
-    # is properly edited to match the documentation; that is, to /security/advisories/product
-    # instead of the old /cvrf /oval urls. 
     def get_by_product(self, adv_format, product_name, a_filter=None):
         """Return advisories by product name"""
+        '''
+        TODO: It was discovered that the endpoint url in the documentation
+        is incorrect. get_by_product should work AFTER the endpoint url path
+        is properly edited to match the documentation; that is, to /security/advisories/product
+        instead of the old /cvrf /oval urls. This will be done in December 2018. 
+        '''
         req_path = "product"
         advisories = self.get_request(
             req_path, params={'product': product_name})
