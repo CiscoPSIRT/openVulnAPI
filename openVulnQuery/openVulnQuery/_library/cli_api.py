@@ -28,6 +28,21 @@ def valid_date(date_text):
             ' YYYY-MM-DD:YYYY-MM-DD format' % date_text)
 
 
+# CLI_API_ASPECT = (  # Code is data is code is data is code is ...
+#     {
+#         'action': 'an_argparse_action',
+#         'choices': 'argparse_choices',
+#         'const': 'an_argparse_const',
+#         'dest': 'an_argparse_dest',
+#         'help': ('an_argparse_help'),
+#         'metavar': 'an_argparse_metavar',
+#         'nargs': 'an_argparse_nargs',
+#         'tokens': ('-a', '--abstract'),
+#         'type': 'an_argparse_type',
+#     },
+# )  # Above structures can be fed into argparse parser construction.
+
+
 CLI_API_API_RESOURCE = (
     {
         'action': 'store_const',
