@@ -1,4 +1,4 @@
-from _library.main import main
+from ._library.main import main
 
 if __name__ == '__main__':
     main()

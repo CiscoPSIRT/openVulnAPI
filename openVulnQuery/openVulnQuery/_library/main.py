@@ -35,18 +35,16 @@ def filter_config(resource, first_pub_pair=None, last_pub_pair=None):
     return {'a_filter': a_filter}
 
 
-def advisory_format_from_call(adv_format):
-    """Sanity check from args given to ensure only known formats continue."""
-    adv_f = adv_format if adv_format else constants.ADVISORY_FORMAT_TOKENS[-1]
-    return query_client.ensure_adv_format_token(adv_f)
-
-
 def main(string_list=None):
     args = cli_api.process_command_line(string_list)
     api_resource_key, api_resource_value = args.api_resource
 
     topic = api_resource_key
-    adv_format = advisory_format_from_call(args.advisory_format)
+    
+    if api_resource_key == constants.IOS_ADVISORY_FORMAT_TOKEN:
+        adv_format = constants.IOS_ADVISORY_FORMAT_TOKEN
+    else:
+        adv_format = constants.DEFAULT_ADVISORY_FORMAT_TOKEN
 
     f_cfg = filter_config(
         api_resource_key, args.first_published, args.last_published)

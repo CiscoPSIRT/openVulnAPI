@@ -25,7 +25,9 @@ DEBUG_TIME_STAMP_FORMAT = "%Y%m%dT%H%M%S.%f"
 
 
 def ensure_adv_format_token(adv_format):
-    """Map cvrf, oval, anything to cvrf, oval, ios - just DRY."""
+  ''' 
+  This used to be the legacy cvrf and oval advisory formats.
+  '''
     return adv_format if adv_format in ADV_TOKENS else ADV_TOKENS[-1]
 
 
@@ -80,42 +82,37 @@ class OpenVulnQueryClient(object):
     def get_by_all(self, adv_format, all_adv, a_filter):
         """Return all the advisories using requested advisory format"""
         req_cfg = {
-            'adv_format': ensure_adv_format_token(adv_format),
-            'all': all_adv,
             'filter': a_filter.path,
         }
-        req_path = "{adv_format}/{all}/{filter}".format(**req_cfg)
+        req_path = "all/{filter}".format(**req_cfg)
         advisories = self.get_request(req_path, a_filter.params)
         return self.advisory_list(advisories['advisories'], adv_format)
 
-    def get_by_cve(self, adv_format, cve, a_filter=None):
+    def get_by_cve(self, adv_format, cve_id, a_filter=None):
         """Return the advisory using requested cve id"""
         req_cfg = {
-            'adv_format': ensure_adv_format_token(adv_format),
-            'cve': cve,
+            'cve_id': cve_id,
         }
-        req_path = "{adv_format}/cve/{cve}".format(**req_cfg)
+        req_path = "cve/{cve_id}".format(**req_cfg)
         advisories = self.get_request(req_path)
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_advisory(self, adv_format, an_advisory, a_filter=None):
         """Return the advisory using requested advisory id"""
         req_cfg = {
-            'adv_format': ensure_adv_format_token(adv_format),
             'advisory': an_advisory,
         }
-        req_path = "{adv_format}/advisory/{advisory}".format(**req_cfg)
-        advisories = {'advisories': [self.get_request(req_path)]}
+        req_path = "advisory/{advisory}".format(**req_cfg)
+        advisories = self.get_request(req_path)
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_severity(self, adv_format, severity, a_filter=None):
         """Return the advisories using requested severity"""
         req_cfg = {
-            'adv_format': ensure_adv_format_token(adv_format),
             'severity': severity,
             'filter': Filter().path if a_filter is None else a_filter.path,
         }
-        req_path = ("{adv_format}/severity/{severity}/{filter}"
+        req_path = ("severity/{severity}/{filter}"
                     "".format(**req_cfg))
         advisories = self.get_request(req_path, params=a_filter.params)
         return self.advisory_list(advisories['advisories'], adv_format)
@@ -123,29 +120,31 @@ class OpenVulnQueryClient(object):
     def get_by_year(self, adv_format, year, a_filter=None):
         """Return the advisories using requested year"""
         req_cfg = {
-            'adv_format': ensure_adv_format_token(adv_format),
             'year': year,
         }
-        req_path = "{adv_format}/year/{year}".format(**req_cfg)
+        req_path = "year/{year}".format(**req_cfg)
         advisories = self.get_request(req_path)
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_latest(self, adv_format, latest, a_filter=None):
         """Return the advisories using requested latest"""
         req_cfg = {
-            'adv_format': ensure_adv_format_token(adv_format),
             'latest': latest,
         }
-        req_path = "{adv_format}/latest/{latest}".format(**req_cfg)
+        req_path = "latest/{latest}".format(**req_cfg)
         advisories = self.get_request(req_path)
         return self.advisory_list(advisories['advisories'], adv_format)
 
     def get_by_product(self, adv_format, product_name, a_filter=None):
         """Return advisories by product name"""
-        req_cfg = {
-            'adv_format': ensure_adv_format_token(adv_format),
-        }
-        req_path = "{adv_format}/product".format(**req_cfg)
+
+        '''
+        TODO: It was discovered that the endpoint url in the documentation
+        is incorrect. get_by_product should work AFTER the endpoint url path
+        is properly edited to match the documentation; that is, to /security/advisories/product
+        instead of the old /cvrf /oval urls. This will be done in December 2018. 
+        '''
+        req_path = "product"
         advisories = self.get_request(
             req_path, params={'product': product_name})
         return self.advisory_list(advisories['advisories'], adv_format)
@@ -220,7 +219,7 @@ class OpenVulnQueryClient(object):
         """Converts json into a list of advisory objects.
 
         :param advisories: A list of dictionaries describing advisories.
-        :param adv_format: The target format either in ('cvrf', 'oval') or
+        :param adv_format: The target format in default format or
             something that evaluates to False (TODO HACK A DID ACK ?) for ios.
         :return list of advisory instances
         """
