@@ -78,7 +78,6 @@ RUN set -ex \
     --with-system-ffi \
     --without-ensurepip \
   && make -j "$(nproc)" \
-
     EXTRA_CFLAGS="-DTHREAD_STACK_SIZE=0x100000" \
   && make install \
   \

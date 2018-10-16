@@ -6,6 +6,8 @@ with open("README.md", "r") as fh:
 setup(name='OpenVulnQuery',
       version='1.30',
       description='A python-based module(s) to query the Cisco PSIRT openVuln API.',
+      long_description=long_description,
+      long_description_content_type="text/markdown",
       url='https://github.com/CiscoPSIRT/openVulnAPI/tree/master/openVulnQuery',
       author=' Omar Santos',
       author_email='os@cisco.com',
