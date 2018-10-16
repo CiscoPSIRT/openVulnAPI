@@ -1,0 +1,275 @@
+---
+swagger: "2.0"
+info:
+  description: "The Cisco Product Security Incident Response Team (PSIRT) openVuln\
+    \ API is a RESTful API that allows customers to obtain Cisco Security Vulnerability\
+    \ information in different machine-consumable formats. APIs are important for\
+    \ customers because they allow their technical staff and programmers to build\
+    \ tools that help them do their job more effectively (in this case, to keep up\
+    \ with security vulnerability information).\nFor more information about the Cisco\
+    \ PSIRT openVuln API visit https://developer.cisco.com/site/PSIRT/discover/overview\n\
+    \nFor detail steps on how to use the API go to: https://developer.cisco.com/site/PSIRT/get-started/getting-started.gsp\n\
+    \nThis is a beta release of a swagger YAML for the Cisco PSIRT openVuln API\n\n\
+    To access the API sign in with your Cisco CCO account at http://apiconsole.cisco.com\
+    \ and register an application\nto recieve a client_id and a client_secret\n\n\
+    You can then get your token using curl or any other method you prefer.\n\n'curl\
+    \ -s -k -H \"Content-Type: application/x-www-form-urlencoded\" -X POST -d \"client_id=<your_client_id>\"\
+    \ -d \"client_secret=<your_client_secret>\" -d \"grant_type=client_credentials\"\
+    \ https://cloudsso.cisco.com/as/token.oauth2'\n\nYou will receive an access token\
+    \ as demonstrated in the following example:\n '{\"access_token\":\"I7omWtBDAieSiUX3shOxNJfuy4J6\"\
+    ,\"token_type\":\"Bearer\",\"expires_in\":3599}'\n\nIn Swagger, click on Change\
+    \ Authentication\n\nenter the text \"I7omWtBDAieSiUX3shOxNJfuy4J6\" (which is\
+    \ the token you received)\n\nthen click on \"Try this operation\"\n"
+  version: "0.0.4"
+  title: "Cisco PSIRT openVuln API"
+  contact:
+    name: "Omar Santos"
+    email: "os@cisco.com"
+host: "api.cisco.com"
+schemes:
+- "https"
+produces:
+- "application/json"
+paths:
+  /security/advisories/all:
+    get:
+      description: "Used to obtain information about all published security advisories.\
+        \ By default the output is in JSON. To obtain the output in XML use the .xml\
+        \ extension. For example, /advisories/all.xml\n"
+      parameters: []
+      responses:
+        200:
+          description: "Successful response"
+      security:
+      - psirt_openvuln_api_auth:
+        - "read:advisories"
+  /security/advisories/cve/{cve_id}:
+    get:
+      description: "Used to obtain an advisory using a given Common Vulnerability\
+        \ Enumerator (CVE). The `cve_id` format is CVE-YYYY-NNNN. For more information\
+        \ about CVE visit http://cve.mitre.org/\n"
+      parameters:
+      - name: "cve_id"
+        in: "path"
+        description: "CVE Identifier (i.e., CVE-YYYY-NNNN)"
+        required: true
+        type: "string"
+        format: "CVE-YYYY-NNNN"
+        x-exportParamName: "CveId"
+      responses:
+        200:
+          description: "Successful response"
+      security:
+      - psirt_openvuln_api_auth:
+        - "read:advisories"
+  /security/advisories/advisory/{advisory_id}:
+    get:
+      description: "Used to obtain an advisory given its advisory ID `advisory_id`\
+        \ (i.e., cisco-sa-20180221-ucdm)\n"
+      parameters:
+      - name: "advisory_id"
+        in: "path"
+        description: "advisory ID"
+        required: true
+        type: "string"
+        format: "cisco-sa-XXX"
+        x-exportParamName: "AdvisoryId"
+      responses:
+        200:
+          description: "Successful response"
+      security:
+      - psirt_openvuln_api_auth:
+        - "read:advisories"
+  /security/advisories/severity/{severity}:
+    get:
+      description: "Used to obtain all security advisories for a given security impact\
+        \ rating (critical, high, medium, or low).\n"
+      parameters:
+      - name: "severity"
+        in: "path"
+        description: "Critical, High, Medium, Low"
+        required: true
+        type: "string"
+        format: "enum"
+        enum:
+        - "critical"
+        - "high"
+        - "medium"
+        - "low"
+        x-exportParamName: "Severity"
+      responses:
+        200:
+          description: "Successful response"
+      security:
+      - psirt_openvuln_api_auth:
+        - "read:advisories"
+  /security/advisories/severity/{severity}/lastpublished:
+    get:
+      description: "Used to obtain all security advisories for a given security impact\
+        \ rating (critical, high, medium, or low).\n"
+      parameters:
+      - name: "severity"
+        in: "path"
+        description: "Used to obtain all advisories that have a security impact rating\
+          \ of critical"
+        required: true
+        type: "string"
+        format: "enum"
+        enum:
+        - "critical"
+        - "high"
+        - "medium"
+        - "low"
+        x-exportParamName: "Severity"
+      - name: "startDate"
+        in: "query"
+        required: true
+        type: "string"
+        format: "date"
+        x-exportParamName: "StartDate"
+      - name: "endDate"
+        in: "query"
+        required: true
+        type: "string"
+        format: "date"
+        x-exportParamName: "EndDate"
+      responses:
+        200:
+          description: "Successful response"
+      security:
+      - psirt_openvuln_api_auth:
+        - "read:advisories"
+  /security/advisories/severity/{severity}/firstpublished:
+    get:
+      description: "Used to obtain all security advisories for a given security impact\
+        \ rating (critical, high, medium, or low) and additionally filter based of\
+        \ firstpublished start date and enddate.\n"
+      parameters:
+      - name: "severity"
+        in: "path"
+        description: "Used to obtain all advisories that have a security impact rating\
+          \ of critical"
+        required: true
+        type: "string"
+        format: "enum"
+        enum:
+        - "critical"
+        - "high"
+        - "medium"
+        - "low"
+        x-exportParamName: "Severity"
+      - name: "startDate"
+        in: "query"
+        required: true
+        type: "string"
+        format: "date"
+        x-exportParamName: "StartDate"
+      - name: "endDate"
+        in: "query"
+        required: true
+        type: "string"
+        format: "date"
+        x-exportParamName: "EndDate"
+      responses:
+        200:
+          description: "Successful response"
+      security:
+      - psirt_openvuln_api_auth:
+        - "read:advisories"
+  /security/advisories/year/{year}:
+    get:
+      description: "Used to obtain all security advisories that have were orginally\
+        \ published in a specific year `YYYY`.\n"
+      parameters:
+      - name: "year"
+        in: "path"
+        description: "The four digit year."
+        required: true
+        type: "string"
+        format: "YYYY"
+        x-exportParamName: "Year"
+      responses:
+        200:
+          description: "Successful response"
+      security:
+      - psirt_openvuln_api_auth:
+        - "read:advisories"
+  /security/advisories/latest/{number}:
+    get:
+      description: "Used to obtain all the latest security advisories given an absolute\
+        \ number. For instance, the latest 10 or latest 5.\n"
+      parameters:
+      - name: "number"
+        in: "path"
+        description: "An absolute number to obtain the latest security advisories."
+        required: true
+        type: "integer"
+        format: "number"
+        x-exportParamName: "Number"
+      responses:
+        200:
+          description: "Successful response"
+      security:
+      - psirt_openvuln_api_auth:
+        - "read:advisories"
+  /security/advisories/product:
+    get:
+      description: "Used to obtain all the advisories that affects the given product\
+        \ name.\n"
+      parameters:
+      - name: "product"
+        in: "query"
+        description: "An product name to obtain security advisories that matches given\
+          \ product name."
+        required: true
+        type: "string"
+        format: "string"
+        x-exportParamName: "Product"
+      responses:
+        200:
+          description: "Successful response"
+      security:
+      - psirt_openvuln_api_auth:
+        - "read:advisories"
+  /security/advisories/ios:
+    get:
+      description: "Used to obtain all advisories that affects the given ios version\n"
+      parameters:
+      - name: "version"
+        in: "query"
+        description: "IOS version to obtain security advisories"
+        required: true
+        type: "string"
+        format: "string"
+        x-exportParamName: "Version"
+      responses:
+        200:
+          description: "Successful response"
+      security:
+      - psirt_openvuln_api_auth:
+        - "read:advisories"
+  /security/advisories/iosxe:
+    get:
+      description: "Used to obtain all advisories that affects the given ios version\n"
+      parameters:
+      - name: "version"
+        in: "query"
+        description: "IOS version to obtain security advisories"
+        required: true
+        type: "string"
+        format: "string"
+        x-exportParamName: "Version"
+      responses:
+        200:
+          description: "Successful response"
+      security:
+      - psirt_openvuln_api_auth:
+        - "read:advisories"
+securityDefinitions:
+  psirt_openvuln_api_auth:
+    type: "oauth2"
+    authorizationUrl: "https://cloudsso.cisco.com/as/token.oauth2"
+    flow: "implicit"
+    scopes:
+      read:advisories: "read advisories"
+definitions: {}
