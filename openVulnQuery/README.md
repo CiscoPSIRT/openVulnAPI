@@ -1,120 +1,132 @@
 # openVulnQuery
+
 A python-based module(s) to query the Cisco PSIRT openVuln API.
 
-The Cisco Product Security Incident Response Team (PSIRT) openVuln API is a RESTful API that allows customers to obtain Cisco Security Vulnerability information in different machine-consumable formats. APIs are important for customers because they allow their technical staff and programmers to build tools that help them do their job more effectively (in this case, to keep up with security vulnerability information). More information about the API can be found at: https://developer.cisco.com/site/PSIRT/discover/overview/
+The Cisco Product Security Incident Response Team (PSIRT) openVuln API is a RESTful API that allows customers to obtain Cisco Security Vulnerability information in different machine-consumable formats. APIs are important for customers because they allow their technical staff and programmers to build tools that help them do their job more effectively (in this case, to keep up with security vulnerability information). More information about the API can be found at: <https://developer.cisco.com/site/PSIRT/discover/overview/>
 
-#### PIP Installation
+## PIP Installation
+
 You can easily do:
+
 ```
 pip install openVulnQuery
 ```
 
 Depending on your environment, you may need to specify the latest version (1.29), as demonstrated below:
+
 ```
 python3 -m pip install openVulnQuery==1.29
 ```
 
-  If you are experiencing any difficulty installing openVulnQuery.
-  Here is the link to [common installation issues solutions]   (https://github.com/iamparas/openVulnAPI/blob/master/openVulnQuery/InstallationIssueSolutions.md).
+If you are experiencing any difficulty installing openVulnQuery. Here is the link to [common installation issues solutions] (<https://github.com/iamparas/openVulnAPI/blob/master/openVulnQuery/InstallationIssueSolutions.md>).
 
 Requirements
+
 - Tested on Python Version 2.7.13
 - `argparse >= 1.4.0`
 - requests >= 2.10.0`
 
-#### Config File
+## Config File
+
 Obtain client ID and Secret:
 
-1. Visit https://apiconsole.cisco.com/
+1. Visit <https://apiconsole.cisco.com/>
 2. Sign In
 3. Select My Applications Tab
 4. Register a New Application by:
-   - Entering Application Name
-   - Under OAuth2.0 Credentials check Client Credentials
-   - Under Select APIs choose Cisco PSIRT openVuln API
-   - Agree to the terms and service and click Register
+
+  - Entering Application Name
+  - Under OAuth2.0 Credentials check Client Credentials
+  - Under Select APIs choose Cisco PSIRT openVuln API
+  - Agree to the terms and service and click Register
+
 5. Take note of the "rate contract" presented like e.g.:
-    ```
-    Rate Limits
-    10	Calls per second
-    5,000	Calls per day
-    ```
+
+  ```
+   Rate Limits
+   10    Calls per second
+   5,000    Calls per day
+  ```
+
 6. Note the value of "Client ID" (a string like e.g. 'abc12abcd13abcdefabcde1a')
 7. Note the value of "Client Secret" (a string like e.g. '1a2abcDEfaBcDefAbcDeFA3b')
 8. Provide the credentials to the application at runtime via two preferred alternativev ways:
-   * Either export two matching environment variables (below the syntax for bash and assuming the values are as in steps 6. and 7.):
-        ```
-        >> export CLIENT_ID="abc12abcd13abcdefabcde1a" 
-        >> export CLIENT_SECRET="1a2abcDEfaBcDefAbcDeFA3b"
-        ```
-   * Or create a valid JSON file (e.g. `credentials.json`) with these personal credentials similar to the below given (assuming the values are as in steps 6. and 7.):
-        ```
-        {
-            "CLIENT_ID": "abc12abcd13abcdefabcde1a", 
-            "CLIENT_SECRET": "1a2abcDEfaBcDefAbcDeFA3b"
-        }
-        ```
+
+  - Either export two matching environment variables (below the syntax for bash and assuming the values are as in steps 6\. and 7.):
+
+    ```
+       >> export CLIENT_ID="abc12abcd13abcdefabcde1a"
+       >> export CLIENT_SECRET="1a2abcDEfaBcDefAbcDeFA3b"
+    ```
+
+  - Or create a valid JSON file (e.g. `credentials.json`) with these personal credentials similar to the below given (assuming the values are as in steps 6\. and 7.):
+
+    ```
+       {
+           "CLIENT_ID": "abc12abcd13abcdefabcde1a",
+           "CLIENT_SECRET": "1a2abcDEfaBcDefAbcDeFA3b"
+       }
+    ```
+
 9. Do not distribute the credentials file resulting from previous step
 
-**Notes**: 
-* The resulting OAuth2 Token will be automatically generated on every call to the API.
+**Notes**:
 
-#### Run OpenVulnQuery in the Terminal
+- The resulting OAuth2 Token will be automatically generated on every call to the API.
+
+## Run OpenVulnQuery in the Terminal
+
 - If installed with pip run the program by typing
-```
+
+  ```
   >>openVulnQuery --config PathToCredentialsFile --Advisory Type --API Filters --Parsing Fields --Output Format -Count
-```
+  ```
+
 - Or cd into the directory with the main.py file and run using
-```
+
+  ```
   >>python main.py --config PathToCredentialsFile --Advisory Type --API Filters --Parsing Fields --Output Format -Count
-```
-Notes:
+  ```
+
+  Notes:
 
 -- Used for whole word commands, - Used for single character commands
 
-#### Configuration (Optional)
+## Configuration (Optional)
+
 ```
 --config FILE
         Path to JSON file with credentials (as in above step 8)
         A sample has been provided in the same folder as main.py:
             sample:configuration.json
-        The configuration will be tried first from config file, 
+        The configuration will be tried first from config file,
         next from environemnt variables CLIENT_ID and CLIENT_SECRET,
         last from config.py variable values, or fail.
 ```
 
-#### Advisory Type (Required)
-```
---cvrf
-        Filter openVuln API by only cvrf advisories
---oval
-        Filter openVuln API by only oval advisories
-```
-#### API Filters (Required)
+## API Filters (Required)
+
 ```
 --all
         Return all advisories in cvrf or oval format
         Examples:
-        >> openVulnQuery --cvrf --all
-        >> openVulnQuery --oval --all
+        >> openVulnQuery --all
+
 
 --advisory
         Search by specific advisory id
         Examples:
-        >> openVulnQuery --cvrf --advisory cisco-sa-20110201-webex
-        >> openVulnQuery --oval --advisory cisco-sa-20100324-ldp
+        >> openVulnQuery --advisory cisco-sa-20110201-webex
 
 --cve
         Search by specific cve id
         Examples:
-        >> openVulnQuery --cvrf --cve CVE-2010-3043
-        >> openVulnQuery --oval --cve CVE-2010-0576
+        >> openVulnQuery --cve CVE-2010-3043
 
 --latest
         Search by the number of latest advisories in cvrf or oval format
         Examples:
-        >> openVulnQuery --cvrf --latest 10
-        >> openVulnQuery --oval --latest 10
+        >> openVulnQuery  --latest 10
 
         Note: the latest option is limited to 100 maximum queries
 
@@ -122,25 +134,20 @@ Notes:
         Search by severity (low, medium, high, critical)
         Note: Oval does not have a low severity
         Examples:
-        >> openVulnQuery --cvrf --severity critical
-        >> openVulnQuery --cvrf --severity high
-        >> openVulnQuery --cvrf --severity medium
-        >> openVulnQuery --cvrf --severity low
-        >> openVulnQuery --oval --severity critical
-        >> openVulnQuery --oval --severity high
-        >> openVulnQuery --oval --severity medium
+        >> openVulnQuery  --severity critical
+        >> openVulnQuery  --severity high
+        >> openVulnQuery  --severity medium
+        >> openVulnQuery  --severity low
 
 --year
         Search by the year (1995 to present)
         Examples:
-        >> openVulnQuery --cvrf --year 2016
-        >> openVulnQuery --oval --year 2016
+        >> openVulnQuery  --year 2016
 
 --product
          Search by the product name
          Examples:
-         >> openVulnQuery --cvrf --product Cisco
-         >> openVulnQuery --oval --product Cisco
+         >> openVulnQuery  --product Cisco
 
 --ios
         Search by IOS version
@@ -154,116 +161,124 @@ Notes:
         Search by Cisco IOS or Cisco IOS XE Software version.
         Example:
         >> openVulnQuery --ios_xe 3.16.1S
-
 ```
 
-#### Client Application (Optional)
+## Client Application (Optional)
+
 ```
 --user-agent APPLICATION
         Name of application to be sent as User-Agent header value in the request.
         Default is TestApp.
 ```
 
-#### Parsing Fields (Optional)
+## Parsing Fields (Optional)
+
 Notes:
 
 If no fields are passed in the default API fields will be returned
 
 Any field that has no information will return with with the field name and NA
 
-##### Available Fields
-  - advisory_id
-  - sir
-  - first_published
-  - last_updated
-  - cves
-  - bug_ids
-  - cvss_base_score
-  - advisory_title
-  - publication_url
-  - cwe
-  - product_names
-  - summary
-  - vuln_title
-  - oval_urls
-  - cvrf_url
+### Available Fields
+
+- advisory_id
+- sir
+- first_published
+- last_updated
+- cves
+- bug_ids
+- cvss_base_score
+- advisory_title
+- publication_url
+- cwe
+- product_names
+- summary
+- vuln_title
+- cvrf_url
 
 ```
 -f or --fields
 
         API Fields
               Examples:
-              openVulnQuery --config PathToCredentialsFile --cvrf or --oval --any API filter -f  or --fields list of fields separated by space
-              >> openVulnQuery --config PathToCredentialsFile --cvrf --all -f sir cves cvrf_url
-              >> openVulnQuery --config PathToCredentialsFile --cvrf --severity critical -f last_updated cves
-              >> openVulnQuery --config PathToCredentialsFile --oval --all -f sir cves oval_url
-              >> openVulnQuery --config PathToCredentialsFile --oval --severity critical -f last_updated cves
+              openVulnQuery --config PathToCredentialsFile --any API filter -f  or --fields list of fields separated by space
+              >> openVulnQuery --config PathToCredentialsFile  --all -f sir cves cvrf_url
+              >> openVulnQuery --config PathToCredentialsFile  --severity critical -f last_updated cves
 
         CVRF XML Fields
               Examples:
-              openVulnQuery --config PathToCredentialsFile --cvrf --any API filter -f or --fields list of fields separated by space
-              >> openVulnQuery --config PathToCredentialsFile --cvrf --all -f bug_ids vuln_title product_names
-              >> openVulnQuery --config PathToCredentialsFile --cvrf --severity critical -f bug_ids summary
+              openVulnQuery --config PathToCredentialsFile  --any API filter -f or --fields list of fields separated by space
+              >> openVulnQuery --config PathToCredentialsFile  --all -f bug_ids vuln_title product_names
+              >> openVulnQuery --config PathToCredentialsFile  --severity critical -f bug_ids summary
 
         Combination
               Examples:
-              openVulnQuery --config PathToCredentialsFile --cvrf --any API filter -f or --fields list of fields separated by space
-              >> openVulnQuery --config PathToCredentialsFile --cvrf --all -f sir bug_ids cves vuln_title
-              >> openVulnQuery --config PathToCredentialsFile --cvrf --year 2011 -f cves cvrf_url bug_ids summary product_names
+              openVulnQuery --config PathToCredentialsFile  --any API filter -f or --fields list of fields separated by space
+              >> openVulnQuery --config PathToCredentialsFile  --all -f sir bug_ids cves vuln_title
+              >> openVulnQuery --config PathToCredentialsFile  --year 2011 -f cves cvrf_url bug_ids summary product_names
 ```
 
-##### Additional Filters
+### Additional Filters
+
 User can be more specific on filtering advisories when searching all advisories or by severity. They can filter based on last updated and first published dates providing start and end date as a search range. Dates should be entered in YYYY-MM-DD format.
+
 ```
 >> # export CLIENT_ID and CLIENT_SECRET or write to config.py ... then:
->> openVulnQuery --cvrf --severity high --last_updated 2016-01-02:2016-04-02 --json filename.json
->> openVulnQuery --cvrf --all --last_updated 2016-01-02:2016-07-02
->> openVulnQuery --cvrf --severity critical --first_published 2015-01-02:2015-01-04
+>> openVulnQuery  --severity high --last_updated 2016-01-02:2016-04-02 --json filename.json
+>> openVulnQuery  --all --last_updated 2016-01-02:2016-07-02
+>> openVulnQuery  --severity critical --first_published 2015-01-02:2015-01-04
 ```
 
-#### Output Format (Optional)
+## Output Format (Optional)
+
 ```
 Default
         Table style printed to screen
         Example:
-        >> openVulnQuery --config PathToCredentialsFile --cvrf --year 2016
+        >> openVulnQuery --config PathToCredentialsFile  --year 2016
 
 --json file path
         Returns json in a file in the specified path
         Example:
-        >> openVulnQuery --config PathToCredentialsFile --cvrf --year 2016 --json  /Users/bkorabik/Documents/2016_cvrf.json
+        >> openVulnQuery --config PathToCredentialsFile  --year 2016 --json  /Users/bkorabik/Documents/2016_cvrf.json
 
 --csv file path
         Creates a CSV file in the specified path
         Example:
-        >> openVulnQuery --config PathToCredentialsFile --cvrf --year 2016 --csv  /Users/bkorabik/Documents/2016_cvrf.csv
+        >> openVulnQuery --config PathToCredentialsFile  --year 2016 --csv  /Users/bkorabik/Documents/2016_cvrf.csv
 ```
-#### Count (Optional)
+
+## Count (Optional)
+
 Returns the count of fields entered with -f or --fields. If no fields are entered the base API fields are counted and displayed
+
 ```
 -c
 
         Examples:
-        >> openVulnQuery --config PathToCredentialsFile --cvrf --year 2016 -c
+        >> openVulnQuery --config PathToCredentialsFile  --year 2016 -c
         >> # export CLIENT_ID and CLIENT_SECRET or write to config.py ... then:
-        >> openVulnQuery --cvrf --severity low -f sir cves bug_ids -c
+        >> openVulnQuery  --severity low -f sir cves bug_ids -c
 ```
 
-#### Developers
+## Developers
+
 - Update the config.py file with client id and secret
 - Directly interact with query_client.py to query the Open Vuln API
 - query_client.py returns Advisory Object
 - advisory.py module has Advisory object a abstract class which is inherited by CVRF and OVAL data type
 - This abstraction hides the implementation details and the data source used to populate the data type. The data members of CVRF and OVAL advisories are populated from API results.
 
-#### Disclosures:
+## Disclosures:
+
 No support for filtering based on --API fields, you can't use --year 2016 and --severity high
 
 Filtering with Grep:
+
 ```
 Finding the Number of CVRF Advisories with a "Critical" sir in 2013
-        >> openVulnQuery --config PathToCredentialsFile --cvrf --year 2013 -f sir | grep -c "Critical"
-        >> openVulnQuery --config PathToCredentialsFile --cvrf --severity critical -f first_published | grep -c "2013"
+        >> openVulnQuery --config PathToCredentialsFile  --year 2013 -f sir | grep -c "Critical"
+        >> openVulnQuery --config PathToCredentialsFile  --severity critical -f first_published | grep -c "2013"
 ```
 
 If more than one API filter is entered, the last filter will be used for the API call.
@@ -271,102 +286,124 @@ If more than one API filter is entered, the last filter will be used for the API
 You can alternatively use the date range functionality, as shown below:
 
 ```
->> openVulnQuery --config PathToCredentialsFile --cvrf --severity critical --first_published 2017-01-02:2017-10-01
+>> openVulnQuery --config PathToCredentialsFile  --severity critical --first_published 2017-01-02:2017-10-01
 ```
 
-#### Run OpenVulnQuery as a Library
-After you install openVulnQuery package, you can use the query_client module to make API-call which returns
- advisory objects. For each query to the API, you can pick the advisory format.
+## Run OpenVulnQuery as a Library
+
+After you install openVulnQuery package, you can use the query_client module to make API-call which returns advisory objects. For each query to the API, you can pick the advisory format.
+
 ```
 >> from openVulnQuery import query_client
 >> query_client = query_client.OpenVulnQueryClient(client_id="", client_secret="")
 >> advisories = query_client.get_by_year(year=2010, adv_format='cvrf')
 >> advisories = query_client.get_by_ios_xe('ios', '3.16.1S')
 ```
+
 If you want to use the additional date filters based on first published and last updated date. You can pass the appropriate class
+
 ```
 >> advisories = query_client.get_by_severity(adv_format='cvrf', severity='high', FirstPublished(2016-01-01, 2016-02-02))
 >> advisories = query_client.get_by_severity(adv_format='oval', severity='low', LastUpdated(2016-01-01, 2016-02-02))
 ```
 
-##### Debugging Requests and Responses
+### Debugging Requests and Responses
 
-If the run time environment has the variable `CISCO_OPEN_VULN_API_DEBUG` 
-set (and the value evaluates to True) the data forming every request as well 
-as raw and formatted variants of successful responses (`HTTP 200/OK`)
-will be written to files in JSON format.
+If the run time environment has the variable `CISCO_OPEN_VULN_API_DEBUG` set (and the value evaluates to True) the data forming every request as well as raw and formatted variants of successful responses (`HTTP 200/OK`) will be written to files in JSON format.
 
-The file names follow the pattern: `ts-{ts}_id-{id}_snapshot-of-{kind}.json`, 
-where: 
+The file names follow the pattern: `ts-{ts}_id-{id}_snapshot-of-{kind}.json`, where:
 
-* `{ts}` receives a date time stamp as ruled by the module variable 
-`DEBUG_TIME_STAMP_FORMAT` (default `%Y%m%dT%H%M%S.%f`) and noted in local
-time,
-* `{id}` is a string holding a UUID4 generated for the request and useful to
- correlate request and response data files
-* `{kind}` is one of three strings speaking for themselves: 
-  + `request`
-  + `response-raw`
-  + `response-formated`
+- `{ts}` receives a date time stamp as ruled by the module variable `DEBUG_TIME_STAMP_FORMAT` (default `%Y%m%dT%H%M%S.%f`) and noted in local time,
+- `{id}` is a string holding a UUID4 generated for the request and useful to correlate request and response data files
+- `{kind}` is one of three strings speaking for themselves:
 
-The files will be written either to the current folder, or to a path stored
-in the environment variable `CISCO_OPEN_VULN_API_PATH` (if it is set).
+  - `request`
+  - `response-raw`
+  - `response-formated`
 
-*Note*: The folder at that later path is expected to exist and be writeable 
-by the user. Please note also, that Filesystem and JSON serialization errors
-are ignored.
+The files will be written either to the current folder, or to a path stored in the environment variable `CISCO_OPEN_VULN_API_PATH` (if it is set).
+
+_Note_: The folder at that later path is expected to exist and be writeable by the user. Please note also, that Filesystem and JSON serialization errors are ignored.
 
 Here are the information stored in advisory object.
-##### Advisory
-      * advisory_id
-      * sir
-      * first_published
-      * last_updated
-      * cves
-      * bug_ids
-      * cvss_base_score
-      * advisory_title
-      * publication_url
-      * cwe
-      * product_names
-      * summary
 
-##### CVRF (inherits Advisory Abstract Class)
-            * cvrf_url
-            * vuln_title
-##### OVAL (inherits Advisory Abstract Class)
-            * oval_url
-After you install openVulnQuery package, you can use the query_client module to make API-call which returns
- advisory objects. For each query to the API, you can pick advisory format.
+### Advisory
+
+```
+  * advisory_id
+  * sir
+  * first_published
+  * last_updated
+  * cves
+  * bug_ids
+  * cvss_base_score
+  * advisory_title
+  * publication_url
+  * cwe
+  * product_names
+  * summary
+```
+
+### CVRF (inherits Advisory Abstract Class)
+
+```
+        * cvrf_url
+        * vuln_title
+```
+
+### OVAL (inherits Advisory Abstract Class)
+
+```
+        * oval_url
+```
+
+After you install openVulnQuery package, you can use the query_client module to make API-call which returns advisory objects. For each query to the API, you can pick advisory format.
+
 ```
 >> from openVulnQuery import query_client
 >> query_client = query_client.OpenVulnQueryClient(client_id='', client_secret='')
 >> advisories = query_client.get_by_year(year=2010, adv_format='cvrf')
 ```
-Here are the information stored in advisory object.
-##### Advisory (Abstract Base Class)
-       * advisory_id
-       * sir
-       * first_published
-       * last_updated
-       * cves
-       * bug_ids
-       * cvss_base_score
-       * advisory_title
-       * publication_url
-       * cwe
-       * product_names
-       * summary
-##### CVRF
-        * cvrf_url
-##### OVAL
-        * oval_url
-##### AdvisoryIOS
-        * ios_release
-        * first_fixed
-        * cvrf_url
-        * oval_url
 
+Here are the information stored in advisory object.
+
+### Advisory (Abstract Base Class)
+
+```
+   * advisory_id
+   * sir
+   * first_published
+   * last_updated
+   * cves
+   * bug_ids
+   * cvss_base_score
+   * advisory_title
+   * publication_url
+   * cwe
+   * product_names
+   * summary
+```
+
+### CVRF
+
+```
+    * cvrf_url
+```
+
+### OVAL
+
+```
+    * oval_url
+```
+
+### AdvisoryIOS
+
+```
+    * ios_release
+    * first_fixed
+    * cvrf_url
+    * oval_url
+```
 
 ### Running the tests
 
@@ -388,7 +425,7 @@ $ pytest
 platform darwin -- Python 2.7.13, pytest-3.1.2, py-1.4.34, pluggy-0.4.0
 rootdir: /www/github.com/CiscoPSIRT/openVulnAPI/openVulnQuery, inifile:
 plugins: cov-2.5.1
-collected 159 items 
+collected 159 items
 
 tests/test_advisory.py ......................
 tests/test_authorization.py ...
@@ -411,7 +448,7 @@ $ pytest --cov=openVulnQuery --cov-report=term-missing --cov-report=html
 platform darwin -- Python 2.7.13, pytest-3.1.2, py-1.4.34, pluggy-0.4.0
 rootdir: /www/github.com/CiscoPSIRT/openVulnAPI/openVulnQuery, inifile:
 plugins: cov-2.5.1
-collected 159 items 
+collected 159 items
 
 tests/test_advisory.py ......................
 tests/test_authorization.py ...
