@@ -131,5 +131,5 @@ RUN set -ex; \
 
 # Finally installing the openVulnQuery client.
 RUN set -ex; \
-  python3 -m pip install openVulnQuery==1.29
+  python3 -m pip install openVulnQuery==1.30
 CMD ["python3"]

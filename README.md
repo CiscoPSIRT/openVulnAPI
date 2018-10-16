@@ -23,7 +23,7 @@ pip install openVulnQuery
 Depending on your environment, you may need to specify the latest version (1.29), as demonstrated below:
 
 ```
-python3 -m pip install openVulnQuery==1.29
+python3 -m pip install openVulnQuery==1.30
 ```
 
 If you are experiencing any difficulty installing openVulnQuery. Here is the link to [common installation issues solutions](<https://github.com/iamparas/openVulnAPI/blob/master/openVulnQuery/InstallationIssueSolutions.md>).
@@ -37,4 +37,3 @@ You can also pull the container from [Docker Hub](https://hub.docker.com/r/santo
 ```
 docker pull santosomar/openvulnquery
 ```
-
