@@ -51,7 +51,9 @@ class Filterable(object):
 
 
 class Advisory(Filterable):
-    """Abstract Advisory object"""
+    """
+    This class abstracts advisory object
+    """
 
     __metaclass__ = ABCMeta
 
