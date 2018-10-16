@@ -23,13 +23,8 @@ DEBUG_API_USAGE = os.getenv('CISCO_OPEN_VULN_API_DEBUG', None)
 DEBUG_API_PATH = os.getenv('CISCO_OPEN_VULN_API_PATH', None)
 DEBUG_TIME_STAMP_FORMAT = "%Y%m%dT%H%M%S.%f"
 
-
 def ensure_adv_format_token(adv_format):
-  ''' 
-  This used to be the legacy cvrf and oval advisory formats.
-  '''
     return adv_format if adv_format in ADV_TOKENS else ADV_TOKENS[-1]
-
 
 class Filter(object):
     def __init__(self, path='', params=None):
