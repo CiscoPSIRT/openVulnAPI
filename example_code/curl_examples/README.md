@@ -34,4 +34,4 @@ The following example demonstrates how to obtain the latest 10 advisories:
 ```
 curl -X GET -s -k -H "Accept: application/json" -H "Authorization: Bearer ytuopLCGZxBFN5O0hnL1M2QX2QVp" https://api.cisco.com/security/advisories/latest/10
 ```
-For more information about the available RESTful resource URIs and the Cisco PSIRT openVuln API visit: https://developer.cisco.com/site/PSIRT/
+For more information about the available RESTful resource URIs and the Cisco PSIRT openVuln API visit: https://developer.cisco.com/psirt
