@@ -7,7 +7,7 @@ FROM alpine:latest
 # ensure local python is preferred over distribution python
 ENV PATH /usr/local/bin:$PATH
 
-# At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3.x; 
+# At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3.x;
 # that is a bug documented at: http://bugs.python.org/issue19846
 
 ENV LANG C.UTF-8
@@ -78,8 +78,7 @@ RUN set -ex \
     --with-system-ffi \
     --without-ensurepip \
   && make -j "$(nproc)" \
-# set thread stack size to 1MB so we don't segfault before we hit sys.getrecursionlimit()
-# https://github.com/alpinelinux/aports/commit/2026e1259422d4e0cf92391ca2d3844356c649d0
+
     EXTRA_CFLAGS="-DTHREAD_STACK_SIZE=0x100000" \
   && make install \
   \
@@ -108,6 +107,7 @@ RUN cd /usr/local/bin \
   && ln -s python3-config python-config
 
 # if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
+
 ENV PYTHON_PIP_VERSION 18.1
 
 RUN set -ex; \
