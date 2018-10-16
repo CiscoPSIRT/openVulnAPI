@@ -62,7 +62,7 @@ Obtain client ID and Secret:
 #### Run OpenVulnQuery in the Terminal
 - If installed with pip run the program by typing
 ```
-  >>OpenVulnQuery --config PathToCredentialsFile --Advisory Type --API Filters --Parsing Fields --Output Format -Count
+  >>openVulnQuery --config PathToCredentialsFile --Advisory Type --API Filters --Parsing Fields --Output Format -Count
 ```
 - Or cd into the directory with the main.py file and run using
 ```
