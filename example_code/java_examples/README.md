@@ -70,7 +70,7 @@ public class DefaultApiExample {
 
     public static void main(String[] args) {
         ApiClient defaultClient = Configuration.getDefaultApiClient();
-        
+
         // Configure OAuth2 access token for authorization: psirt_openvuln_api_auth
         OAuth psirt_openvuln_api_auth = (OAuth) defaultClient.getAuthentication("psirt_openvuln_api_auth");
         psirt_openvuln_api_auth.setAccessToken("YOUR ACCESS TOKEN");
@@ -94,17 +94,17 @@ All URIs are relative to *https://api.cisco.com*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**securityAdvisoriesAdvisoryAdvisoryIdGet**](docs/DefaultApi.md#securityAdvisoriesAdvisoryAdvisoryIdGet) | **GET** /security/advisories/advisory/{advisory_id} | 
-*DefaultApi* | [**securityAdvisoriesAllGet**](docs/DefaultApi.md#securityAdvisoriesAllGet) | **GET** /security/advisories/all | 
-*DefaultApi* | [**securityAdvisoriesCveCveIdGet**](docs/DefaultApi.md#securityAdvisoriesCveCveIdGet) | **GET** /security/advisories/cve/{cve_id} | 
-*DefaultApi* | [**securityAdvisoriesIosGet**](docs/DefaultApi.md#securityAdvisoriesIosGet) | **GET** /security/advisories/ios | 
-*DefaultApi* | [**securityAdvisoriesIosxeGet**](docs/DefaultApi.md#securityAdvisoriesIosxeGet) | **GET** /security/advisories/iosxe | 
-*DefaultApi* | [**securityAdvisoriesLatestNumberGet**](docs/DefaultApi.md#securityAdvisoriesLatestNumberGet) | **GET** /security/advisories/latest/{number} | 
-*DefaultApi* | [**securityAdvisoriesProductGet**](docs/DefaultApi.md#securityAdvisoriesProductGet) | **GET** /security/advisories/product | 
-*DefaultApi* | [**securityAdvisoriesSeveritySeverityFirstpublishedGet**](docs/DefaultApi.md#securityAdvisoriesSeveritySeverityFirstpublishedGet) | **GET** /security/advisories/severity/{severity}/firstpublished | 
-*DefaultApi* | [**securityAdvisoriesSeveritySeverityGet**](docs/DefaultApi.md#securityAdvisoriesSeveritySeverityGet) | **GET** /security/advisories/severity/{severity} | 
-*DefaultApi* | [**securityAdvisoriesSeveritySeverityLastpublishedGet**](docs/DefaultApi.md#securityAdvisoriesSeveritySeverityLastpublishedGet) | **GET** /security/advisories/severity/{severity}/lastpublished | 
-*DefaultApi* | [**securityAdvisoriesYearYearGet**](docs/DefaultApi.md#securityAdvisoriesYearYearGet) | **GET** /security/advisories/year/{year} | 
+*DefaultApi* | [**securityAdvisoriesAdvisoryAdvisoryIdGet**](docs/DefaultApi.md#securityAdvisoriesAdvisoryAdvisoryIdGet) | **GET** /security/advisories/advisory/{advisory_id} |
+*DefaultApi* | [**securityAdvisoriesAllGet**](docs/DefaultApi.md#securityAdvisoriesAllGet) | **GET** /security/advisories/all |
+*DefaultApi* | [**securityAdvisoriesCveCveIdGet**](docs/DefaultApi.md#securityAdvisoriesCveCveIdGet) | **GET** /security/advisories/cve/{cve_id} |
+*DefaultApi* | [**securityAdvisoriesIosGet**](docs/DefaultApi.md#securityAdvisoriesIosGet) | **GET** /security/advisories/ios |
+*DefaultApi* | [**securityAdvisoriesIosxeGet**](docs/DefaultApi.md#securityAdvisoriesIosxeGet) | **GET** /security/advisories/iosxe |
+*DefaultApi* | [**securityAdvisoriesLatestNumberGet**](docs/DefaultApi.md#securityAdvisoriesLatestNumberGet) | **GET** /security/advisories/latest/{number} |
+*DefaultApi* | [**securityAdvisoriesProductGet**](docs/DefaultApi.md#securityAdvisoriesProductGet) | **GET** /security/advisories/product |
+*DefaultApi* | [**securityAdvisoriesSeveritySeverityFirstpublishedGet**](docs/DefaultApi.md#securityAdvisoriesSeveritySeverityFirstpublishedGet) | **GET** /security/advisories/severity/{severity}/firstpublished |
+*DefaultApi* | [**securityAdvisoriesSeveritySeverityGet**](docs/DefaultApi.md#securityAdvisoriesSeveritySeverityGet) | **GET** /security/advisories/severity/{severity} |
+*DefaultApi* | [**securityAdvisoriesSeveritySeverityLastpublishedGet**](docs/DefaultApi.md#securityAdvisoriesSeveritySeverityLastpublishedGet) | **GET** /security/advisories/severity/{severity}/lastpublished |
+*DefaultApi* | [**securityAdvisoriesYearYearGet**](docs/DefaultApi.md#securityAdvisoriesYearYearGet) | **GET** /security/advisories/year/{year} |
 
 
 ## Documentation for Models
@@ -119,7 +119,7 @@ Authentication schemes defined for the API:
 - **Type**: OAuth
 - **Flow**: implicit
 - **Authorization URL**: https://cloudsso.cisco.com/as/token.oauth2
-- **Scopes**: 
+- **Scopes**:
   - read:advisories: read advisories
 
 
@@ -130,4 +130,3 @@ It's recommended to create an instance of `ApiClient` per thread in a multithrea
 ## Author
 
 os@cisco.com
-
