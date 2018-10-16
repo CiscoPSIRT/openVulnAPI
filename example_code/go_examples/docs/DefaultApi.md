@@ -4,31 +4,31 @@ All URIs are relative to *https://api.cisco.com*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**SecurityAdvisoriesAdvisoryAdvisoryIdGet**](DefaultApi.md#SecurityAdvisoriesAdvisoryAdvisoryIdGet) | **Get** /security/advisories/advisory/{advisory_id} | 
-[**SecurityAdvisoriesAllGet**](DefaultApi.md#SecurityAdvisoriesAllGet) | **Get** /security/advisories/all | 
-[**SecurityAdvisoriesCveCveIdGet**](DefaultApi.md#SecurityAdvisoriesCveCveIdGet) | **Get** /security/advisories/cve/{cve_id} | 
-[**SecurityAdvisoriesIosGet**](DefaultApi.md#SecurityAdvisoriesIosGet) | **Get** /security/advisories/ios | 
-[**SecurityAdvisoriesIosxeGet**](DefaultApi.md#SecurityAdvisoriesIosxeGet) | **Get** /security/advisories/iosxe | 
-[**SecurityAdvisoriesLatestNumberGet**](DefaultApi.md#SecurityAdvisoriesLatestNumberGet) | **Get** /security/advisories/latest/{number} | 
-[**SecurityAdvisoriesProductGet**](DefaultApi.md#SecurityAdvisoriesProductGet) | **Get** /security/advisories/product | 
-[**SecurityAdvisoriesSeveritySeverityFirstpublishedGet**](DefaultApi.md#SecurityAdvisoriesSeveritySeverityFirstpublishedGet) | **Get** /security/advisories/severity/{severity}/firstpublished | 
-[**SecurityAdvisoriesSeveritySeverityGet**](DefaultApi.md#SecurityAdvisoriesSeveritySeverityGet) | **Get** /security/advisories/severity/{severity} | 
-[**SecurityAdvisoriesSeveritySeverityLastpublishedGet**](DefaultApi.md#SecurityAdvisoriesSeveritySeverityLastpublishedGet) | **Get** /security/advisories/severity/{severity}/lastpublished | 
-[**SecurityAdvisoriesYearYearGet**](DefaultApi.md#SecurityAdvisoriesYearYearGet) | **Get** /security/advisories/year/{year} | 
+[**SecurityAdvisoriesAdvisoryAdvisoryIdGet**](DefaultApi.md#SecurityAdvisoriesAdvisoryAdvisoryIdGet) | **Get** /security/advisories/advisory/{advisory_id} |
+[**SecurityAdvisoriesAllGet**](DefaultApi.md#SecurityAdvisoriesAllGet) | **Get** /security/advisories/all |
+[**SecurityAdvisoriesCveCveIdGet**](DefaultApi.md#SecurityAdvisoriesCveCveIdGet) | **Get** /security/advisories/cve/{cve_id} |
+[**SecurityAdvisoriesIosGet**](DefaultApi.md#SecurityAdvisoriesIosGet) | **Get** /security/advisories/ios |
+[**SecurityAdvisoriesIosxeGet**](DefaultApi.md#SecurityAdvisoriesIosxeGet) | **Get** /security/advisories/iosxe |
+[**SecurityAdvisoriesLatestNumberGet**](DefaultApi.md#SecurityAdvisoriesLatestNumberGet) | **Get** /security/advisories/latest/{number} |
+[**SecurityAdvisoriesProductGet**](DefaultApi.md#SecurityAdvisoriesProductGet) | **Get** /security/advisories/product |
+[**SecurityAdvisoriesSeveritySeverityFirstpublishedGet**](DefaultApi.md#SecurityAdvisoriesSeveritySeverityFirstpublishedGet) | **Get** /security/advisories/severity/{severity}/firstpublished |
+[**SecurityAdvisoriesSeveritySeverityGet**](DefaultApi.md#SecurityAdvisoriesSeveritySeverityGet) | **Get** /security/advisories/severity/{severity} |
+[**SecurityAdvisoriesSeveritySeverityLastpublishedGet**](DefaultApi.md#SecurityAdvisoriesSeveritySeverityLastpublishedGet) | **Get** /security/advisories/severity/{severity}/lastpublished |
+[**SecurityAdvisoriesYearYearGet**](DefaultApi.md#SecurityAdvisoriesYearYearGet) | **Get** /security/advisories/year/{year} |
 
 
 # **SecurityAdvisoriesAdvisoryAdvisoryIdGet**
 > SecurityAdvisoriesAdvisoryAdvisoryIdGet(ctx, advisoryId)
 
 
-Used to obtain an advisory given its advisory ID `advisory_id` (i.e., cisco-sa-20180221-ucdm) 
+Used to obtain an advisory given its advisory ID `advisory_id` (i.e., cisco-sa-20180221-ucdm)
 
 ### Required Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **ctx** | **context.Context** | context for logging, tracing, authentication, etc.
-  **advisoryId** | **string**| advisory ID | 
+  **advisoryId** | **string**| advisory ID |
 
 ### Return type
 
@@ -49,7 +49,7 @@ Name | Type | Description  | Notes
 > SecurityAdvisoriesAllGet(ctx, )
 
 
-Used to obtain information about all published security advisories. By default the output is in JSON. To obtain the output in XML use the .xml extension. For example, /advisories/all.xml 
+Used to obtain information about all published security advisories. By default the output is in JSON. To obtain the output in XML use the .xml extension. For example, /advisories/all.xml
 
 ### Required Parameters
 This endpoint does not need any parameter.
@@ -73,14 +73,14 @@ This endpoint does not need any parameter.
 > SecurityAdvisoriesCveCveIdGet(ctx, cveId)
 
 
-Used to obtain an advisory using a given Common Vulnerability Enumerator (CVE). The `cve_id` format is CVE-YYYY-NNNN. For more information about CVE visit http://cve.mitre.org/ 
+Used to obtain an advisory using a given Common Vulnerability Enumerator (CVE). The `cve_id` format is CVE-YYYY-NNNN. For more information about CVE visit http://cve.mitre.org/
 
 ### Required Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **ctx** | **context.Context** | context for logging, tracing, authentication, etc.
-  **cveId** | **string**| CVE Identifier (i.e., CVE-YYYY-NNNN) | 
+  **cveId** | **string**| CVE Identifier (i.e., CVE-YYYY-NNNN) |
 
 ### Return type
 
@@ -101,14 +101,14 @@ Name | Type | Description  | Notes
 > SecurityAdvisoriesIosGet(ctx, version)
 
 
-Used to obtain all advisories that affects the given ios version 
+Used to obtain all advisories that affects the given ios version
 
 ### Required Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **ctx** | **context.Context** | context for logging, tracing, authentication, etc.
-  **version** | **string**| IOS version to obtain security advisories | 
+  **version** | **string**| IOS version to obtain security advisories |
 
 ### Return type
 
@@ -129,14 +129,14 @@ Name | Type | Description  | Notes
 > SecurityAdvisoriesIosxeGet(ctx, version)
 
 
-Used to obtain all advisories that affects the given ios version 
+Used to obtain all advisories that affects the given ios version
 
 ### Required Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **ctx** | **context.Context** | context for logging, tracing, authentication, etc.
-  **version** | **string**| IOS version to obtain security advisories | 
+  **version** | **string**| IOS version to obtain security advisories |
 
 ### Return type
 
@@ -157,14 +157,14 @@ Name | Type | Description  | Notes
 > SecurityAdvisoriesLatestNumberGet(ctx, number)
 
 
-Used to obtain all the latest security advisories given an absolute number. For instance, the latest 10 or latest 5. 
+Used to obtain all the latest security advisories given an absolute number. For instance, the latest 10 or latest 5.
 
 ### Required Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **ctx** | **context.Context** | context for logging, tracing, authentication, etc.
-  **number** | **int32**| An absolute number to obtain the latest security advisories. | 
+  **number** | **int32**| An absolute number to obtain the latest security advisories. |
 
 ### Return type
 
@@ -185,14 +185,14 @@ Name | Type | Description  | Notes
 > SecurityAdvisoriesProductGet(ctx, product)
 
 
-Used to obtain all the advisories that affects the given product name. 
+Used to obtain all the advisories that affects the given product name.
 
 ### Required Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **ctx** | **context.Context** | context for logging, tracing, authentication, etc.
-  **product** | **string**| An product name to obtain security advisories that matches given product name. | 
+  **product** | **string**| An product name to obtain security advisories that matches given product name. |
 
 ### Return type
 
@@ -213,16 +213,16 @@ Name | Type | Description  | Notes
 > SecurityAdvisoriesSeveritySeverityFirstpublishedGet(ctx, severity, startDate, endDate)
 
 
-Used to obtain all security advisories for a given security impact rating (critical, high, medium, or low) and additionally filter based of firstpublished start date and enddate. 
+Used to obtain all security advisories for a given security impact rating (critical, high, medium, or low) and additionally filter based of firstpublished start date and enddate.
 
 ### Required Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **ctx** | **context.Context** | context for logging, tracing, authentication, etc.
-  **severity** | **string**| Used to obtain all advisories that have a security impact rating of critical | 
-  **startDate** | **string**|  | 
-  **endDate** | **string**|  | 
+  **severity** | **string**| Used to obtain all advisories that have a security impact rating of critical |
+  **startDate** | **string**|  |
+  **endDate** | **string**|  |
 
 ### Return type
 
@@ -243,14 +243,14 @@ Name | Type | Description  | Notes
 > SecurityAdvisoriesSeveritySeverityGet(ctx, severity)
 
 
-Used to obtain all security advisories for a given security impact rating (critical, high, medium, or low). 
+Used to obtain all security advisories for a given security impact rating (critical, high, medium, or low).
 
 ### Required Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **ctx** | **context.Context** | context for logging, tracing, authentication, etc.
-  **severity** | **string**| Critical, High, Medium, Low | 
+  **severity** | **string**| Critical, High, Medium, Low |
 
 ### Return type
 
@@ -271,16 +271,16 @@ Name | Type | Description  | Notes
 > SecurityAdvisoriesSeveritySeverityLastpublishedGet(ctx, severity, startDate, endDate)
 
 
-Used to obtain all security advisories for a given security impact rating (critical, high, medium, or low). 
+Used to obtain all security advisories for a given security impact rating (critical, high, medium, or low).
 
 ### Required Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **ctx** | **context.Context** | context for logging, tracing, authentication, etc.
-  **severity** | **string**| Used to obtain all advisories that have a security impact rating of critical | 
-  **startDate** | **string**|  | 
-  **endDate** | **string**|  | 
+  **severity** | **string**| Used to obtain all advisories that have a security impact rating of critical |
+  **startDate** | **string**|  |
+  **endDate** | **string**|  |
 
 ### Return type
 
@@ -301,14 +301,14 @@ Name | Type | Description  | Notes
 > SecurityAdvisoriesYearYearGet(ctx, year)
 
 
-Used to obtain all security advisories that have were orginally published in a specific year `YYYY`. 
+Used to obtain all security advisories that have were orginally published in a specific year `YYYY`.
 
 ### Required Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **ctx** | **context.Context** | context for logging, tracing, authentication, etc.
-  **year** | **string**| The four digit year. | 
+  **year** | **string**| The four digit year. |
 
 ### Return type
 
@@ -324,4 +324,3 @@ Name | Type | Description  | Notes
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
