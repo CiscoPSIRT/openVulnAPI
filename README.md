@@ -32,3 +32,9 @@ The client source code can be accessed [here](https://github.com/CiscoPSIRT/open
 
 ## Docker Container
 The client can be easily run in a container. For your convenience, a [Dockerfile is available](https://github.com/CiscoPSIRT/openVulnAPI/blob/master/openVulnQuery/Dockerfile) to run the client is a slim container running Alpine and Python 3.x.
+
+You can also pull the container from [Docker Hub](https://hub.docker.com/r/santosomar/openvulnquery/) with:
+```
+docker pull santosomar/openvulnquery
+```
+
