@@ -8,6 +8,7 @@ setup(name='OpenVulnQuery',
       author_email='os@cisco.com',
       license='The MIT License (MIT)',
       packages=find_packages(exclude=["tests"]),
+      long_description=open('README.md').read(),
       entry_points={
           'console_scripts':
               ['openVulnQuery=openVulnQuery.main:main']
