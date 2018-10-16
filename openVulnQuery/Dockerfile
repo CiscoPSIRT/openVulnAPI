@@ -2,15 +2,14 @@
 # and to install the openVulnQuery client (client for the Cisco openVuln API)
 # Author: Omar Santos os@cisco.com
 
-
-
 FROM alpine:latest
 
 # ensure local python is preferred over distribution python
 ENV PATH /usr/local/bin:$PATH
 
-# http://bugs.python.org/issue19846
-# > At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3*, and that's not OK.
+# At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3.x; 
+# that is a bug documented at: http://bugs.python.org/issue19846
+
 ENV LANG C.UTF-8
 
 # install ca-certificates so that HTTPS works consistently
@@ -130,6 +129,7 @@ RUN set -ex; \
     \) -exec rm -rf '{}' +; \
   rm -f get-pip.py
 
+# Finally installing the openVulnQuery client.
 RUN set -ex; \
   python3 -m pip install openVulnQuery==1.29
 CMD ["python3"]
