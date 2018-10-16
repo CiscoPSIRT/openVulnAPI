@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: OpenVulnQuery
+Version: 1.30
+Summary: A python-based module(s) to query the Cisco PSIRT openVuln API.
+Home-page: https://github.com/CiscoPSIRT/openVulnAPI/tree/master/openVulnQuery
+Author:  Omar Santos
+Author-email: os@cisco.com
+License: The MIT License (MIT)
+Description: UNKNOWN
+Platform: UNKNOWN

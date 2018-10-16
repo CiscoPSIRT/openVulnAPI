@@ -1,0 +1,3 @@
+[console_scripts]
+openVulnQuery = openVulnQuery.main:main
+
