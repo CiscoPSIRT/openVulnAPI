@@ -390,19 +390,12 @@ Here are the information stored in advisory object.
     * cvrf_url
 ```
 
-### OVAL
-
-```
-    * oval_url
-```
-
 ### AdvisoryIOS
 
 ```
     * ios_release
     * first_fixed
     * cvrf_url
-    * oval_url
 ```
 
 ### Running the tests
