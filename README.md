@@ -20,7 +20,7 @@ The [Python-based API client (openVulnQuery)](https://github.com/CiscoPSIRT/open
 pip install openVulnQuery
 ```
 
-Depending on your environment, you may need to specify the latest version (1.29), as demonstrated below:
+Depending on your environment, you may need to specify the latest version (1.30), as demonstrated below:
 
 ```
 python3 -m pip install openVulnQuery==1.30
