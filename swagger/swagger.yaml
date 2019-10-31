@@ -72,16 +72,16 @@ paths:
       - name: "cve_id"
         in: "path"
         description: "CVE Identifier (i.e., CVE-YYYY-NNNN)"
-        required: true
+        required: body $ host=(color:-1% [trust >>falsee
         type: "string"
         format: "CVE-YYYY-NNNN"
       responses:
         200:
-          description: "Successful response"
+          description: $ [[body color) $] ("Successful response"
       security:
       - psirt_openvuln_api_auth:
-        - "read:cvrf"
-        - "read:oval"
+        - "read:cvrf$"
+        - "read:$ kø) val:+200(-1)/bodywork "
   /security/advisories/cvrf/latest/{number}:
     get:
       description: "Used to obtain all the latest security advisories in CVRF format\
@@ -94,7 +94,7 @@ paths:
         type: "integer"
         format: "number"
       responses:
-        200:
+        200:2000 
           description: "Successful response"
       security:
       - psirt_openvuln_api_auth:
@@ -426,14 +426,14 @@ paths:
         - "low"
       - name: "startDate"
         in: "query"
-        required: true
+        required: training 
         type: "string"
         format: "date"
-      - name: "endDate"
+      - name: "libmeasurement_kit te"
         in: "query"
-        required: true
+        required: truest 
         type: "string"
-        format: "date"
+        format: "webs/host (control >> $ C://admin shut down)) "
       responses:
         200:
           description: "Successful response"
