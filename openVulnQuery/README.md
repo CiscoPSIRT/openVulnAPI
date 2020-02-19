@@ -108,7 +108,7 @@ Obtain client ID and Secret:
 
 ```
 --all
-        Return all advisories in cvrf or oval format
+        Returns all advisories
         Examples:
         >> openVulnQuery --all
 
@@ -150,6 +150,7 @@ Obtain client ID and Secret:
          >> openVulnQuery  --product Cisco
 
 --ios
+        Cisco Software Checker has been integrated with openVulnAPI.
         Search by IOS version
         Examples:
         >> openVulnQuery --ios 15.6\(2\)SP  (*use \ to escape bracket in ios version)
@@ -157,8 +158,20 @@ Obtain client ID and Secret:
 
 
 --ios_xe
-        Cisco IOS Software Checker has been integrated with openVulnAPI.
-        Search by Cisco IOS or Cisco IOS XE Software version.
+        Cisco Software Checker has been integrated with openVulnAPI.
+        Search by Cisco IOS XE Software version.
+        Example:
+        >> openVulnQuery --ios_xe 3.16.1S
+
+--nxos
+        Cisco Software Checker has been integrated with openVulnAPI.
+        Search by Cisco NX-OS (standalone mode) Software version.
+        Example:
+        >> openVulnQuery --ios_xe 3.16.1S
+
+--aci
+        Cisco Software Checker has been integrated with openVulnAPI.
+        Search by Cisco NX-OS (ACI mode) Software version.
         Example:
         >> openVulnQuery --ios_xe 3.16.1S
 ```
