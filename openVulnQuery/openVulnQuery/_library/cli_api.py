@@ -138,6 +138,24 @@ CLI_API_API_RESOURCE = (
         'tokens': ('--ios',),
         'type': (lambda x: ('ios', x)),
     },
+    {
+        'dest': 'api_resource',
+        'help': (
+            'Retrieve advisories affecting user inputted NX-OS (in standalone mode) version.'
+            'Only one version at a time is allowed.'),
+        'metavar': 'nxos_version',
+        'tokens': ('--nxos',),
+        'type': (lambda x: ('nxos', x)),
+    },
+    {
+        'dest': 'api_resource',
+        'help': (
+            'Retrieve advisories affecting user inputted NX-OS (in ACI mode) version.'
+            'Only one version at a time is allowed.'),
+        'metavar': 'aci_version',
+        'tokens': ('--aci',),
+        'type': (lambda x: ('aci', x)),
+    },
 )
 
 CLI_API_OUTPUT_FORMAT = (
