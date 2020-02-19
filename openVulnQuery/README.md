@@ -124,7 +124,7 @@ Obtain client ID and Secret:
         >> openVulnQuery --cve CVE-2010-3043
 
 --latest
-        Search by the number of latest advisories in cvrf or oval format
+        Search by the last number of advisories published
         Examples:
         >> openVulnQuery  --latest 10
 
@@ -278,8 +278,8 @@ Returns the count of fields entered with -f or --fields. If no fields are entere
 - Update the config.py file with client id and secret
 - Directly interact with query_client.py to query the Open Vuln API
 - query_client.py returns Advisory Object
-- advisory.py module has Advisory object a abstract class which is inherited by CVRF and OVAL data type
-- This abstraction hides the implementation details and the data source used to populate the data type. The data members of CVRF and OVAL advisories are populated from API results.
+- advisory.py module has Advisory object a abstract class
+- This abstraction hides the implementation details and the data source used to populate the data type. The data members of security advisories are populated from API results.
 
 ## Disclosures:
 
@@ -316,7 +316,6 @@ If you want to use the additional date filters based on first published and last
 
 ```
 >> advisories = query_client.get_by_severity(adv_format='cvrf', severity='high', FirstPublished(2016-01-01, 2016-02-02))
->> advisories = query_client.get_by_severity(adv_format='oval', severity='low', LastUpdated(2016-01-01, 2016-02-02))
 ```
 
 ### Debugging Requests and Responses
@@ -363,11 +362,7 @@ Here are the information stored in advisory object.
         * vuln_title
 ```
 
-### OVAL (inherits Advisory Abstract Class)
 
-```
-        * oval_url
-```
 
 After you install openVulnQuery package, you can use the query_client module to make API-call which returns advisory objects. For each query to the API, you can pick advisory format.
 
