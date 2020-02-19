@@ -168,6 +168,30 @@ class OpenVulnQueryClient(object):
             raise requests.exceptions.HTTPError(
                 e.response.status_code, e.response.text)
 
+    def get_by_nxos(self, adv_format, nxos_version, a_filter=None):
+        """Return advisories by Cisco NX-OS (standalone mode) advisories version"""
+        req_path = "nxos"
+        try:
+            advisories = self.get_request(
+                req_path,
+                params={'version': nxos_version})
+            return self.advisory_list(advisories['advisories'], None)
+        except requests.exceptions.HTTPError as e:
+            raise requests.exceptions.HTTPError(
+                e.response.status_code, e.response.text)
+
+    def get_by_aci(self, adv_format, aci_version, a_filter=None):
+        """Return advisories by Cisco NX-OS (in ACI mode) advisories version"""
+        req_path = "aci"
+        try:
+            advisories = self.get_request(
+                req_path,
+                params={'version': aci_version})
+            return self.advisory_list(advisories['advisories'], None)
+        except requests.exceptions.HTTPError as e:
+            raise requests.exceptions.HTTPError(
+                e.response.status_code, e.response.text)
+
     def get_by(self, topic, format, aspect, **kwargs):
         """Cartesian product ternary paths biased REST dispatcher."""
         trampoline = {  # key: function; required and [optional] parameters
@@ -180,6 +204,9 @@ class OpenVulnQueryClient(object):
             'product': self.get_by_product,  # format, product_name, [a_filter]
             'ios_xe': self.get_by_ios_xe,  # 'ios', ios_version, [a_filter]
             'ios': self.get_by_ios,  # 'ios', ios_version, [a_filter]
+            'nxos': self.get_by_nxos,  # 'nxos', nxos_version, [a_filter]
+            'aci': self.get_by_aci,  # 'aci', aci_version, [a_filter]
+
         }
         if topic not in trampoline:
             raise KeyError(
