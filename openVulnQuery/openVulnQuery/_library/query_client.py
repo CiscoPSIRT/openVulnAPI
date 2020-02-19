@@ -204,8 +204,8 @@ class OpenVulnQueryClient(object):
             'product': self.get_by_product,  # format, product_name, [a_filter]
             'ios_xe': self.get_by_ios_xe,  # 'ios', ios_version, [a_filter]
             'ios': self.get_by_ios,  # 'ios', ios_version, [a_filter]
-            'nxos': self.get_by_nxos,  # 'nxos', nxos_version, [a_filter]
-            'aci': self.get_by_aci,  # 'aci', aci_version, [a_filter]
+            'nxos': self.get_by_nxos,  # 'ios', nxos_version, [a_filter]
+            'aci': self.get_by_aci,  # 'ios', aci_version, [a_filter]
 
         }
         if topic not in trampoline:
