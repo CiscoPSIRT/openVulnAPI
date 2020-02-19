@@ -132,7 +132,6 @@ Obtain client ID and Secret:
 
 --severity
         Search by severity (low, medium, high, critical)
-        Note: Oval does not have a low severity
         Examples:
         >> openVulnQuery  --severity critical
         >> openVulnQuery  --severity high
@@ -167,13 +166,13 @@ Obtain client ID and Secret:
         Cisco Software Checker has been integrated with openVulnAPI.
         Search by Cisco NX-OS (standalone mode) Software version.
         Example:
-        >> openVulnQuery --ios_xe 3.16.1S
+        >> openVulnQuery --nxos 8.3(1)
 
 --aci
         Cisco Software Checker has been integrated with openVulnAPI.
         Search by Cisco NX-OS (ACI mode) Software version.
         Example:
-        >> openVulnQuery --ios_xe 3.16.1S
+        >> openVulnQuery --aci 11.0(2j)
 ```
 
 ## Client Application (Optional)
