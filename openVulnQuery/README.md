@@ -175,6 +175,9 @@ Obtain client ID and Secret:
         >> openVulnQuery --aci 11.0(2j)
 ```
 
+**NOTE**: Cisco reserves the right to remove End-of-Support releases from the Cisco Software Checker (subsequently reflected in this API).
+
+
 ## Client Application (Optional)
 
 ```
