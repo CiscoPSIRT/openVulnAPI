@@ -127,7 +127,8 @@ def advisory_factory(adv_data, adv_format, logger):
             adv_map[k] = adv_data[v]
     else:  # IOS advisory format targeted:
         for k, v in IOS_ADD_ONS_MAP.items():
-            adv_map[k] = adv_data[v]
+            if v in adv_data:
+                adv_map[k] = adv_data[v]
 
     an_adv = advisory_format_factory_map()[adv_format](**adv_map)
     logger.debug(
