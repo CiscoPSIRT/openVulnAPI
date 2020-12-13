@@ -14,7 +14,7 @@ https://developer.cisco.com/psirt
 
 ## Python-based Client : openVulnQuery
 
-The [Python-based API client (openVulnQuery)](https://github.com/CiscoPSIRT/openVulnAPI/tree/master/openVulnQuery) can be installed using Python `pip`, as shown below:
+The [Python-based API client (openVulnQuery)](https://github.com/CiscoPSIRT/openVulnQuery) can be installed using Python `pip`, as shown below:
 
 ```
 pip install openVulnQuery
