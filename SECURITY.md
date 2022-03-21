@@ -2,7 +2,7 @@
 
 To learn about Cisco security vulnerability disclosure policies and publications, access the [Cisco Security Vulnerability Policy](https://tools.cisco.com/security/center/resources/security_vulnerability_policy.html). This document also contains instructions for obtaining fixed software and receiving security vulnerability information from Cisco.
 
-https://www.cisco.com/go/psirt
+All Cisco Security Advisories are published at: https://www.cisco.com/go/psirt
 
 ## Reporting a Vulnerability
 
