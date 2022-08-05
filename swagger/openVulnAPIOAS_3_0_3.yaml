@@ -1,0 +1,2428 @@
+openapi: "3.0.3"
+info:
+  version: 2.0.1
+  title: 'Cisco PSIRT openVuln API'
+  description: |
+    The Cisco Product Security Incident Response Team (PSIRT) openVuln API is a RESTful API that allows customers to obtain Cisco Security Vulnerability information in different machine-consumable formats. APIs are important for customers because they allow their technical staff and programmers to build tools that help them do their job more effectively (in this case, to keep up with security vulnerability information).
+    For more information about the Cisco PSIRT openVuln API visit https://developer.cisco.com/psirt/
+    For detail steps on how to use the API go to: https://developer.cisco.com/docs/psirt/
+
+    This is a beta release of a OpenAPI YAML for the Cisco PSIRT openVuln API
+
+    To access the API sign in with your Cisco CCO account at http://apiconsole.cisco.com and register an application to receive a client_id and a client_secret
+
+    You can then get your token using curl or any other method you prefer:
+
+    1: Using curl:
+
+    'curl -s -k -H "Content-Type: application/x-www-form-urlencoded" -X POST -d "client_id=<your_client_id>" -d "client_secret=<your_client_secret>" -d "grant_type=client_credentials" https://cloudsso.cisco.com/as/token.oauth2'
+
+    You will receive an access token as demonstrated in the following example:
+     '{"access_token":"I7omWtBDAieSiUX3shOxNJfuy4J6","token_type":"Bearer","expires_in":3599}'
+
+    2: Using PostMan:
+       First time:
+
+       Within PostMan:
+       In "Authorization":
+       : Type: OAuth 2.0
+       : Add Authorization Data to: Request Headers
+
+       "Configure New Token" Pane:
+       * Token Name: OpenVulnAPI
+       * Grant Type: Client Credentials
+       * Access Token URL: https://cloudsso.cisco.com/as/token.oauth2
+       * Client ID: <your_client_id>
+       * Client Secret: <your_client_secret>
+       * Scope: Can leave blank
+       * Client Authentication: Send as Basic Auth header
+   
+       When need to use; click on "Get New Access Token".
+
+    3: Using any script you have to pull the token:
+       See https://github.com/CiscoPSIRT/openVulnAPI/tree/master/example_code
+
+    Once you have your token via either method above; in Swagger, click on "Authorize"
+
+    enter the text "I7omWtBDAieSiUX3shOxNJfuy4J6" (which is the token you received)
+    then click on "Authorize"
+
+  termsOfService: https://github.com/CiscoPSIRT/openVulnAPI/blob/master/LICENSE.md
+  
+  contact:
+    name: Cisco PSIRT
+    url:  https://tools.cisco.com/security/center/publicationListing.x
+    email: openvuln@cisco.com
+
+servers:  
+  - url: https://api.cisco.com/{basePath}
+    description: "OpenVuln API"
+    variables:
+      basePath: 
+        default: "security/advisories/v2"
+        enum: 
+          - "security/advisories"     #Original version of OpenVuln API
+          - "security/advisories/v2"  #Version 2.0 of OpenVuln API
+          
+security:
+  - psirt_openvuln_api_auth: []
+
+externalDocs:
+  description: "Read the formal Documentation here"
+  url: https://developer.cisco.com/docs/psirt/
+
+tags:
+  - name: Current Endpoints
+    description: Current supported API endpoints.
+  
+  - name: Sunset Endpoints
+    description: The "security/advisories" basepath will be deprecated in the future. These API endpoints have changed with the introduction of v2 basepath.  Migrate the below endpoints to current endpoint calls. The below endpoints only work with "security/advisories" basepath.
+    
+  - name: Obsolete Endpoints
+    description: These API endpoints are no longer available.  Migrate to current version calls.
+    
+paths:
+  /all:
+    get:
+      description: 'Used to obtain information about all published security advisories.'
+      tags:
+        - Current Endpoints
+      parameters:
+        - name: summaryDetails
+          in: query
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+           type: boolean
+        - name: productNames
+          in: query
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+           type: boolean
+        - name: pageIndex
+          in: query
+          description: 'The pageIndex field is an integer representing the current page index out of total number of pages'
+          required: false
+          schema:
+           type: integer
+           minimum: 1
+           maximum: 100
+        - name: pageSize
+          in: query
+          description: 'The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+          
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+
+        '404':
+          description: Invalid extension used.  Currently this incorrect. In a minor update this will be moved to a 406 with the correct error message.
+          
+        '406':
+          description: Invalid page index or size used
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_INVALID_PAGEINDEX'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_INVALID_PAGEINDEX'
+          
+
+  /all/firstpublished:
+    get:
+      description: Used to obtain information about all published security advisories first published within a date timeframe.
+      tags:
+        - Current Endpoints
+      parameters:
+        - name: summaryDetails
+          in: query
+          description: Include the Advisory Summary Description or not
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query
+          description: Include the ProductNames or not
+          required: false
+          schema:
+            type: boolean
+        - name: startDate
+          description: Format example Year-Month-Day 2022-05-12
+          in: query
+          required: true
+          schema:
+            type: string
+            format: string
+            pattern: ^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$
+        - name: endDate
+          in: query
+          description: Format example Year-Month-Day 2022-05-12
+          required: true
+          schema:
+            type: string
+            format: string
+            pattern: ^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$
+        - name: pageIndex
+          in: query
+          description: The pageIndex field is an integer representing the current page index out of total number of pages
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: pageSize
+          in: query
+          description: The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+                
+        '404':
+          description: No advisories published within the date range supplied.               
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_NO_DATA_FOUND'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_NO_DATA_FOUND'
+
+        '406':
+          description: Invalid page index or size used
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/errorCode_INVALID_PAGEINDEX'
+                  - $ref: '#/components/schemas/errorCode_MIN_PAGESIZE'
+                  - $ref: '#/components/schemas/errorCode_INVALID_DATE_FORMAT'
+                  - $ref: '#/components/schemas/errorCode_START_DATE_GREATER'
+                  - $ref: '#/components/schemas/errorCode_START_DATE_AND_END_DATE_MANDATORY'        
+
+            application/xml:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/errorCode_INVALID_PAGEINDEX'
+                  - $ref: '#/components/schemas/errorCode_MIN_PAGESIZE'
+                  - $ref: '#/components/schemas/errorCode_INVALID_DATE_FORMAT'
+                  - $ref: '#/components/schemas/errorCode_START_DATE_GREATER'
+                  - $ref: '#/components/schemas/errorCode_START_DATE_AND_END_DATE_MANDATORY'   
+
+  /all/lastpublished:
+    get:
+      description: Used to obtain information about all published security advisories last published within a date timeframe.
+      tags:
+        - Current Endpoints
+      parameters:
+        - name: summaryDetails
+          in: query
+          description: Include the Advisory Summary Description or not
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query
+          description: Include the ProductNames or not
+          required: false
+          schema:
+            type: boolean
+        - name: startDate
+          in: query
+          description: Format example Year-Month-Day 2022-05-12
+          required: true
+          schema:
+            type: string
+            format: string
+            pattern: ^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$
+        - name: endDate
+          in: query
+          description: Format example Year-Month-Day 2022-05-12
+          required: true
+          schema:
+            type: string
+            format: string
+            pattern: ^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$
+        - name: pageIndex
+          in: query
+          description: The pageIndex field is an integer representing the current page index out of total number of pages
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: pageSize
+          in: query
+          description: The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+                
+        '404':
+          description: No advisories published within the date range supplied.               
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_NO_DATA_FOUND'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_NO_DATA_FOUND'
+
+        '406':
+          description: Invalid page index or size used
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/errorCode_INVALID_PAGEINDEX'
+                  - $ref: '#/components/schemas/errorCode_MIN_PAGESIZE'
+                  - $ref: '#/components/schemas/errorCode_INVALID_DATE_FORMAT'
+                  - $ref: '#/components/schemas/errorCode_START_DATE_GREATER'
+                  - $ref: '#/components/schemas/errorCode_START_DATE_AND_END_DATE_MANDATORY'        
+
+            application/xml:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/errorCode_INVALID_PAGEINDEX'
+                  - $ref: '#/components/schemas/errorCode_MIN_PAGESIZE'
+                  - $ref: '#/components/schemas/errorCode_INVALID_DATE_FORMAT'
+                  - $ref: '#/components/schemas/errorCode_START_DATE_GREATER'
+                  - $ref: '#/components/schemas/errorCode_START_DATE_AND_END_DATE_MANDATORY'   
+
+ 
+  /advisory/{advisoryId}:
+    get:
+      description: 'Used to obtain an advisory given its advisory ID `advisoryId` (i.e., cisco-sa-20180221-ucdm)'
+      tags:
+        - Current Endpoints
+      parameters:
+        - name: advisoryId
+          in: path
+          description: Enter advisory ID.  Defaults to .json format, use advisoryId.xml if require xml format.
+          required: true
+          schema:
+            type: string
+            format: cisco-sa-XXX
+            example: cisco-sa-20180221-ucdm
+        - name: summaryDetails
+          in: query
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+
+        '404':
+          description: Invalid advisory id used or not found.               
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_ADVISORYID_NOT_FOUND'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_ADVISORYID_NOT_FOUND'
+          
+        '406':
+          description: Invalid extension used
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_INVALID_EXTENSION'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_INVALID_EXTENSION'
+ 
+  /cve/{cve_id}:
+    get:
+      description: 'Used to obtain an advisory using a given Common Vulnerability Enumerator (CVE). The `cve_id` format is CVE-YYYY-NNNN. For more information about CVE visit http://cve.mitre.org/'
+      tags:
+        - Current Endpoints
+      parameters:
+        - name: cve_id
+          in: path
+          description: 'CVE Identifier (i.e., CVE-YYYY-NNNN)'
+          required: true
+          schema:
+            type: string
+            format: CVE-YYYY-NNNN
+        - name: summaryDetails
+          in: query
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+                
+        '404':
+          description: Invalid or not found CVE-ID.               
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_NO_DATA_FOUND_CVE'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_NO_DATA_FOUND_CVE'
+
+  /bugid/{bug_id}:
+    get:
+      description: 'Used to obtain an advisory using a given bug_id . The `bug_id` format is start with CSC.'
+      tags:
+        - Current Endpoints
+      parameters:
+        - in: path
+          name: bug_id
+          description: 'BUG Identifier (i.e., CSCxyNNNNN)'
+          required: true
+          schema:
+            type: string
+            format: CSCxyNNNNN
+        - in: query
+          name: summaryDetails
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: productNames
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+                
+        '404':
+          description: No advisories with supplied Cisco Bug ID found.  Currently this returns a partial match on the bug id; not an exact match.
+       
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_NO_DATA_FOUND'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_NO_DATA_FOUND'
+          
+  /latest/{number}:
+    get:
+      description: 'Used to obtain all the latest security advisories given an absolute number. For instance, the latest 10 or latest 5.'
+      tags:
+        - Current Endpoints
+      parameters:
+        - name: number
+          in: path
+          description: An absolute number to obtain the latest security advisories.
+          required: true
+          schema:
+            type: integer
+            format: number
+        - name: summaryDetails
+          in: query
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+                
+        '406':
+          description: Invalid advisory count used.
+
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_INVALID_ADV_COUNT'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_INVALID_ADV_COUNT'
+  
+  /severity/{severity}:
+    get:
+      description: 'Used to obtain all security advisories for a given security impact rating (critical, high, medium, low or informational)'
+      tags:
+        - Current Endpoints
+      parameters:
+        - name: severity
+          in: path
+          description: 'Critical, High, Medium, Low or informational'
+          required: true
+          schema:
+            type: string
+            enum: ["critical", "high", "medium", "low", "informational"]
+        - name: summaryDetails
+          in: query
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+        - name: pageIndex
+          in: query
+          description: 'The pageIndex field is an integer representing the current page index out of total number of pages'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: pageSize
+          in: query
+          description: 'The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+                
+        '404':
+          description: No advisories by a given severity are found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_NO_DATA_FOUND'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_NO_DATA_FOUND'
+                
+        '406':
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/errorCode_INVALID_PAGEINDEX_LONG'
+                  - $ref: '#/components/schemas/errorCode_MIN_PAGESIZE'
+                  - $ref: '#/components/schemas/errorCode_INVALID_SEVERITY'
+                  - $ref: '#/components/schemas/errorCode_START_DATE_GREATER'
+                  - $ref: '#/components/schemas/errorCode_START_DATE_AND_END_DATE_MANDATORY'        
+
+            application/xml:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/errorCode_INVALID_PAGEINDEX_LONG'
+                  - $ref: '#/components/schemas/errorCode_MIN_PAGESIZE'
+                  - $ref: '#/components/schemas/errorCode_INVALID_SEVERITY'
+                  - $ref: '#/components/schemas/errorCode_START_DATE_GREATER'
+                  - $ref: '#/components/schemas/errorCode_START_DATE_AND_END_DATE_MANDATORY' 
+
+  /severity/{severity}/firstpublished:
+    get:
+      description: 'Used to obtain all security advisories for a given security impact rating (critical, high, medium, low or informational) and additionally filter based of firstpublished start date and enddate.'
+      tags:
+        - Current Endpoints
+      parameters:
+        - name: severity
+          in: path
+          description: 'Used to obtain all advisories that have a specific security impact rating'
+          required: true
+          schema:
+            type: string
+            enum: ["critical", "high", "medium", "low", "informational"]
+        - name: startDate
+          in: query
+          description: Format example Year-Month-Day 2022-05-12
+          required: true
+          schema:
+            type: string
+            format: string
+            pattern: ^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: string
+            pattern: ^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$
+        - name: summaryDetails
+          in: query
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query 
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+        - name: pageIndex
+          in: query
+          description: 'The pageIndex field is an integer representing the current page index out of total number of pages'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: pageSize
+          in: query
+          description: 'The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+                
+        '404':
+          description: No advisories by a given severity are found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_NO_DATA_FOUND'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_NO_DATA_FOUND'
+
+        '406':
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/errorCode_INVALID_PAGEINDEX'
+                  - $ref: '#/components/schemas/errorCode_MIN_PAGESIZE'
+                  - $ref: '#/components/schemas/errorCode_INVALID_DATE_FORMAT'
+                  - $ref: '#/components/schemas/errorCode_INVALID_SEVERITY'
+                  - $ref: '#/components/schemas/errorCode_START_DATE_AND_END_DATE_MANDATORY'        
+
+            application/xml:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/errorCode_INVALID_PAGEINDEX'
+                  - $ref: '#/components/schemas/errorCode_MIN_PAGESIZE'
+                  - $ref: '#/components/schemas/errorCode_INVALID_DATE_FORMAT'
+                  - $ref: '#/components/schemas/errorCode_INVALID_SEVERITY'
+                  - $ref: '#/components/schemas/errorCode_START_DATE_AND_END_DATE_MANDATORY' 
+         
+  /severity/{severity}/lastpublished:
+    get:
+      description: 'Used to obtain all security advisories for a given security impact rating (critical, high, medium, low or informational) and additionally filter based of lastpublished start date and enddate.'
+      tags:
+        - Current Endpoints
+      parameters:
+        - name: severity
+          in: path
+          description: 'Used to obtain all advisories that have a specific security impact rating'
+          required: true
+          schema:
+            type: string
+            enum: ["critical", "high", "medium", "low", "informational"]
+        - name: startDate
+          in: query
+          description: Format example Year-Month-Day 2022-05-12
+          required: true
+          schema:
+            type: string
+            format: string
+            pattern: ^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$
+        - name: endDate
+          in: query
+          description: Format example Year-Month-Day 2022-05-12
+          required: true
+          schema:
+            type: string
+            format: string
+            pattern: ^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$
+        - name: summaryDetails
+          in: query
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query 
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+        - name: pageIndex
+          in: query
+          description: 'The pageIndex field is an integer representing the current page index out of total number of pages'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: pageSize
+          in: query
+          description: 'The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+                
+        '404':
+          description: No advisories by a given severity are found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_NO_DATA_FOUND'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_NO_DATA_FOUND'
+
+        '406':
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/errorCode_INVALID_PAGEINDEX'
+                  - $ref: '#/components/schemas/errorCode_MIN_PAGESIZE'
+                  - $ref: '#/components/schemas/errorCode_INVALID_DATE_FORMAT'
+                  - $ref: '#/components/schemas/errorCode_INVALID_SEVERITY'
+                  - $ref: '#/components/schemas/errorCode_START_DATE_AND_END_DATE_MANDATORY'        
+
+            application/xml:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/errorCode_INVALID_PAGEINDEX'
+                  - $ref: '#/components/schemas/errorCode_MIN_PAGESIZE'
+                  - $ref: '#/components/schemas/errorCode_INVALID_DATE_FORMAT'
+                  - $ref: '#/components/schemas/errorCode_INVALID_SEVERITY'
+                  - $ref: '#/components/schemas/errorCode_START_DATE_AND_END_DATE_MANDATORY' 
+  
+ 
+  /product:
+    get:
+      description: 'Used to obtain all the advisories that affects the given product name.'
+      tags:
+        - Current Endpoints
+      parameters:
+        - name: product
+          in: query
+          description: An product name to obtain security advisories that matches given product name.
+          required: true
+          schema:
+            type: string
+            format: string
+        - name: summaryDetails
+          in: query
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+        - name: pageIndex
+          in: query
+          description: 'The pageIndex field is an integer representing the current page index out of total number of pages'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: pageSize
+          in: query
+          description: 'The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      security:
+        - psirt_openvuln_api_auth:
+          - 'read:advisories'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+                
+        '404':
+          description: No advisories found matching product name.  To check product names use https://tools.cisco.com/security/center/productBoxData.x?prodType=CISCO
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_PRODUCT_NOT_FOUND'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_PRODUCT_NOT_FOUND'
+                
+        '406':
+          description: Invalid page index or size used
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_INVALID_PRODUCT_NAME_FORMAT'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_INVALID_PRODUCT_NAME_FORMAT'
+      
+  /year/{year}:
+    get:
+      description: 'Used to obtain all security advisories that have were originally published in a specific year `YYYY`.'
+      tags:
+        - Current Endpoints
+      parameters:
+        - name: year
+          in: path
+          description: The four digit year.
+          required: true
+          schema:
+            type: string
+            format: YYYY
+        - name: summaryDetails
+          in: query
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+        - name: pageIndex
+          in: query
+          description: 'The pageIndex field is an integer representing the current page index out of total number of pages'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: pageSize
+          in: query
+          description: 'The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Advisories'
+                
+        '404':
+          description: No advisories are found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_NO_DATA_FOUND'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_NO_DATA_FOUND'
+                
+        '406':
+          description: Invalid year, page index or size used.  Year should be in range 1995 to current year
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_INVALID_YEAR'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_INVALID_YEAR'
+                
+                
+  /OSType/{OSType}:
+    get:
+      summary: (Only works with v2 basepath)
+      description: 'Used to obtain all advisories that affects the given network operating system version.'
+      tags:
+        - Current Endpoints
+      parameters:
+        - in: path
+          name: OSType
+          description: 'Network Operating System requested'
+          required: true
+          schema:
+            $ref: '#/components/schemas/OSTypes'      
+        - in: query
+          name: version
+          description: 'Network Operating System version to obtain security advisories'
+          required: false
+          schema:
+            type: string
+            format: string
+        - in: query
+          name: platformAlias
+          description: 'The Platform Alias to query by (Used only for nxos, asa, ftd and fxos)'
+          required: false
+          schema:
+            $ref: '#/components/schemas/PlatformAliases'
+          explode: false
+        - in: query 
+          name: advisoryId
+          description: Enter advisory ID for individual advisory.
+          required: false
+          schema:
+            type: string
+            format: cisco-sa-XXX
+        - in: query
+          name: summaryDetails
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: productNames
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: pageIndex
+          description: 'The pageIndex field is an integer representing the current page index out of total number of pages'
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          description: 'The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.'
+          required: false
+          schema:
+            type: integer
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Advisories'
+                  - $ref: '#/components/schemas/AdvisoriesErrors'   
+
+            application/xml:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Advisories'
+                  - $ref: '#/components/schemas/AdvisoriesErrors'
+
+        '404':
+          description: No data found
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/errorCode_VERSION_ID_IS_MANDATORY'
+                  - $ref: '#/components/schemas/errorCode_NO_DATA_FOUND'
+                  - $ref: '#/components/schemas/errorCode_ADVISORYID_NOT_FOUND'
+       
+            application/xml:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/errorCode_VERSION_ID_IS_MANDATORY'
+                  - $ref: '#/components/schemas/errorCode_NO_DATA_FOUND'
+                  - $ref: '#/components/schemas/errorCode_ADVISORYID_NOT_FOUND'
+  
+        '406':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                oneOf:
+                   - $ref: '#/components/schemas/errorCode_INVALID_PAGEINDEX'
+                   - $ref: '#/components/schemas/errorCode_MIN_PAGESIZE'
+                   - $ref: '#/components/schemas/errorCode_INVALID_DATE_FORMAT'
+                   - $ref: '#/components/schemas/errorCode_INVALID_SEVERITY'
+                   - $ref: '#/components/schemas/errorCode_START_DATE_AND_END_DATE_MANDATORY'        
+            application/xml:
+              schema:
+                oneOf:
+                   - $ref: '#/components/schemas/errorCode_INVALID_PAGEINDEX'
+                   - $ref: '#/components/schemas/errorCode_MIN_PAGESIZE'
+                   - $ref: '#/components/schemas/errorCode_INVALID_DATE_FORMAT'
+                   - $ref: '#/components/schemas/errorCode_INVALID_SEVERITY'
+                   - $ref: '#/components/schemas/errorCode_START_DATE_AND_END_DATE_MANDATORY' 
+          
+  /OS_version/OS_data:
+    get:
+      summary: (Only works with v2 basepath)
+      description: 'To obtain version information regarding the different Network Operating Systems'
+      tags:
+        - Current Endpoints
+      parameters:
+        - name: OSType
+          in: query
+          description: 'The type of Network Operating System to Query'
+          required: true
+          schema:
+            $ref: '#/components/schemas/OSTypes'
+          explode: false
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/OSData'
+            
+            application/xml:
+              schema:
+                  $ref: '#/components/schemas/OSData'
+
+        '404':
+          description: OSType not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_OS_TYPE_NOT_FOUND'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_OS_TYPE_NOT_FOUND'
+                
+        '406':
+          description: Invalid OS Type presented.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_INVALID_OS_TYPE'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_INVALID_OS_TYPE'
+                
+  /platforms:
+    get:
+      description: 'To obtain the platform types for the networking operating system.'
+      tags:
+        - Current Endpoints
+      parameters:
+        - name: OSType
+          in: query
+          description: '(Use with v2 basepath)'
+          required: false
+          schema:
+            $ref: '#/components/schemas/OSTypesPlatforms'
+          explode: false
+        - name: nos_type
+          in: query
+          description: '(Use with "security/advisories" basepath.  This is a sunsetting parameter)'
+          required: false
+          schema:
+            type: string
+            enum:
+              - nxOS
+            format: enum
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/PlatformData'
+            application/xml:
+              schema:
+                  $ref: '#/components/schemas/PlatformData'
+        '404':
+          description: OSType not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_OS_TYPE_NOT_FOUND'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_OS_TYPE_NOT_FOUND'
+                
+        '406':
+          description: Invalid OS Type presented.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorCode_INVALID_OS_TYPE'
+
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/errorCode_INVALID_OS_TYPE'
+                
+  /ios:
+    get:
+      description: 'Used to obtain all advisories that affects the given ios version.'
+      tags:
+        - Sunset Endpoints
+      parameters:
+        - in: query
+          name: version
+          description: IOS version to obtain security advisories
+          required: true
+          schema:
+            type: string
+            format: string
+        - in: query
+          name: advisoryId
+          description: Enter advisory ID for individual advisory.
+          required: false
+          schema:
+            type: string
+            format: cisco-sa-XXX
+        - in: query
+          name: summaryDetails
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: productNames
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: pageIndex
+          description: 'The pageIndex field is an integer representing the current page index out of total number of pages'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - in: query
+          name: pageSize
+          description: 'The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      security:
+        - psirt_openvuln_api_auth:
+          - 'read:advisories'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Advisories'
+                  - $ref: '#/components/schemas/AdvisoriesErrors'   
+
+            application/xml:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Advisories'
+                  - $ref: '#/components/schemas/AdvisoriesErrors'   
+
+  /iosxe:
+    get:
+      description: 'Used to obtain all advisories that affects the given ios-xe version.'
+      tags:
+        - Sunset Endpoints
+      parameters:
+        - in: query
+          name: version
+          description: IOS-XE version to obtain security advisories
+          required: true
+          schema:
+            type: string
+            format: string
+        - in: query 
+          name: advisoryId
+          description: Enter advisory ID for individual advisory.
+          required: false
+          schema:
+            type: string
+            format: cisco-sa-XXX
+        - in: query
+          name: summaryDetails
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: productNames
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: pageIndex
+          description: 'The pageIndex field is an integer representing the current page index out of total number of pages'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - in: query
+          name: pageSize
+          description: 'The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      security:
+        - psirt_openvuln_api_auth:
+          - 'read:advisories'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Advisories'
+                  - $ref: '#/components/schemas/AdvisoriesErrors'   
+
+
+            application/xml:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Advisories'
+                  - $ref: '#/components/schemas/AdvisoriesErrors'   
+         
+  /aci:
+    get:
+      description: 'Used to obtain all advisories that affects the given aci version.'
+      tags:
+        - Sunset Endpoints
+      parameters:
+        - in: query
+          name: version
+          description: 'ACI version to obtain security advisories'
+          required: true
+          schema:
+            type: string
+            format: string
+        - in: query 
+          name: advisoryId
+          description: Enter advisory ID for individual advisory.
+          required: false
+          schema:
+            type: string
+            format: cisco-sa-XXX
+        - in: query
+          name: summaryDetails
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: productNames
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: pageIndex
+          description: 'The pageIndex field is an integer representing the current page index out of total number of pages'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - in: query
+          name: pageSize
+          description: 'The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Advisories'
+                  - $ref: '#/components/schemas/AdvisoriesErrors'   
+
+            application/xml:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Advisories'
+                  - $ref: '#/components/schemas/AdvisoriesErrors'   
+
+          
+  /nxos:
+    get:
+      description: 'Used to obtain all advisories that affects the given nxos version.'
+      tags:
+        - Sunset Endpoints
+      parameters:
+        - in: query
+          name: version
+          description: 'NXOS version to obtain security advisories'
+          required: true
+          schema:
+            type: string
+            format: string
+        - in: query
+          name: platformAlias
+          description: 'The Platform Alias to query by'
+          required: false
+          schema:
+            $ref: '#/components/schemas/PlatformAliases'
+          explode: false
+        - in: query 
+          name: advisoryId
+          description: Enter advisory ID for individual advisory.
+          required: false
+          schema:
+            type: string
+            format: cisco-sa-XXX
+        - in: query
+          name: summaryDetails
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: productNames
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: pageIndex
+          description: 'The pageIndex field is an integer representing the current page index out of total number of pages'
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          description: 'The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.'
+          required: false
+          schema:
+            type: integer
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Advisories'
+                  - $ref: '#/components/schemas/AdvisoriesErrors'   
+
+            application/xml:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Advisories'
+                  - $ref: '#/components/schemas/AdvisoriesErrors'   
+
+  /nos_version/nos_data:
+    get:
+      description: 'To obtain version information regarding the different Network Operating Systems'
+      tags:
+        - Sunset Endpoints
+      parameters:
+        - name:  nos_type
+          in: query
+          description: 'The type of Network Operating System to Query'
+          required: true
+          schema:
+            $ref: '#/components/schemas/OSTypes'
+          explode: false
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/OSData'
+            
+            application/xml:
+              schema:
+                  $ref: '#/components/schemas/OSData'
+
+  /cvrf/advisory/{advisoryId}:
+    get:
+      description: 'Used to obtain an advisory given its advisory ID `advisoryId` (i.e., cisco-sa-20180221-ucdm)'
+      deprecated: true
+      tags:
+        - Obsolete Endpoints
+      parameters:
+        - name: advisoryId
+          in: path
+          description: Enter advisory ID.  Defaults to .json format, use advisoryId.xml if require xml format.
+          required: true
+          schema:
+            type: string
+            format: cisco-sa-XXX
+        - name: summaryDetails
+          in: query
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '410':
+          description: "Endpoint containing /cvrf/ is now obsolete."
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+            
+            application/xml:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+ 
+  /cvrf/all:
+    get:
+      description: 'Used to obtain information about all published security advisories.'
+      deprecated: true
+      tags:
+        - Obsolete Endpoints
+      parameters:
+        - name: summaryDetails
+          in: query
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+           type: boolean
+        - name:  lastpublished
+          in: query
+          description: Get Advisories by the lastpublished date with startDate=2022-05-12&endDate=2022-05-16
+          required: false
+          schema:
+            type: string
+        - name: productNames
+          in: query
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+           type: boolean
+        - name: pageIndex
+          in: query
+          description: 'The pageIndex field is an integer representing the current page index out of total number of pages'
+          required: false
+          schema:
+           type: integer
+           minimum: 1
+           maximum: 100
+        - name: pageSize
+          in: query
+          description: 'The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '410':
+          description: "Endpoint containing /cvrf/ is now obsolete."
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+            
+            application/xml:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+
+  /cvrf/all/firstpublished:
+    get:
+      description: Used to obtain information about all published security advisories first published within a date timeframe.
+      deprecated: true
+      tags:
+        - Obsolete Endpoints
+      parameters:
+        - name: summaryDetails
+          in: query
+          description: Include the Advisory Summary Description or not
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query
+          description: Include the ProductNames or not
+          required: false
+          schema:
+            type: boolean
+        - name: startDate
+          description: Format example Year-Month-Day 2022-05-12
+          in: query
+          required: true
+          schema:
+            type: string
+            format: string
+            pattern: ^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$
+        - name: endDate
+          in: query
+          description: Format example Year-Month-Day 2022-05-12
+          required: true
+          schema:
+            type: string
+            format: string
+            pattern: ^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$
+        - name: pageIndex
+          in: query
+          description: The pageIndex field is an integer representing the current page index out of total number of pages
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: pageSize
+          in: query
+          description: The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '410':
+          description: "Endpoint containing /cvrf/ is now obsolete."
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+            
+            application/xml:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+                  
+  /cvrf/all/lastpublished:
+    get:
+      description: Used to obtain information about all published security advisories last published within a date timeframe.
+      deprecated: true
+      tags:
+        - Obsolete Endpoints
+      parameters:
+        - name: summaryDetails
+          in: query
+          description: Include the Advisory Summary Description or not
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query
+          description: Include the ProductNames or not
+          required: false
+          schema:
+            type: boolean
+        - name: startDate
+          in: query
+          description: Format example Year-Month-Day 2022-05-12
+          required: true
+          schema:
+            type: string
+            format: string
+            pattern: ^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$
+        - name: endDate
+          in: query
+          description: Format example Year-Month-Day 2022-05-12
+          required: true
+          schema:
+            type: string
+            format: string
+            pattern: ^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$
+        - name: pageIndex
+          in: query
+          description: The pageIndex field is an integer representing the current page index out of total number of pages
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: pageSize
+          in: query
+          description: The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '410':
+          description: "Endpoint containing /cvrf/ is now obsolete."
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+            
+            application/xml:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+                  
+  /cvrf/cve/{cve_id}:
+    get:
+      description: 'Used to obtain an advisory using a given Common Vulnerability Enumerator (CVE). The `cve_id` format is CVE-YYYY-NNNN. For more information about CVE visit http://cve.mitre.org/'
+      deprecated: true
+      tags:
+        - Obsolete Endpoints
+      parameters:
+        - name: cve_id
+          in: path
+          description: 'CVE Identifier (i.e., CVE-YYYY-NNNN)'
+          required: true
+          schema:
+            type: string
+            format: CVE-YYYY-NNNN
+        - name: summaryDetails
+          in: query
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '410':
+          description: "Endpoint containing /cvrf/ is now obsolete."
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+            
+            application/xml:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+                  
+  /cvrf/product:
+    get:
+      description: 'Used to obtain all the advisories that affects the given product name.'
+      deprecated: true
+      tags:
+        - Obsolete Endpoints
+      parameters:
+        - name: product
+          in: query
+          description: An product name to obtain security advisories that matches given product name.
+          required: true
+          schema:
+            type: string
+            format: string
+        - name: summaryDetails
+          in: query
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+        - name: pageIndex
+          in: query
+          description: 'The pageIndex field is an integer representing the current page index out of total number of pages'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: pageSize
+          in: query
+          description: 'The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '410':
+          description: "Endpoint containing /cvrf/ is now obsolete."
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+            
+            application/xml:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+                  
+  /cvrf/severity/{severity}:
+    get:
+      description: 'Used to obtain all security advisories for a given security impact rating (critical, high, medium, low or informational)'
+      deprecated: true
+      tags:
+        - Obsolete Endpoints
+      parameters:
+        - name: severity
+          in: path
+          description: 'Critical, High, Medium, Low or informational'
+          required: true
+          schema:
+            type: string
+            enum: ["critical", "high", "medium", "low", "informational"]
+        - name: summaryDetails
+          in: query
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+        - name: pageIndex
+          in: query
+          description: 'The pageIndex field is an integer representing the current page index out of total number of pages'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: pageSize
+          in: query
+          description: 'The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '410':
+          description: "Endpoint containing /cvrf/ is now obsolete."
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+            
+            application/xml:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+                  
+  /cvrf/severity/{severity}/lastpublished:
+    get:
+      description: 'Used to obtain all security advisories for a given security impact rating (critical, high, medium, low or informational) and additionally filter based of lastpublished start date and enddate.'
+      deprecated: true
+      tags:
+        - Obsolete Endpoints
+      parameters:
+        - name: severity
+          in: path
+          description: 'Used to obtain all advisories that have a specific security impact rating'
+          required: true
+          schema:
+            type: string
+            enum: ["critical", "high", "medium", "low", "informational"]
+        - name: startDate
+          in: query
+          description: Format example Year-Month-Day 2022-05-12
+          required: true
+          schema:
+            type: string
+            format: string
+            pattern: ^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$
+        - name: endDate
+          in: query
+          description: Format example Year-Month-Day 2022-05-12
+          required: true
+          schema:
+            type: string
+            format: string
+            pattern: ^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$
+        - name: summaryDetails
+          in: query
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+        - name: pageIndex
+          in: query
+          description: 'The pageIndex field is an integer representing the current page index out of total number of pages'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: pageSize
+          in: query
+          description: 'The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '410':
+          description: "Endpoint containing /cvrf/ is now obsolete."
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+            
+            application/xml:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+                  
+  /cvrf/severity/{severity}/firstpublished:
+    get:
+      description: 'Used to obtain all security advisories for a given security impact rating (critical, high, medium, low or informational) and additionally filter based of firstpublished start date and enddate.'
+      deprecated: true
+      tags:
+        - Obsolete Endpoints
+      parameters:
+        - name: severity
+          in: path
+          description: 'Used to obtain all advisories that have a specific security impact rating'
+          required: true
+          schema:
+            type: string
+            enum: ["critical", "high", "medium", "low", "informational"]
+        - name: startDate
+          in: query
+          description: Format example Year-Month-Day 2022-05-12
+          required: true
+          schema:
+            type: string
+            format: string
+            pattern: ^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: string
+            pattern: ^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$
+        - name: summaryDetails
+          in: query
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+        - name: pageIndex
+          in: query
+          description: 'The pageIndex field is an integer representing the current page index out of total number of pages'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: pageSize
+          in: query
+          description: 'The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '410':
+          description: "Endpoint containing /cvrf/ is now obsolete."
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+            
+            application/xml:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+                  
+  /cvrf/year/{year}:
+    get:
+      description: 'Used to obtain all security advisories that have were originally published in a specific year `YYYY`.'
+      deprecated: true
+      tags:
+        - Obsolete Endpoints
+      parameters:
+        - name: year
+          in: path
+          description: The four digit year.
+          required: true
+          schema:
+            type: string
+            format: YYYY
+        - name: summaryDetails
+          in: query
+          description: 'Include the Advisory Summary Description or not'
+          required: false
+          schema:
+            type: boolean
+        - name: productNames
+          in: query
+          description: 'Include the ProductNames or not'
+          required: false
+          schema:
+            type: boolean
+        - name: pageIndex
+          in: query
+          description: 'The pageIndex field is an integer representing the current page index out of total number of pages'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: pageSize
+          in: query
+          description: 'The pageSize field is an integer representing the maximum number of items requested by the client for the current page. The maximum pageSize limit is 100.'
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      security:
+       - psirt_openvuln_api_auth:
+           - 'read:advisories'
+      responses:
+        '410':
+          description: "Endpoint containing /cvrf/ is now obsolete."
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+            
+            application/xml:
+              schema:
+                  $ref: '#/components/schemas/EndofLife'
+                  
+components:
+  securitySchemes:
+    psirt_openvuln_api_auth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  schemas:
+    Advisories:
+      description: Successful pull of advisory information
+      properties:
+            advisoryId:
+              type: string
+              example: cisco-sa-lsplus-Z6AQEOjk
+            advisoryTitle:
+              type: string
+              example: Cisco IOS XR Software for ASR 9000 Series Routers Lightspeed-Plus Line Cards Denial of Service Vulnerability
+            bugIDs:
+              type: string
+              example: CSCvy48962
+            ipsSignatures:
+              type: string
+              example: NA
+            cves:
+              type: string
+              example: CVE-2022-20714
+            cvrfUrl:
+              type: string
+              example: https://tools.cisco.com/security/center/contentxml/CiscoSecurityAdvisory/cisco-sa-lsplus-Z6AQEOjk/cvrf/cisco-sa-lsplus-Z6AQEOjk_cvrf.xml
+            csafUrl:
+              type: string
+              example: https://tools.cisco.com/security/center/contentjson/CiscoSecurityAdvisory/cisco-sa-lsplus-Z6AQEOjk/csaf/cisco-sa-lsplus-Z6AQEOjk_csaf.json
+            cvssBaseScore:
+              type: number
+              example: 8.6
+            cwe:
+              type: string
+              example: CWE-12
+            firstPublished:
+              type: string
+              format: date-time
+              example: "2022-04-13T23:00:00"
+            lastUpdated:
+              type: string
+              format: date-time
+              example: "2022-04-29T04:28:53"                   
+            status:
+              type: string
+              example: Final
+            version:
+              type: number
+              example: 1.1
+            productNames:
+              type: string
+              example: Cisco IOS XR Software
+            publicationUrl:
+              type: string
+              example: https://tools.cisco.com/security/center/content/CiscoSecurityAdvisory/cisco-sa-lsplus-Z6AQEOjk
+            sir:
+              type: string
+              example: High
+            summary:
+              type: string
+              example: \r\n<p>A vulnerability in the data plane microcode of Lightspeed-Plus line cards for <span class=\"mce-annotation tox-comment\" data-mce-annotation-uid=\"CONV-0005559\" data-mce-annotation=\"tinycomments\">Cisco&nbsp;ASR 9000 Series Aggregation Services Routers</span>,&nbsp;ASR 9902 Compact High-Performance Routers, and ASR 9903 Compact High-Performance Routers could allow an unauthenticated, remote attacker to cause the line card to reset.</p>...
+    AdvisoriesErrors:
+      description: Data Query informs of data information.  Use endpoint /OS_version/OS_data to retrive valid OS versions.
+      properties:
+        errorCode:
+          type: string
+          example: NO_IOS_AFFECTING_ADVISORIES_FOUND; INVALID_IOS_VERSION
+        errorMessage:
+          type: string
+          example: No Cisco Security Advisories affect the Cisco IOS Software release; IOS version not found
+    
+    OSData:
+      description: Data Query informs of version and platform information.
+      properties:
+        nos_type:
+          type: string
+          example: NXOS
+        nos_version:
+          type: string
+          example: 7.0(3)F1(1)
+        platform_name:
+          type: string
+          example: Cisco Nexus 9000 Series Switches (Returned for - nxos)
+
+    PlatformData:
+      description: Data Query informs of platform aliases for a given OS.
+      properties:
+        platformAlias:
+          type: string
+          example: MDS9000
+        id:
+          type: integer
+          example: 265086
+        name:
+          type: string
+          example: Cisco MDS 9000 Multilayer Directors and Fabric Switches
+
+    EndofLife:
+      description: And End of Life endpoint.  Migrate your code to latest API endpoint.
+      properties:
+        errorCode:
+          type: string
+          example: URI_NOT_AVAILABLE
+        errorMessage:
+          type: string
+          example: URI_CONTAINING(/CVRF/)_IS_NO_LONGER_AVAILABLE
+
+    OSTypes:
+     description: List of supported Network Operating Systems
+     type: array
+     items:
+        type: string
+        enum: ["aci","ios","iosxe","nxos", "asa", "ftd", "fmc", "fxos"]
+        
+    OSTypesPlatforms:
+     description: List of supported Network Operating Systems which support Platforms
+     type: array
+     items:
+        type: string
+        enum: ["asa", "ftd", "fxos","nxos"]
+     
+    PlatformAliases:
+     description: List of supported Platform Aliases
+     type: array
+     items:
+        type: string
+        enum: ["ASA5500", "ASA5500X", "ASASM", "ASAV", "FPR1000", "FPR2100", "FPR4100", "FPR9000", "FPRNGFW", "FWL3100", "ISA3000", "MDS9000", "NEXUS1000V", "NEXUS3000", "NEXUS5000", "NEXUS6000", "NEXUS7000", "NEXUS9000"]
+        
+    errorCode_INVALID_PAGEINDEX:
+      description: Error Code and Message for INVALID_PAGEINDEX
+      properties:
+        errorCode:
+          type: string
+          example: INVALID_PAGEINDEX
+        errorMessage:
+          type: string
+          example: Incorrect page index value     
+ 
+    errorCode_INVALID_PAGEINDEX_LONG:
+      description: Error Code and Message for INVALID_PAGEINDEX , MIN_PAGESIZE , MAX_PAGESIZE
+      properties:
+        errorCode:
+          type: string
+          example: INVALID_PAGEINDEX , MIN_PAGESIZE , MAX_PAGESIZE
+        errorMessage:
+          type: string
+          example: Incorrect page index value and Minimum page size value = 1 and Maximum page size = 100   
+          
+    errorCode_MIN_PAGESIZE:
+      description: Error Code and Message for MIN_PAGESIZE , MAX_PAGESIZE
+      properties:
+        errorCode:
+          type: string
+          example: MIN_PAGESIZE , MAX_PAGESIZE
+        errorMessage:
+          type: string
+          example: Minimum page size value = 1 and Maximum page size = 100
+  
+    errorCode_INVALID_DATE_FORMAT:
+      description: Error Code and Message for INVALID_DATE_FORMAT
+      properties:
+        errorCode:
+          type: string
+          example: INVALID_DATE_FORMAT
+        errorMessage:
+          type: string
+          example: Invalid date format, please enter date in yyyy-mm-dd format
+          
+    errorCode_START_DATE_GREATER:
+      description: Error Code and Message for START_DATE_GREATER
+      properties:
+        errorCode:
+          type: string
+          example: START_DATE_GREATER
+        errorMessage:
+          type: string
+          example: Start date should not be greater than end date
+
+    errorCode_START_DATE_AND_END_DATE_MANDATORY:
+      description: Error Code and Message for START_DATE_AND_END_DATE_MANDATORY
+      properties:
+        errorCode:
+          type: string
+          example: START_DATE_AND_END_DATE_MANDATORY
+        errorMessage:
+          type: string
+          example: Start Date and End Date are mandatory
+          
+    errorCode_NO_DATA_FOUND:
+      description: Error Code and Message for NO_DATA_FOUND
+      properties:
+        errorCode:
+          type: string
+          example: NO_DATA_FOUND
+        errorMessage:
+          type: string
+          example: No data found
+ 
+    errorCode_NO_DATA_FOUND_CVE:
+      description: Error Code and Message for NO_DATA_FOUND_CVE
+      properties:
+        errorCode:
+          type: string
+          example: NO_DATA_FOUND
+        errorMessage:
+          type: string
+          example: CVE_ID not found
+          
+    errorCode_ADVISORYID_NOT_FOUND:
+      description: Error Code and Message for ADVISORYID_NOT_FOUND
+      properties:
+        errorCode:
+          type: string
+          example: ADVISORYID_NOT_FOUND
+        errorMessage:
+          type: string
+          example: Advisory-id not found
+  
+    errorCode_INVALID_EXTENSION:
+      description: Error Code and Message for INVALID_EXTENSION
+      properties:
+        errorCode:
+          type: string
+          example: INVALID_EXTENSION
+        errorMessage:
+          type: string
+          example: Not supported extension type. Supported extension types are .json and .xml
+          
+    errorCode_INVALID_ADV_COUNT:
+      description: Error Code and Message for INVALID_ADV_COUNT
+      properties:
+        errorCode:
+          type: string
+          example: INVALID_ADV_COUNT
+        errorMessage:
+          type: string
+          example: Invalid advisories count
+          
+    errorCode_INVALID_SEVERITY:
+      description: Error Code and Message for INVALID_SEVERITY
+      properties:
+        errorCode:
+          type: string
+          example: INVALID_SEVERITY
+        errorMessage:
+          type: string
+          example: Invalid Severity. Supported severities are critical, high, medium, low and informational
+          
+    errorCode_PRODUCT_NOT_FOUND:
+      description: Error Code and Message for PRODUCT_NOT_FOUND
+      properties:
+        errorCode:
+          type: string
+          example: PRODUCT_NOT_FOUND
+        errorMessage:
+          type: string
+          example: Product not found
+
+    errorCode_INVALID_PRODUCT_NAME_FORMAT:
+      description: Error Code and Message for INVALID_PRODUCT_NAME_FORMAT
+      properties:
+        errorCode:
+          type: string
+          example: INVALID_PRODUCT_NAME_FORMAT
+        errorMessage:
+          type: string
+          example: "Invalid product name format, Special characters are not allowed (&,!,$,',@,#,!,<,?). Valid example's e.g 'cisco' ,'cisco_xe' ,'cisco-xe*' etc"
+          
+    errorCode_INVALID_YEAR:
+      description: Error Code and Message for INVALID_YEAR
+      properties:
+        errorCode:
+          type: string
+          example: INVALID_YEAR
+        errorMessage:
+          type: string
+          example: Year should be in range 1995 to current year
+          
+    errorCode_VERSION_ID_IS_MANDATORY:
+      description: Error Code and Message for VERSION_ID_IS_MANDATORY
+      properties:
+        errorCode:
+          type: string
+          example: VERSION_ID_IS_MANDATORY
+        errorMessage:
+          type: string
+          example: Version ID is mandatory
+          
+    errorCode_OS_TYPE_NOT_FOUND:
+      description: Error Code and Message for OS_TYPE_NOT_FOUND
+      properties:
+        errorCode:
+          type: string
+          example: OS_TYPE_NOT_FOUND
+        errorMessage:
+          type: string
+          example: OS Type is mandatory
+          
+    errorCode_INVALID_OS_TYPE:
+      description: Error Code and Message for INVALID_OS_TYPE
+      properties:
+        errorCode:
+          type: string
+          example: INVALID_OS_TYPE
+        errorMessage:
+          type: string
+          example: OS Type is Invalid
