@@ -1,51 +1,11 @@
 openapi: "3.0.3"
 info:
-  version: 2.0.1
+  version: 2.0.2
   title: 'Cisco PSIRT openVuln API'
   description: |
     The Cisco Product Security Incident Response Team (PSIRT) openVuln API is a RESTful API that allows customers to obtain Cisco Security Vulnerability information in different machine-consumable formats. APIs are important for customers because they allow their technical staff and programmers to build tools that help them do their job more effectively (in this case, to keep up with security vulnerability information).
     For more information about the Cisco PSIRT openVuln API visit https://developer.cisco.com/psirt/
     For detail steps on how to use the API go to: https://developer.cisco.com/docs/psirt/
-
-    This is a beta release of a OpenAPI YAML for the Cisco PSIRT openVuln API
-
-    To access the API sign in with your Cisco CCO account at http://apiconsole.cisco.com and register an application to receive a client_id and a client_secret
-
-    You can then get your token using curl or any other method you prefer:
-
-    1: Using curl:
-
-    'curl -s -k -H "Content-Type: application/x-www-form-urlencoded" -X POST -d "client_id=<your_client_id>" -d "client_secret=<your_client_secret>" -d "grant_type=client_credentials" https://cloudsso.cisco.com/as/token.oauth2'
-
-    You will receive an access token as demonstrated in the following example:
-     '{"access_token":"I7omWtBDAieSiUX3shOxNJfuy4J6","token_type":"Bearer","expires_in":3599}'
-
-    2: Using PostMan:
-       First time:
-
-       Within PostMan:
-       In "Authorization":
-       : Type: OAuth 2.0
-       : Add Authorization Data to: Request Headers
-
-       "Configure New Token" Pane:
-       * Token Name: OpenVulnAPI
-       * Grant Type: Client Credentials
-       * Access Token URL: https://cloudsso.cisco.com/as/token.oauth2
-       * Client ID: <your_client_id>
-       * Client Secret: <your_client_secret>
-       * Scope: Can leave blank
-       * Client Authentication: Send as Basic Auth header
-   
-       When need to use; click on "Get New Access Token".
-
-    3: Using any script you have to pull the token:
-       See https://github.com/CiscoPSIRT/openVulnAPI/tree/master/example_code
-
-    Once you have your token via either method above; in Swagger, click on "Authorize"
-
-    enter the text "I7omWtBDAieSiUX3shOxNJfuy4J6" (which is the token you received)
-    then click on "Authorize"
 
   termsOfService: https://github.com/CiscoPSIRT/openVulnAPI/blob/master/LICENSE.md
   
@@ -56,7 +16,16 @@ info:
 
 servers:  
   - url: https://api.cisco.com/{basePath}
-    description: "OpenVuln API"
+    description: "OpenVuln API - Applications created prior March 1, 2023; expires Sep 30, 2023"  #See https://raw.githubusercontent.com/api-at-cisco/Images/master/Whats_New_Doc.pdf
+    variables:
+      basePath: 
+        default: "security/advisories/v2"
+        enum: 
+          - "security/advisories"     #Original version of OpenVuln API
+          - "security/advisories/v2"  #Version 2.0 of OpenVuln API
+
+  - url: https://apix.cisco.com/{basePath}
+    description: "OpenVuln API - Applications created post March 1, 2023" #See https://raw.githubusercontent.com/api-at-cisco/Images/master/Whats_New_Doc.pdf
     variables:
       basePath: 
         default: "security/advisories/v2"
